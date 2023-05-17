@@ -12,15 +12,11 @@ export class UserWorkspace {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Workspace, (workspace) => workspace.users, {
-    cascade: ['soft-remove'],
-  })
-  workspaceId: Workspace;
+  @ManyToOne(() => Workspace, (workspace) => workspace.users)
+  workspace: Workspace;
 
-  @ManyToOne(() => User, (user) => user.workspaces, {
-    cascade: ['soft-remove'],
-  })
-  userId: User;
+  /* @ManyToOne(() => User, (user) => user.workspaces)
+  user: User; */
 
   @CreateDateColumn()
   created_at: Date;

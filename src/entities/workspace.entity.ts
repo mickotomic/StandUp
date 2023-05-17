@@ -15,18 +15,19 @@ export class Workspace {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => UserWorkspace, (userWokrspace) => userWokrspace.workspaceId)
+  @OneToMany(() => UserWorkspace, (userWokrspace) => userWokrspace.workspace)
   users: UserWorkspace[];
 
-  @ManyToOne(() => User, (user) => user.ownedWorkspaces, {
-    cascade: ['soft-remove'],
-  })
-  ownerId: User;
+  /* @ManyToOne(() => User, (user) => user.ownedWorkspaces)
+  owner: User;
 
-  @OneToMany(() => Task, (task) => task.workspaceId)
+  @OneToMany(() => Task, (task) => task.workspace)
   tasks: Task[];
 
-  @Column({ type: 'string' })
+  @OneToMany(() => Summary, (summary) => summary.workspace)
+  summaries: Summary[]; */
+
+  @Column({ type: 'varchar' })
   projectName: string;
 
   @Column({ type: 'json' })
