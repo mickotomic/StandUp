@@ -23,6 +23,9 @@ export class Workspace {
   })
   ownerId: User;
 
+  @OneToMany(() => Task, (task) => task.workspaceId)
+  tasks: Task[];
+
   @Column({ type: 'string' })
   projectName: string;
 
