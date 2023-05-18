@@ -27,6 +27,8 @@ export class Summary {
   @Column()
   workspaceId: number;
 
+  //relacija sa workspace
+
   @Column()
   tasksCompleted: number;
 
