@@ -21,7 +21,7 @@ export class Workspace {
   @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.workspace)
   users: UserWorkspace[];
 
-  @ManyToOne(() => User, (user) => user.ownerWorkskpaces)
+  @ManyToOne(() => User, (user) => user.ownerWorkspaces)
   owner: User;
 
   @OneToMany(() => Task, (task) => task.workspace)

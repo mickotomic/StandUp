@@ -17,7 +17,7 @@ export class User {
   id: number;
 
   @OneToMany(() => Workspace, (workspace) => workspace.owner)
-  ownerWorkskpaces: Workspace[];
+  ownerWorkspaces: Workspace[];
 
   @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.user)
   workspaces: UserWorkspace[];
