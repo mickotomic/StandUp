@@ -9,6 +9,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserWorkspace } from './user-workspace.entity';
+import { Task } from './task.entity';
+import { Summary } from './summary.entity';
 import { User } from './user.entity';
 
 @Entity({ name: 'workspaces' })
@@ -19,14 +21,14 @@ export class Workspace {
   @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.workspace)
   users: UserWorkspace[];
 
-   @ManyToOne(() => User, (user) => user.ownerWorskpaces)
+  @ManyToOne(() => User, (user) => user.ownerWorkspaces)
   owner: User;
 
-  //@OneToMany(() => Task, (task) => task.workspace)
-  //tasks: Task[];
+  @OneToMany(() => Task, (task) => task.workspace)
+  tasks: Task[];
 
-  //@OneToMany(() => Summary, (summary) => summary.workspace)
-  //summaries: Summary[]; */
+  @OneToMany(() => Summary, (summary) => summary.workspace)
+  summaries: Summary[];
 
   @Column({ type: 'varchar' })
   projectName: string;
