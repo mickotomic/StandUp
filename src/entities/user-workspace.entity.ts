@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Workspace } from './workspace.entity';
+import { User } from './user.entity';
 
 @Entity({ name: 'users_workspaces' })
 export class UserWorkspace {
@@ -15,8 +16,8 @@ export class UserWorkspace {
   @ManyToOne(() => Workspace, (workspace) => workspace.users)
   workspace: Workspace;
 
-  /* @ManyToOne(() => User, (user) => user.workspaces)
-  user: User; */
+   @ManyToOne(() => User, (user) => user.workspaces)
+  user: User; 
 
   @CreateDateColumn()
   createdAt: Date;
