@@ -1,41 +1,44 @@
-import { 
-    Column, 
-    Entity, 
-    ManyToOne, 
-    PrimaryGeneratedColumn 
-} from "typeorm";
-@import { Workspace } from './workspace.entity';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Workspace } from './workspace.entity';
+import { User } from './user.entity';
 
-
-@Entity({ name: 'tasks'})
+@Entity({ name: 'tasks' })
 export class Task {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @ManyToOne(() => User, (user) => user.tasks)
-    user: User;
+  @ManyToOne(() => User, (user) => user.tasks)
+  user: User;
 
-    @ManyToOne(() => Workspace, (workspace) => workspace.tasks)
-    workspace: Workspace;
+  @ManyToOne(() => Workspace, (workspace) => workspace.tasks)
+  workspace: Workspace;
 
-    @Column({ type: 'varchar' })
-    name: string;
+  @Column({ type: 'varchar' })
+  name: string;
 
-    @Column({ type: 'varchar' })
-    priority: string;
+  @Column({ type: 'varchar' })
+  priority: string;
 
-    @Column({ type: 'varchar' })
-    status: string;
+  @Column({ type: 'varchar' })
+  status: string;
 
-    @Column({ nullable: true})
-    deadline: Date;
+  @Column({ nullable: true })
+  deadline: Date;
 
-    @Column()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @Column()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
-    @Column()
-    deletedAt: Date;
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
