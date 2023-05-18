@@ -1,9 +1,14 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { 
+    Column, 
+    Entity, 
+    ManyToOne, 
+    PrimaryGeneratedColumn 
+} from "typeorm";
+@import { Workspace } from './workspace.entity';
 
 
-
-@Entity({ name: 'task'})
-@export class Task {
+@Entity({ name: 'tasks'})
+export class Task {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -22,7 +27,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
     @Column({ type: 'varchar' })
     status: string;
 
-    @Column()
+    @Column({ nullable: true})
     deadline: Date;
 
     @Column()
