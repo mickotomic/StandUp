@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'summary' })
+@Entity({ name: 'summaries' })
 export class Summary {
   @PrimaryGeneratedColumn()
   id: number;
@@ -34,10 +34,10 @@ export class Summary {
   tasksDue: number;
 
   @Column()
-  taskPastDue: number;
+  tasksPastDue: number;
 
   @Column()
-  atendees: string;
+  attendees: string;
 
   @Column()
   absentUsers: string;
