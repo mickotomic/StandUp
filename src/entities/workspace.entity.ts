@@ -15,7 +15,7 @@ export class Workspace {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => UserWorkspace, (userWokrspace) => userWokrspace.workspace)
+  @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.workspace)
   users: UserWorkspace[];
 
   /* @ManyToOne(() => User, (user) => user.ownedWorkspaces)

@@ -19,8 +19,8 @@ export class UserWorkspace {
   user: User; */
 
   @CreateDateColumn()
-  created_at: Date;
+  createdAt: Date;
 
   @DeleteDateColumn()
-  deleted_at: Date;
+  deletedAt: Date;
 }
