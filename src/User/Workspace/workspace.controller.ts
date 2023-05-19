@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entities/user.entity';
 
 import { WorkspaceService } from './workspace.service';
@@ -38,7 +38,11 @@ export class WorkspaceController {
   }
 
   @Get('/check/mail')
-  async checkDoesEmailExists(email: string) {
+  async checkDoesEmailExists(
+    @Query('email') email: string,
+    // @Query('token') token: string,
+    // @Query('workspaceId') workspaceId: number,
+  ) {
     return await this.workspaceService.checkDoesEmailExists(email);
   }
 }

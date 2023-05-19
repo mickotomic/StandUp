@@ -16,11 +16,11 @@ export class WorkspaceService {
   constructor(
     @InjectRepository(Workspace)
     private readonly workspaceRepository: Repository<Workspace>,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(UserToken)
     private readonly userTokenRepository: Repository<UserToken>,
     @InjectRepository(UserWorkspace)
     private readonly userWorkspaceRepository: Repository<UserWorkspace>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly mailerService: MailerService,
   ) {}
 
