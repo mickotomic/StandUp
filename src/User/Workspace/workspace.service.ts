@@ -1,12 +1,10 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { InjectQueue } from '@nestjs/bull';
 import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Queue } from 'bull';
 import { UserToken } from 'src/entities/user-token.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
@@ -24,17 +22,13 @@ export class WorkspaceService {
     @InjectRepository(UserWorkspace)
     private readonly userWorkspaceRepository: Repository<UserWorkspace>,
     private readonly mailerService: MailerService,
-    @InjectQueue('email') private mailerQueue: Queue,
   ) {}
 
   public async inviteUsers(
     id: number,
     invitedEmails: { emails: string },
   ): Promise<void> {
-    const workspace = await this.workspaceRepository.findOne({
-      where: { id },
-      relations: { owner: true },
-    });
+    const workspace = await this.workspaceRepository.findOneBy({ id });
     if (!workspace) {
       throw new NotFoundException('Workspace not found');
     }
@@ -58,36 +52,20 @@ export class WorkspaceService {
         workspace,
         token,
       });
-      console.log(
-        await this.mailerQueue.add(
-          'test',
-          {
-            email,
-            link,
-            name: workspace.owner.name,
-          },
-          {
-            priority: 1,
-            delay: 1000,
-            attempts: 2,
-            timeout: 5000,
-          },
-        ),
-      );
-      // this.mailerService
-      //   .sendMail({
-      //     to: email,
-      //     from: 'stefan.jeftic122@gmail.com',
-      //     subject: 'You got invitation to join workspace',
-      //     template: 'invitation-email',
-      //     context: { link, name: 'test' },
-      //   })
-      //   .then((info) => {
-      //     console.log(info);
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
+      this.mailerService
+        .sendMail({
+          to: email,
+          from: 'stefan.jeftic122@gmail.com',
+          subject: 'You got invitation to join workspace',
+          template: 'invitation-email',
+          context: { link, name: 'test' },
+        })
+        .then((info) => {
+          console.log(info);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     });
   }
 
