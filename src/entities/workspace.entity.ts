@@ -12,6 +12,7 @@ import { UserWorkspace } from './user-workspace.entity';
 import { Task } from './task.entity';
 import { Summary } from './summary.entity';
 import { User } from './user.entity';
+import { UserToken } from './user-token.entity';
 
 @Entity({ name: 'workspaces' })
 export class Workspace {
@@ -29,6 +30,9 @@ export class Workspace {
 
   @OneToMany(() => Summary, (summary) => summary.workspace)
   summaries: Summary[];
+
+  @OneToMany(() => UserToken, (userToken) => userToken.workspace)
+  userTokens: UserToken[];
 
   @Column({ type: 'varchar' })
   projectName: string;

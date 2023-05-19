@@ -1,8 +1,13 @@
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { UserModule } from './User/user.module';
 
 @Module({
   imports: [
@@ -19,6 +24,27 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       migrations: ['./dist/migration/*.js'],
       autoLoadEntities: true,
     }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAILER_HOST,
+        port: +process.env.MAILER_PORT,
+        ignoreTLS: process.env.MAILER_IGNORE_TLS === 'true',
+        secure: process.env.MAILER_SECURE === 'true',
+        auth: {
+          user: process.env.MAILER_USER,
+          pass: process.env.MAILER_PASS,
+        },
+      },
+      template: {
+        dir: process.cwd() + '/templates',
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
+    BullModule.forRoot({}),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
