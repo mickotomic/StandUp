@@ -24,8 +24,9 @@ export class WorkspaceController {
   async inviteUsers(
     @Param('id') id: string,
     @Body() invitedEmails: { emails: string },
+    /*@GetUser()*/ user: User,
   ): Promise<void> {
-    return await this.workspaceService.inviteUsers(+id, invitedEmails);
+    return await this.workspaceService.inviteUsers(+id, invitedEmails, user);
   }
 
   @Get('/:id/invite')
@@ -33,11 +34,12 @@ export class WorkspaceController {
     @Param('id') id: string,
     @Query('email') email: string,
     @Query('token') token: string,
+    /*@GetUser()*/ user: User,
   ) {
-    return await this.workspaceService.verifyInvite(+id, email, token);
+    return await this.workspaceService.verifyInvite(+id, email, token, user);
   }
 
-  @Get('/check/mail')
+  @Get('/check/email')
   async checkDoesEmailExists(
     @Query('email') email: string,
     // @Query('token') token: string,

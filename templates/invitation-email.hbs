@@ -8,33 +8,60 @@
     <style>
       body {
         font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background: gold;
       }
       a {
         text-decoration: none;
       }
+      center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        width: 500px;
+        background: #bbbbbb;
+        border-radius: 15px;
+      }
       .header {
+        background: darkgray;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        width: 70%;
+        border-radius: 15px;
+      }
+      .body-link {
+        margin: 5px;
+        margin-bottom: 10px;
+      }
+      .button {
+        cursor: pointer;
+        background: #007bff;
+        padding: 5px;
+        margin: 5px;
+        border-radius: 5px;
+        color: white;
+        font-size: 18px;
       }
     </style>
   </head>
   <body>
     <center>
-      <div class="header">
-        <h2 class="website" href="mywebsite.com">StandUp</h2>
-      </div>
+      <div class="container">
+        <div class="header">
+          <h2>StandUp</h2>
+        </div>
 
-      <div class="body">
-        <h5 class="p1">{{name}} has invited you to join workspace</h5>
-      </div>
+        <div class="body">
+          <h4 class="p1">{{ name }} has invited you to join {{ workspace }} workspace.</h4>
+        </div>
 
-      <div class="body-link">
-        <p class="p2">Here is link to join workspace:</p>
-        <a href="{{ link }}">Join Workspace</a>
-      </div>
+        <div class="body-link">
+          <p>Here is link to join workspace:</p>
+          <a class="button" href="{{ link }}">Join Workspace</a>
+        </div>
 
-      <div class="footer"></div>
+        <div class="footer"></div>
+      </div>
     </center>
   </body>
 </html>
