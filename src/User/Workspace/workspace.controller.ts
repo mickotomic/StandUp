@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entities/user.entity';
-
 import { WorkspaceService } from './workspace.service';
 
 @ApiTags('user-workspace')
