@@ -3,13 +3,14 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  OneToMany,
+  OneToMany, OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+  UpdateDateColumn
+} from "typeorm";
 import { UserWorkspace } from './user-workspace.entity';
 import { Workspace } from './workspace.entity';
 import { Task } from './task.entity';
+import { ValidationCode } from "./validation_code.entity";
 
 @Entity({ name: 'users' })
 export class User {
@@ -24,6 +25,9 @@ export class User {
 
   @OneToMany(() => Task, (task) => task.user)
   tasks: Task[];
+
+  @OneToMany(() => ValidationCode, (code) => code.user)
+  code: ValidationCode;
 
   @Column({ type: 'varchar', length: 50 })
   name: string;

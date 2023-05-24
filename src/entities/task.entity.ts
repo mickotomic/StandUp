@@ -5,12 +5,12 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Workspace } from './workspace.entity';
-import { User } from './user.entity';
+  UpdateDateColumn
+} from "typeorm";
+import { Workspace } from "./workspace.entity";
+import { User } from "./user.entity";
 
-@Entity({ name: 'tasks' })
+@Entity({ name: "tasks" })
 export class Task {
   @PrimaryGeneratedColumn()
   id: number;
@@ -21,13 +21,13 @@ export class Task {
   @ManyToOne(() => Workspace, (workspace) => workspace.tasks)
   workspace: Workspace;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: "varchar" })
   name: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: "varchar" })
   priority: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: "varchar" })
   status: string;
 
   @Column({ nullable: true })
