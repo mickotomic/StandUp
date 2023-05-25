@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { UserWorkspace } from './user-workspace.entity';
 import { User } from './user.entity';
+import { Task } from './task.entity';
 
 @Entity({ name: 'workspaces' })
 export class Workspace {
@@ -19,11 +20,11 @@ export class Workspace {
   @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.workspace)
   users: UserWorkspace[];
 
-   @ManyToOne(() => User, (user) => user.ownerWorskpaces)
+  @ManyToOne(() => User, (user) => user.ownerWorskpaces)
   owner: User;
 
-  //@OneToMany(() => Task, (task) => task.workspace)
-  //tasks: Task[];
+  @OneToMany(() => Task, (task) => task.workspace)
+  tasks: Task[];
 
   //@OneToMany(() => Summary, (summary) => summary.workspace)
   //summaries: Summary[]; */
