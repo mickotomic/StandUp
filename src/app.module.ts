@@ -3,10 +3,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UserModule } from './User/user.module';
+import { BullModule } from '@nestjs/bull';
+import { MainModule } from './app/main.module';
 
 @Module({
   imports: [
@@ -42,9 +40,13 @@ import { UserModule } from './User/user.module';
         },
       },
     }),
-    UserModule,
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
+      },
+    }),
+    MainModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

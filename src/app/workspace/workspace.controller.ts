@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entities/user.entity';
 import { WorkspaceService } from './workspace.service';
@@ -21,29 +29,37 @@ export class WorkspaceController {
   })
   @Post('/:id/invite')
   async inviteUsers(
-    @Param('id') id: string,
+    @Param('id') workspaceId: string,
     @Body() invitedEmails: { emails: string },
     /*@GetUser()*/ user: User,
   ): Promise<void> {
-    return await this.workspaceService.inviteUsers(+id, invitedEmails, user);
+    return await this.workspaceService.inviteUsers(
+      +workspaceId,
+      invitedEmails,
+      user,
+    );
   }
 
-  @Get('/:id/invite')
-  async verifyInvite(
-    @Param('id') id: string,
+  @Get('/verify')
+  async verifyInvitation(
+    @Query('workspaceId', ParseIntPipe) workspaceId: string,
     @Query('email') email: string,
     @Query('token') token: string,
+    // user can't login without vertifyed email
     /*@GetUser()*/ user: User,
-  ) {
-    return await this.workspaceService.verifyInvite(+id, email, token, user);
+  ): Promise<{ user: User; workspaceId: number }> {
+    return await this.workspaceService.verifyInvitation(
+      +workspaceId,
+      email,
+      token,
+      user,
+    );
   }
 
   @Get('/check/email')
   async checkDoesEmailExists(
     @Query('email') email: string,
-    // @Query('token') token: string,
-    // @Query('workspaceId') workspaceId: number,
-  ) {
+  ): Promise<{ userExists: boolean }> {
     return await this.workspaceService.checkDoesEmailExists(email);
   }
 }

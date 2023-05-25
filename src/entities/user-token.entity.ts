@@ -21,6 +21,9 @@ export class UserToken {
   @Column()
   token: string;
 
+  @Column({ default: true })
+  isValid: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 }

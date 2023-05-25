@@ -21,12 +21,15 @@
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.8.1",
+    "@nestjs/bull": "^0.6.3",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.2",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.3.0",
     "@nestjs/typeorm": "^9.0.1",
+    "@types/uuid": "^9.0.1",
+    "bull": "^4.10.4",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "handlebars": "^4.7.7",
@@ -37,6 +40,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.3",
     "typeorm": "^0.3.16",
+    "uuid": "^9.0.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {
