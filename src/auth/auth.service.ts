@@ -45,7 +45,7 @@ export class AuthService {
     }
      if(user.emailVerifiedAt === null){
       throw new BadRequestException('Email is not verified')
-    }
+    }                              
 
     const payload = {
       id: user.id,
