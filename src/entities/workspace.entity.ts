@@ -12,7 +12,6 @@ import { UserWorkspace } from './user-workspace.entity';
 import { Task } from './task.entity';
 import { Summary } from './summary.entity';
 import { User } from './user.entity';
-import { Task } from './task.entity';
 
 @Entity({ name: 'workspaces' })
 export class Workspace {
