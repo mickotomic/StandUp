@@ -16,8 +16,8 @@ export class UserWorkspace {
   @ManyToOne(() => Workspace, (workspace) => workspace.users)
   workspace: Workspace;
 
-   @ManyToOne(() => User, (user) => user.workspaces)
-  user: User; 
+  @ManyToOne(() => User, (user) => user.workspaces)
+  user: User;
 
   @CreateDateColumn()
   createdAt: Date;

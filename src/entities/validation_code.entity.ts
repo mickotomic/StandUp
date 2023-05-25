@@ -1,12 +1,16 @@
 import {
   Column,
-  CreateDateColumn, DeleteDateColumn,
-  Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn
-} from "typeorm";
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-import { User } from "./user.entity";
+import { User } from './user.entity';
 
-@Entity({ name: "validation_code" })
+@Entity({ name: 'validation_code' })
 export class ValidationCode {
   @PrimaryGeneratedColumn()
   id: number;
@@ -14,13 +18,13 @@ export class ValidationCode {
   @ManyToOne(() => User, (user) => user.code)
   user: User;
 
-  @Column({ type: "varchar" })
+  @Column({ type: 'varchar' })
   code: string;
 
-  @Column({ type: "integer" })
+  @Column({ type: 'integer', default: 0 })
   numberOfTries: number;
 
-  @Column({ type: "boolean" })
+  @Column({ type: 'boolean', default: true })
   isValid: boolean;
 
   @CreateDateColumn()
