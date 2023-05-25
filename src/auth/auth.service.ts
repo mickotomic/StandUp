@@ -2,10 +2,10 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
-import { JwtPayloadType } from 'src/types/payload.type';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/loginUser.dto';
+import { UserDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,13 +15,36 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(loginDto: LoginDto ) {
-    const user = await this.userRepository.findOneBy(loginDto);
-    if(!user || await bcrypt.compare(loginDto, user.password)){
+  async register(createUserDto: UserDto) {
+    const user = await this.userRepository.findOne({where: {email: createUserDto.email}});
+    if (user) {
+      throw new BadRequestException('Email is in use!');
+    }
+    const preparedUser = {
+      ...createUserDto,
+      password: await bcrypt.hash(createUserDto.password, 10),
+    };
+    const newUser = await this.userRepository.save(preparedUser);
+    if (newUser) {
+      delete newUser.password;
+      return {
+        user: newUser,
+      };
+    } else {
+      throw new BadRequestException(
+        'Something went wrong! User is not created!',
+      );
+    }
+    
+
+}
+ async login(loginDto: LoginDto ) {
+    const user = await this.userRepository.findOneBy({email: loginDto.email});
+    if(!user || !(await bcrypt.compare(loginDto.password, user.password))){
       throw new BadRequestException('invalid password or email!');
     }
      if(user.emailVerifiedAt === null){
-      throw new BadRequestException
+      throw new BadRequestException('Email is not verified')
     }
 
     const payload = {
