@@ -3,31 +3,19 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'summaries' })
 export class Summary {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date;
-
-  @CreateDateColumn()
-  date: Date;
-
-  @Column()
-  workspaceId: number;
-
-  //relacija sa workspace
+  @ManyToMany(() => Workspace, (workspace) => workspace.summaries)
+  workspace: Workspace;
 
   @Column()
   tasksCompleted: number;
@@ -46,4 +34,13 @@ export class Summary {
 
   @Column()
   timespent: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
