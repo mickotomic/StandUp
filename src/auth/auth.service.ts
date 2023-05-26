@@ -28,7 +28,7 @@ export class AuthService {
 
     const newUser = await this.userRepository.save(preparedUser);
     if (newUser) {
-      if (createUserDto.verifiedEmail) {
+      if (createUserDto.verifiedEmail === newUser.email) {
         await this.userRepository.update(newUser.id, {
           emailVerifiedAt: new Date(),
         });
