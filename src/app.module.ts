@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
 import { MainModule } from './app/main.module';
 import { AuthModule } from './auth/auth.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AuthModule } from './auth/auth.module';
         },
       },
     }),
+    EventEmitterModule.forRoot(),
     BullModule.forRoot({
       redis: {
         host: process.env.REDIS_HOST,

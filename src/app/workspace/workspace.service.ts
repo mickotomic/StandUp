@@ -1,5 +1,6 @@
 import { InjectQueue } from '@nestjs/bull';
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -39,19 +40,22 @@ export class WorkspaceService {
       throw new NotFoundException('Workspace not found');
     }
     if (workspace.owner.id !== user.id) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Only workspace owners can invite users');
     }
     const arrOfEmails = invitedEmails.emails.split(',');
 
     arrOfEmails.forEach(async (email) => {
-      const userToken = await this.userTokenRepository.findOneBy({
-        userEmail: email,
-        workspace: { id: workspace.id },
-        isValid: true,
+      const oldUserTokens = await this.userTokenRepository.find({
+        where: {
+          userEmail: email,
+          workspace: { id: workspace.id },
+          isValid: true,
+        },
       });
-      if (userToken) {
-        userToken.isValid = false;
-        this.userTokenRepository.save(userToken);
+      if (oldUserTokens) {
+        oldUserTokens.forEach((userToken) => {
+          this.userTokenRepository.update(userToken.id, { isValid: false });
+        });
       }
       const token = uuidv4();
       const link =
@@ -85,20 +89,28 @@ export class WorkspaceService {
     email: string,
     token: string,
     user: User,
-  ): Promise<{ user: User; workspaceId: number }> {
+  ): Promise<{ message: string; workspace: Workspace }> {
+    const workspace = await this.workspaceRepository.findOneBy({
+      id: workspaceId,
+    });
+    if (!workspace) {
+      throw new BadRequestException('Workspace not found');
+    }
+
     const userToken = await this.userTokenRepository.findOne({
       where: { token, userEmail: email, workspace: { id: workspaceId } },
     });
     if (!userToken || userToken.userEmail !== user.email) {
-      throw new UnauthorizedException();
+      throw new BadRequestException('Token is not valid');
     }
 
+    this.userTokenRepository.update(userToken.id, { isValid: false });
     await this.userWorkspaceRepository.save({
       workspace: { id: workspaceId },
       user,
     });
 
-    return { user, workspaceId: workspaceId };
+    return { message: 'Token is valid', workspace };
   }
 
   public async checkDoesEmailExists(
