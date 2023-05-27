@@ -4,10 +4,12 @@ import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { ValidationCode } from "../entities/validation_code.entity";
+import { MailVerificationListener } from "../events/mail-verification.listener";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User, ValidationCode])],
   controllers: [AuthController],
-  providers: [AuthService, JwtService],
+  providers: [AuthService, JwtService, MailVerificationListener],
 })
 export class AuthModule {}

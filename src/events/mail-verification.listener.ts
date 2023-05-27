@@ -7,7 +7,7 @@ import { User } from '../entities/user.entity';
 export class MailVerificationListener {
   constructor(private readonly authService: AuthService) {}
   @OnEvent('user.created')
-  handleImageUploadEvent(user: User) {
-    this.authService.mailVerification(user);
+  async handleMailSending(user: User) {
+   await this.authService.mailVerification(user);
   }
 }
