@@ -61,7 +61,7 @@ export class WorkspaceService {
       const link =
         process.env.BASE_URL +
         process.env.APP_PORT +
-        `/users/workspaces/verify?workspaceId=${worksapceId}&token=${token}&email=${email}`;
+        `/app/workspaces/verify?workspaceId=${worksapceId}&token=${token}&email=${email}`;
 
       this.userTokenRepository.save({
         userEmail: email,
