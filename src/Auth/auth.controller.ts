@@ -20,7 +20,7 @@ export class AuthController {
     return this.authService.codeVerification(code);
   }
 
-  @Post('/regenarate-code')
+  @Post('/regenerate-code')
   async regenerateCode(@Body() user: User){
     return await this.authService.mailVerification(user);
   }
