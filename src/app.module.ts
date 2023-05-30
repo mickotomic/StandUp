@@ -7,6 +7,7 @@ import { BullModule } from '@nestjs/bull';
 import { MainModule } from './app/main.module';
 import { AuthModule } from './auth/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
         },
       },
       template: {
-        dir: process.cwd() + '/templates',
+        dir: join(process.cwd(), 'templates'),
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,

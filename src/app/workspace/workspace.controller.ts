@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -13,6 +12,7 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
+import { VerifyTokenDto } from './dto/verify-token.dto';
 import { WorkspaceService } from './workspace.service';
 
 @ApiTags('app-workspace')
@@ -21,7 +21,7 @@ export class WorkspaceController {
   constructor(private readonly workspaceService: WorkspaceService) {}
 
   @ApiBody({
-    description: 'Multiple emails sepparated by comma',
+    description: 'Multiple emails separated by comma',
     schema: {
       type: 'object',
       properties: {
@@ -46,19 +46,12 @@ export class WorkspaceController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('/verify')
+  @Post('/verify')
   async verifyInvitation(
-    @Query('workspaceId', ParseIntPipe) workspaceId: string,
-    @Query('email') email: string,
-    @Query('token') token: string,
+    @Body() verifyTokenDto: VerifyTokenDto,
     @GetUser() user: User,
   ): Promise<{ message: string; workspace: Workspace }> {
-    return await this.workspaceService.verifyInvitation(
-      +workspaceId,
-      email,
-      token,
-      user,
-    );
+    return await this.workspaceService.verifyInvitation(verifyTokenDto, user);
   }
 
   @Get('/check/email')

@@ -13,6 +13,7 @@ import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { VerifyTokenDto } from './dto/verify-token.dto';
 
 @Injectable()
 export class WorkspaceService {
@@ -45,18 +46,10 @@ export class WorkspaceService {
     const arrOfEmails = invitedEmails.emails.split(',');
 
     arrOfEmails.forEach(async (email) => {
-      const oldUserTokens = await this.userTokenRepository.find({
-        where: {
-          userEmail: email,
-          workspace: { id: workspace.id },
-          isValid: true,
-        },
-      });
-      if (oldUserTokens) {
-        oldUserTokens.forEach((userToken) => {
-          this.userTokenRepository.update(userToken.id, { isValid: false });
-        });
-      }
+      this.userTokenRepository.update(
+        { userEmail: email, workspace: { id: workspace.id }, isValid: true },
+        { isValid: false },
+      );
       const token = uuidv4();
       const link =
         process.env.BASE_URL +
@@ -85,20 +78,22 @@ export class WorkspaceService {
   }
 
   public async verifyInvitation(
-    workspaceId: number,
-    email: string,
-    token: string,
+    verifyTokenDto: VerifyTokenDto,
     user: User,
   ): Promise<{ message: string; workspace: Workspace }> {
     const workspace = await this.workspaceRepository.findOneBy({
-      id: workspaceId,
+      id: verifyTokenDto.workspaceId,
     });
     if (!workspace) {
       throw new BadRequestException('Workspace not found');
     }
 
     const userToken = await this.userTokenRepository.findOne({
-      where: { token, userEmail: email, workspace: { id: workspaceId } },
+      where: {
+        token: verifyTokenDto.token,
+        userEmail: verifyTokenDto.email,
+        workspace: { id: verifyTokenDto.workspaceId },
+      },
     });
     if (!userToken || userToken.userEmail !== user.email) {
       throw new BadRequestException('Token is not valid');
@@ -106,7 +101,7 @@ export class WorkspaceService {
 
     this.userTokenRepository.update(userToken.id, { isValid: false });
     await this.userWorkspaceRepository.save({
-      workspace: { id: workspaceId },
+      workspace: { id: verifyTokenDto.workspaceId },
       user,
     });
 
