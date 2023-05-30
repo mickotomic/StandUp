@@ -8,7 +8,7 @@ import { UserDto } from "./dto/register.dto";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { MailerService } from "@nestjs-modules/mailer";
 import * as process from "process";
-import { ValidationCode } from "../entities/validation_code.entity";
+import { ValidationCode } from "../entities/validation-code.entity";
 import { CodeVerificationDto } from "./dto/code-verification.dto";
 
 @Injectable()
