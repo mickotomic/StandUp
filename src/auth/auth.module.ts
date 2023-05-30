@@ -7,15 +7,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]),
+  imports: [
+    TypeOrmModule.forFeature([User]),
     JwtModule.register({
-      global:true,
+      global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: {expiresIn: process.env.JWT_EXPIRATION_TIME}
-    })],
+      signOptions: { expiresIn: process.env.JWT_EXPIRATION_TIME },
+    }),
+  ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}
-      

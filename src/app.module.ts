@@ -1,9 +1,13 @@
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './Auth/auth.module';
+import { BullModule } from '@nestjs/bull';
+import { MainModule } from './app/main.module';
+import { AuthModule } from './auth/auth.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -20,9 +24,34 @@ import { AuthModule } from './Auth/auth.module';
       migrations: ['./dist/migration/*.js'],
       autoLoadEntities: true,
     }),
-    AuthModule
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAILER_HOST,
+        port: +process.env.MAILER_PORT,
+        ignoreTLS: process.env.MAILER_IGNORE_TLS === 'true',
+        secure: process.env.MAILER_SECURE === 'true',
+        auth: {
+          user: process.env.MAILER_USER,
+          pass: process.env.MAILER_PASS,
+        },
+      },
+      template: {
+        dir: join(process.cwd(), 'templates'),
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
+    }),
+    EventEmitterModule.forRoot(),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
+      },
+    }),
+    MainModule,
+    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
