@@ -8,6 +8,6 @@ export class MailVerificationListener {
   constructor(private readonly authService: AuthService) {}
   @OnEvent('user.created')
   async handleMailSending(user: User) {
-   await this.authService.mailVerification(user);
+    await this.authService.mailVerification(user);
   }
 }
