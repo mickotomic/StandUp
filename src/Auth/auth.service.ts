@@ -7,7 +7,6 @@ import * as bcrypt from 'bcrypt';
 import { UserDto } from './dto/register.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MailerService } from '@nestjs-modules/mailer';
-import * as process from 'process';
 import { ValidationCode } from '../entities/validation-code.entity';
 import { CodeVerificationDto } from './dto/code-verification.dto';
 import { RegenerateCodeDto } from './dto/regenerate-code.dto';
@@ -60,7 +59,7 @@ export class AuthService {
 
     if (verificationToken) {
       verificationToken.isValid = false;
-      this.validationCodeRepository.save(verificationToken);
+      await this.validationCodeRepository.save(verificationToken);
     }
 
     this.mailerService
@@ -74,7 +73,7 @@ export class AuthService {
           token,
         },
       })
-      .then((info) => {
+      .then(() => {
         this.validationCodeRepository.save({ user: user, code: token });
       })
       .catch((error) => {
@@ -83,47 +82,45 @@ export class AuthService {
   }
 
   async codeVerification(dto: CodeVerificationDto) {
-      const user = await this.userRepository.findOneBy({ email: dto.email });
-      if (!user) {
-        throw new BadRequestException();
-      }
+    const user = await this.userRepository.findOneBy({ email: dto.email });
+    if (!user) {
+      throw new BadRequestException();
+    }
 
-      const userCode = await this.validationCodeRepository
-        .createQueryBuilder('validation_code')
-        .leftJoinAndSelect('validation_code.user', 'user')
-        .where('user.id = :userId', { userId: user.id })
-        .getOne();
-      if(!userCode){
-        throw new BadRequestException('Code not found');
-      }
-      if(!userCode.isValid){
-        throw new BadRequestException('Code is not valid!');
-      }
+    const userCode = await this.validationCodeRepository
+      .createQueryBuilder('validation_code')
+      .leftJoinAndSelect('validation_code.user', 'user')
+      .where('user.id = :userId', { userId: user.id })
+      .getOne();
+    if (!userCode) {
+      throw new BadRequestException('Code not found');
+    }
+    if (!userCode.isValid) {
+      throw new BadRequestException('Code is not valid!');
+    }
 
-      if (userCode.numberOfTries >= 3) {
-        await this.validationCodeRepository.update(userCode.id, {
-          isValid: false,
-        });
-        throw new BadRequestException('Limit reached!');
-      }
+    if (userCode.numberOfTries >= 3) {
+      await this.validationCodeRepository.update(userCode.id, {
+        isValid: false,
+      });
+      throw new BadRequestException('Limit reached!');
+    }
 
-      if (userCode.code !== dto.token) {
-        await this.validationCodeRepository.update(userCode.id, {
-          numberOfTries: ++userCode.numberOfTries,
-        });
-        return { status: 'fail' };
+    if (userCode.code !== dto.token) {
+      await this.validationCodeRepository.update(userCode.id, {
+        numberOfTries: ++userCode.numberOfTries,
+      });
+      return { status: 'fail' };
+    }
+    await this.userRepository.update(user.id, {
+      emailVerifiedAt: new Date(),
+    });
 
-      }
-        await this.userRepository.update(user.id, {
-          emailVerifiedAt: new Date(),
-        });
-
-        await this.validationCodeRepository.update(userCode.id, {
-          numberOfTries: ++userCode.numberOfTries,
-          isValid: false,
-        });
-        return { status: 'ok' };
-
+    await this.validationCodeRepository.update(userCode.id, {
+      numberOfTries: ++userCode.numberOfTries,
+      isValid: false,
+    });
+    return { status: 'ok' };
   }
 
   public async regenerateCode(dto: RegenerateCodeDto) {
@@ -131,7 +128,7 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException();
     }
-    const code = await this.validationCodeRepository.update(
+    await this.validationCodeRepository.update(
       { isValid: true, user: { id: user.id } },
       { isValid: false },
     );

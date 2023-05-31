@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, Length } from 'class-validator';
+import { IsEmail } from 'class-validator';
 
 export class RegenerateCodeDto {
   @ApiProperty()

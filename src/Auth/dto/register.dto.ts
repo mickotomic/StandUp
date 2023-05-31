@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Matches, IsEmail } from 'class-validator';
+import { IsString, Matches, IsEmail, IsOptional } from 'class-validator';
 
 export class UserDto {
   @ApiProperty()
@@ -20,4 +20,11 @@ export class UserDto {
     },
   )
   password: string;
+
+  @ApiProperty({
+    description:
+      'This property is used when verifying users invitation to workspaces',
+  })
+  @IsOptional()
+  verifiedEmail: string;
 }
