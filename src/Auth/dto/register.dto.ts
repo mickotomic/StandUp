@@ -21,7 +21,10 @@ export class UserDto {
   )
   password: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description:
+      'This property is used when verifying users invitation to workspaces',
+  })
   @IsOptional()
   verifiedEmail: string;
 }

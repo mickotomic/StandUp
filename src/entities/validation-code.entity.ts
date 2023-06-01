@@ -21,10 +21,10 @@ export class ValidationCode {
   @Column({ type: 'varchar' })
   code: string;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', default: 0 })
   numberOfTries: number;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: true })
   isValid: boolean;
 
   @CreateDateColumn()

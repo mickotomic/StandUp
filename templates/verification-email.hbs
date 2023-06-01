@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mail</title>
+  <style>
+    body {
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+    a {
+      text-decoration: none;
+    }
+    .center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 500px;
+      background: #bbbbbb;
+      border-radius: 15px;
+    }
+    .header {
+      background: darkgray;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      width: 70%;
+      border-radius: 15px;
+    }
+    .body-link {
+      margin: 5px;
+      margin-bottom: 10px;
+    }
+    .button {
+      cursor: pointer;
+      background: #007bff;
+      padding: 5px;
+      margin: 5px;
+      border-radius: 5px;
+      color: white;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+<div class="center">
+  <div class="container">
+    <div class="header">
+      <h2>StandUp</h2>
+    </div>
+
+    <div class="body">
+      <h4 class="p1">
+        <p>{{ name }}</p>
+        <p>Your verification code is:
+        {{ token }}
+        </p>
+      </h4>
+    </div>
+    <div class="footer"></div>
+  </div>
+</div>
+</body>
+</html>

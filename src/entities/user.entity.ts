@@ -10,7 +10,7 @@ import {
 import { UserWorkspace } from './user-workspace.entity';
 import { Workspace } from './workspace.entity';
 import { Task } from './task.entity';
-import { ValidationCode } from './validation_code.entity';
+import { ValidationCode } from './validation-code.entity';
 
 @Entity({ name: 'users' })
 export class User {

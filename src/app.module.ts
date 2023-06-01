@@ -3,10 +3,10 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BullModule } from '@nestjs/bull';
-import { MainModule } from './app/main.module';
 import { AuthModule } from './auth/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { BullModule } from '@nestjs/bull';
+import { MainModule } from './app/main.module';
 import { join } from 'path';
 
 @Module({
@@ -43,6 +43,7 @@ import { join } from 'path';
         },
       },
     }),
+    AuthModule,
     EventEmitterModule.forRoot(),
     BullModule.forRoot({
       redis: {
@@ -51,7 +52,6 @@ import { join } from 'path';
       },
     }),
     MainModule,
-    AuthModule,
   ],
 })
 export class AppModule {}
