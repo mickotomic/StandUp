@@ -72,8 +72,8 @@ export class AuthService {
       });
   }
 
-  async codeVerification(CodeDto: VerificationCodeDto) {
-    const user = await this.userRepository.findOneBy({ email: CodeDto.email });
+  async codeVerification(codeDto: VerificationCodeDto) {
+    const user = await this.userRepository.findOneBy({ email: codeDto.email });
     if (!user) {
       throw new BadRequestException('User not found!');
     }
@@ -97,7 +97,7 @@ export class AuthService {
       throw new BadRequestException('Limit reached!');
     }
 
-    if (userCode.code !== CodeDto.token) {
+    if (userCode.code !== codeDto.token) {
       await this.validationCodeRepository.update(userCode.id, {
         numberOfTries: ++userCode.numberOfTries,
       });
@@ -114,8 +114,8 @@ export class AuthService {
     return { status: 'ok' };
   }
 
-  public async regenerateCode(CodeDto: RegenerateCodeDto) {
-    const user = await this.userRepository.findOneBy({ email: CodeDto.email });
+  public async regenerateCode(codeDto: RegenerateCodeDto) {
+    const user = await this.userRepository.findOneBy({ email: codeDto.email });
     if (!user) {
       throw new BadRequestException('User not found!');
     }
