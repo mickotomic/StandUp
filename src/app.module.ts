@@ -9,7 +9,6 @@ import { BullModule } from '@nestjs/bull';
 import { MainModule } from './app/main.module';
 import { join } from 'path';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -41,8 +40,8 @@ import { join } from 'path';
         adapter: new HandlebarsAdapter(),
         options: {
           strict: true,
-        }
-      }
+        },
+      },
     }),
     AuthModule,
     EventEmitterModule.forRoot(),
@@ -52,7 +51,7 @@ import { join } from 'path';
         port: +process.env.REDIS_PORT,
       },
     }),
-    MainModule
+    MainModule,
   ],
 })
 export class AppModule {}
