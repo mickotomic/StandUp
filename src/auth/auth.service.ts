@@ -65,7 +65,7 @@ export class AuthService {
       })
       .then(() => {
         this.validationCodeRepository.save({ user: user, code: token });
-        return {status: 'ok'};
+        return { status: 'ok' };
       })
       .catch((error) => {
         throw new BadRequestException(error);
@@ -101,7 +101,7 @@ export class AuthService {
       await this.validationCodeRepository.update(userCode.id, {
         numberOfTries: ++userCode.numberOfTries,
       });
-     throw new BadRequestException('Bad code!');
+      throw new BadRequestException('Bad code!');
     }
     await this.userRepository.update(user.id, {
       emailVerifiedAt: new Date(),
