@@ -1,9 +1,8 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/register.dto';
-import { CodeVerificationDto } from './dto/code-verification.dto';
-import { User } from '../entities/user.entity';
+import { VerificationCodeDto } from './dto/code-verification.dto';
 import { RegenerateCodeDto } from './dto/regenerate-code.dto';
 
 @ApiTags('auth')
@@ -17,7 +16,7 @@ export class AuthController {
   }
 
   @Post('/verification')
-  async codeVerification(@Body() code: CodeVerificationDto) {
+  async codeVerification(@Body() code: VerificationCodeDto) {
     return this.authService.codeVerification(code);
   }
 

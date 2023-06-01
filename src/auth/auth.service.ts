@@ -8,7 +8,7 @@ import { UserDto } from './dto/register.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ValidationCode } from '../entities/validation-code.entity';
-import { CodeVerificationDto } from './dto/code-verification.dto';
+import { VerificationCodeDto } from './dto/code-verification.dto';
 import { RegenerateCodeDto } from './dto/regenerate-code.dto';
 
 @Injectable()
@@ -52,20 +52,10 @@ export class AuthService {
   public async mailVerification(user: User) {
     const token = Math.random().toString(36).toUpperCase().slice(2, 8);
 
-    const verificationToken = await this.validationCodeRepository.findOneBy({
-      user: user,
-      isValid: true,
-    });
-
-    if (verificationToken) {
-      verificationToken.isValid = false;
-      await this.validationCodeRepository.save(verificationToken);
-    }
-
     this.mailerService
       .sendMail({
         to: user.email,
-        from: 'stefan.jeftic122@gmail.com',
+        from: process.env.APP_MAIL,
         subject: 'User verification code',
         template: 'verification-email',
         context: {
@@ -75,16 +65,17 @@ export class AuthService {
       })
       .then(() => {
         this.validationCodeRepository.save({ user: user, code: token });
+        return {status: 'ok'};
       })
       .catch((error) => {
-        console.log(error);
+        throw new BadRequestException(error);
       });
   }
 
-  async codeVerification(dto: CodeVerificationDto) {
-    const user = await this.userRepository.findOneBy({ email: dto.email });
+  async codeVerification(CodeDto: VerificationCodeDto) {
+    const user = await this.userRepository.findOneBy({ email: CodeDto.email });
     if (!user) {
-      throw new BadRequestException();
+      throw new BadRequestException('User not found!');
     }
 
     const userCode = await this.validationCodeRepository
@@ -106,11 +97,11 @@ export class AuthService {
       throw new BadRequestException('Limit reached!');
     }
 
-    if (userCode.code !== dto.token) {
+    if (userCode.code !== CodeDto.token) {
       await this.validationCodeRepository.update(userCode.id, {
         numberOfTries: ++userCode.numberOfTries,
       });
-      return { status: 'fail' };
+     throw new BadRequestException('Bad code!');
     }
     await this.userRepository.update(user.id, {
       emailVerifiedAt: new Date(),
@@ -123,16 +114,16 @@ export class AuthService {
     return { status: 'ok' };
   }
 
-  public async regenerateCode(dto: RegenerateCodeDto) {
-    const user = await this.userRepository.findOneBy({ email: dto.email });
+  public async regenerateCode(CodeDto: RegenerateCodeDto) {
+    const user = await this.userRepository.findOneBy({ email: CodeDto.email });
     if (!user) {
-      throw new BadRequestException();
+      throw new BadRequestException('User not found!');
     }
     await this.validationCodeRepository.update(
       { isValid: true, user: { id: user.id } },
       { isValid: false },
     );
 
-    await this.mailVerification(user);
+    return await this.mailVerification(user);
   }
 }
