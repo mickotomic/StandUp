@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { AuthService } from '../auth/auth.service';
 import { User } from '../entities/user.entity';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class MailVerificationListener {

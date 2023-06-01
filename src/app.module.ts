@@ -1,13 +1,14 @@
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { MailerModule } from '@nestjs-modules/mailer';
-import * as process from 'process';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { BullModule } from '@nestjs/bull';
+import { MainModule } from './app/main.module';
+import { join } from 'path';
+
 
 @Module({
   imports: [
@@ -36,17 +37,22 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
         },
       },
       template: {
-        dir: process.cwd() + '//templates',
+        dir: join(process.cwd(), 'templates'),
         adapter: new HandlebarsAdapter(),
         options: {
-          secret: true,
-        },
-      },
+          strict: true,
+        }
+      }
     }),
     AuthModule,
     EventEmitterModule.forRoot(),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
+      },
+    }),
+    MainModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
