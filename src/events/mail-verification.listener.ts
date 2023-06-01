@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { AuthService } from '../Auth/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { User } from '../entities/user.entity';
 
 @Injectable()
