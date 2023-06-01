@@ -13,6 +13,8 @@ import { TaskService } from './task.service';
 import { Task } from 'src/entities/task.entity';
 import { ApiQuery } from '@nestjs/swagger';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { GetUser } from 'src/decorator/get-user.decorator';
+import { User } from 'src/entities/user.entity';
 
 @Controller('task')
 export class TaskController {
@@ -49,8 +51,9 @@ export class TaskController {
   @Delete()
   @HttpCode(204)
   async deleteTask(
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
   ): Promise<void> {
-    return await this.taskService.deleteTask(userId);
+    return await this.taskService.deleteTask(id, user);
   }
 }
