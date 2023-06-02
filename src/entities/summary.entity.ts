@@ -3,10 +3,10 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToMany,
+  ManyToMany, ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+  UpdateDateColumn
+} from "typeorm";
 import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'summaries' })
@@ -14,7 +14,7 @@ export class Summary {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => Workspace, (workspace) => workspace.summaries)
+  @ManyToOne(() => Workspace, (workspace) => workspace.summaries)
   workspace: Workspace;
 
   @Column()
