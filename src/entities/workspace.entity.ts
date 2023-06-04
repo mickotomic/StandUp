@@ -17,35 +17,35 @@ import { User } from './user.entity';
 @Entity({ name: 'workspaces' })
 export class Workspace {
   @PrimaryGeneratedColumn()
-    id: number;
+  id: number;
 
   @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.workspace)
-    users: UserWorkspace[];
+  users: UserWorkspace[];
 
   @ManyToOne(() => User, (user) => user.ownerWorkspaces)
-    owner: User;
+  owner: User;
 
   @OneToMany(() => Task, (task) => task.workspace)
-    tasks: Task[];
+  tasks: Task[];
 
   @OneToMany(() => Summary, (summary) => summary.workspace)
-    summaries: Summary[];
+  summaries: Summary[];
 
   @OneToMany(() => UserToken, (userToken) => userToken.workspace)
-    userTokens: UserToken[];
+  userTokens: UserToken[];
 
   @Column({ type: 'varchar' })
-    projectName: string;
+  projectName: string;
 
   @Column({ type: 'json' })
-    settings: string;
+  settings: string;
 
   @CreateDateColumn()
-    createdAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-    updatedAt: Date;
+  updatedAt: Date;
 
   @DeleteDateColumn()
-    deletedAt: Date;
+  deletedAt: Date;
 }

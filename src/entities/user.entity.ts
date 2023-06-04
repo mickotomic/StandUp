@@ -15,44 +15,44 @@ import { Workspace } from './workspace.entity';
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
-    id: number;
+  id: number;
 
   @OneToMany(() => Workspace, (workspace) => workspace.owner)
-    ownerWorkspaces: Workspace[];
+  ownerWorkspaces: Workspace[];
 
   @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.user)
-    workspaces: UserWorkspace[];
+  workspaces: UserWorkspace[];
 
   @OneToMany(() => Task, (task) => task.user)
-    tasks: Task[];
+  tasks: Task[];
 
   @OneToMany(() => ValidationCode, (code) => code.user)
-    code: ValidationCode;
+  code: ValidationCode;
 
   @Column({ type: 'varchar', length: 50 })
-    name: string;
+  name: string;
 
   @Column({ type: 'varchar', unique: true, length: 50 })
-    email: string;
+  email: string;
 
   @Column({ type: 'varchar' })
-    password: string;
+  password: string;
 
   @Column({ type: 'boolean', default: true })
-    isActive: boolean;
+  isActive: boolean;
 
   @Column({ type: 'varchar', default: 'user' })
-    role: string;
+  role: string;
 
   @CreateDateColumn()
-    createdAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-    updatedAt: Date;
+  updatedAt: Date;
 
   @DeleteDateColumn()
-    deletedAt: Date;
+  deletedAt: Date;
 
   @Column({ default: null })
-    emailVerifiedAt: Date;
+  emailVerifiedAt: Date;
 }

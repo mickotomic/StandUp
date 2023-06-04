@@ -4,5 +4,5 @@ import { IsEmail } from 'class-validator';
 export class RegenerateCodeDto {
   @ApiProperty()
   @IsEmail()
-    email: string;
+  email: string;
 }

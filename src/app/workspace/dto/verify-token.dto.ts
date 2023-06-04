@@ -4,13 +4,13 @@ import { IsEmail, IsNumber, IsString } from 'class-validator';
 export class VerifyTokenDto {
   @ApiProperty()
   @IsNumber()
-    workspaceId: number;
+  workspaceId: number;
 
   @ApiProperty()
   @IsEmail()
-    email: string;
+  email: string;
 
   @ApiProperty()
   @IsString()
-    token: string;
+  token: string;
 }

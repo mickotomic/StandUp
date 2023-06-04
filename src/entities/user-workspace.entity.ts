@@ -13,20 +13,20 @@ import { Workspace } from './workspace.entity';
 @Entity({ name: 'users_workspaces' })
 export class UserWorkspace {
   @PrimaryGeneratedColumn()
-    id: number;
+  id: number;
 
   @OneToMany(() => Task, (tasks) => tasks.workspace)
-    tasks: Task;
+  tasks: Task;
 
   @ManyToOne(() => Workspace, (workspace) => workspace.users)
-    workspace: Workspace;
+  workspace: Workspace;
 
   @ManyToOne(() => User, (user) => user.workspaces)
-    user: User;
+  user: User;
 
   @CreateDateColumn()
-    createdAt: Date;
+  createdAt: Date;
 
   @DeleteDateColumn()
-    deletedAt: Date;
+  deletedAt: Date;
 }

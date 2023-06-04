@@ -5,9 +5,9 @@ export class VerificationCodeDto {
   @ApiProperty()
   @IsString()
   @Length(6)
-    token: string;
+  token: string;
 
   @ApiProperty()
   @IsEmail()
-    email: string;
+  email: string;
 }
