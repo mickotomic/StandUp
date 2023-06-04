@@ -12,35 +12,35 @@ import { Workspace } from './workspace.entity';
 @Entity({ name: 'summaries' })
 export class Summary {
   @PrimaryGeneratedColumn()
-  id: number;
+    id: number;
 
   @ManyToMany(() => Workspace, (workspace) => workspace.summaries)
-  workspace: Workspace;
+    workspace: Workspace;
 
   @Column()
-  tasksCompleted: number;
+    tasksCompleted: number;
 
   @Column()
-  tasksDue: number;
+    tasksDue: number;
 
   @Column()
-  tasksPastDue: number;
+    tasksPastDue: number;
 
   @Column()
-  attendees: string;
+    attendees: string;
 
   @Column()
-  absentUsers: string;
+    absentUsers: string;
 
   @Column()
-  timespent: number;
+    timespent: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+    createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+    updatedAt: Date;
 
   @DeleteDateColumn()
-  deletedAt: Date;
+    deletedAt: Date;
 }

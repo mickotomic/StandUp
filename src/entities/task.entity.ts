@@ -7,38 +7,38 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Workspace } from './workspace.entity';
 import { User } from './user.entity';
+import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'tasks' })
 export class Task {
   @PrimaryGeneratedColumn()
-  id: number;
+    id: number;
 
   @ManyToOne(() => User, (user) => user.tasks)
-  user: User;
+    user: User;
 
   @ManyToOne(() => Workspace, (workspace) => workspace.tasks)
-  workspace: Workspace;
+    workspace: Workspace;
 
   @Column({ type: 'varchar' })
-  name: string;
+    name: string;
 
   @Column({ type: 'varchar' })
-  priority: string;
+    priority: string;
 
   @Column({ type: 'varchar' })
-  status: string;
+    status: string;
 
   @Column({ nullable: true })
-  deadline: Date;
+    deadline: Date;
 
   @CreateDateColumn()
-  createdAt: Date;
+    createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+    updatedAt: Date;
 
   @DeleteDateColumn()
-  deletedAt: Date;
+    deletedAt: Date;
 }

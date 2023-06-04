@@ -13,26 +13,26 @@ import { User } from './user.entity';
 @Entity({ name: 'validation_code' })
 export class ValidationCode {
   @PrimaryGeneratedColumn()
-  id: number;
+    id: number;
 
   @ManyToOne(() => User, (user) => user.code)
-  user: User;
+    user: User;
 
   @Column({ type: 'varchar' })
-  code: string;
+    code: string;
 
   @Column({ type: 'integer', default: 0 })
-  numberOfTries: number;
+    numberOfTries: number;
 
   @Column({ type: 'boolean', default: true })
-  isValid: boolean;
+    isValid: boolean;
 
   @CreateDateColumn()
-  createdAt: Date;
+    createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+    updatedAt: Date;
 
   @DeleteDateColumn()
-  deletedAt: Date;
+    deletedAt: Date;
 }

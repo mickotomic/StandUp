@@ -6,9 +6,7 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
-  extends: [
-
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   root: true,
   env: {
     node: true,
@@ -16,9 +14,17 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    quotes: ['warn', 'single'],
+    'default-param-last': 'error',
+    'require-await': 'error',
+    'no-else-return': 'error',
+    'no-var': 'error',
+    indent: ['warn', 2],
+    eqeqeq: 'error',
+    '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-explicit-any': 'error',
   },
 };

@@ -1,0 +1,9 @@
+name: Prettier
+on: [push]
+
+jobs:
+  Prettier:
+    runs-on: arch
+    steps: 
+      -run: npm run format
+      -run: echo "Files formated before pushing to github"

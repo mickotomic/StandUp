@@ -10,20 +10,20 @@ import { Workspace } from './workspace.entity';
 @Entity({ name: 'users_token' })
 export class UserToken {
   @PrimaryGeneratedColumn()
-  id: number;
+    id: number;
 
   @ManyToOne(() => Workspace, (workspace) => workspace.userTokens)
-  workspace: Workspace;
+    workspace: Workspace;
 
   @Column()
-  userEmail: string;
+    userEmail: string;
 
   @Column()
-  token: string;
+    token: string;
 
   @Column({ default: true })
-  isValid: boolean;
+    isValid: boolean;
 
   @CreateDateColumn()
-  createdAt: Date;
+    createdAt: Date;
 }

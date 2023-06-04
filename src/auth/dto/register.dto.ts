@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Matches, IsEmail, IsOptional } from 'class-validator';
+import { IsEmail, IsOptional, IsString, Matches } from 'class-validator';
 
 export class UserDto {
   @ApiProperty()
   @IsString()
-  name: string;
+    name: string;
 
   @ApiProperty()
   @IsEmail()
-  email: string;
+    email: string;
 
   @ApiProperty()
   @IsString()
@@ -19,12 +19,12 @@ export class UserDto {
         'Password too week! Must contain minimum 6 characters, at least one UPPERCASE letter, one lowercase letter, one number and one special character!',
     },
   )
-  password: string;
+    password: string;
 
   @ApiProperty({
     description:
       'This property is used when verifying users invitation to workspaces',
   })
   @IsOptional()
-  verifiedEmail: string;
+    verifiedEmail: string;
 }
