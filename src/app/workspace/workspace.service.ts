@@ -123,7 +123,6 @@ export class WorkspaceService {
     return this.workspaceRepository.save(workspace);
   }
 
-
   async findAllWorkspaces(): Promise<Workspace[]> {
     return await this.workspaceRepository.find();
   }
@@ -140,7 +139,6 @@ export class WorkspaceService {
 
   async updateWorkspace(id: number, updateWorkspaceDto: CreateWorkspaceDto) {
     return await this.workspaceRepository.update(id, updateWorkspaceDto);
-   
   }
 
   async removeWorkspace(id: number) {
