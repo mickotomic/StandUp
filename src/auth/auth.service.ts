@@ -157,6 +157,6 @@ export class AuthService {
       { isValid: false },
     );
 
-    return await this.mailVerification(user);
+    return this.mailVerification(user);
   }
 }
