@@ -14,6 +14,7 @@ import { Workspace } from 'src/entities/workspace.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { VerifyTokenDto } from './dto/verify-token.dto';
+import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 
 @Injectable()
 export class WorkspaceService {
@@ -29,12 +30,12 @@ export class WorkspaceService {
   ) {}
 
   public async inviteUsers(
-    worksapceId: number,
+    workspaceId: number,
     invitedEmails: { emails: string },
     user: User,
   ): Promise<void> {
     const workspace = await this.workspaceRepository.findOne({
-      where: { id: worksapceId },
+      where: { id: workspaceId },  
       relations: { owner: true },
     });
     if (!workspace) {
@@ -54,7 +55,7 @@ export class WorkspaceService {
       const link =
         process.env.BASE_URL +
         process.env.APP_PORT +
-        `/app/workspaces/verify?workspaceId=${worksapceId}&token=${token}&email=${email}`;
+        `/app/workspaces/verify?workspaceId=${workspaceId}&token=${token}&email=${email}`;
 
       this.userTokenRepository.save({
         userEmail: email,
@@ -114,4 +115,48 @@ export class WorkspaceService {
     const user = await this.userRepository.findOneBy({ email });
     return { userExists: user ? true : false };
   }
+  
+  public async createWorkspace(createWorkspaceDto: CreateWorkspaceDto, user: User ):
+  Promise<{projectName: string, settings: string, ownerId: number}> {
+    const workspace = { ...createWorkspaceDto, ownerId: user.id};
+    // const workspace = this.workspaceRepository.create(createWorkspaceDto);
+    return this.workspaceRepository.save(workspace);
+  }
+
+
+  async findAllWorkspaces(): Promise<Workspace[]> {
+    return await this.workspaceRepository.find();
+  }
+
+  async findOneWorkspace(id: number): Promise<Workspace> {
+    const workspace = await this.workspaceRepository.findOneBy({ id });
+    if ( workspace.deletedAt === null ) {
+      throw new Error('Workspace with id ' + { id } + ' was deleted');
+    } else if (!workspace) {
+      throw new Error('Workspace not found');
+    }
+    return workspace;
+  }
+
+  async updateWorkspace(id: number, updateWorkspaceDto: CreateWorkspaceDto) {
+    return await this.workspaceRepository.update(id, updateWorkspaceDto);
+   
+  }
+
+  async removeWorkspace(id: number) {
+      return await this.workspaceRepository
+      .createQueryBuilder('ws')
+      .softDelete()
+      .where('id = :id', { id })
+      .execute();
+  }
+
+  async restoreWorkspace(id: number) {
+    return await this.workspaceRepository
+      .createQueryBuilder('ws-restore')
+      .restore()
+      .where('id = :id', { id })
+      .execute();
+  }
+
 }
