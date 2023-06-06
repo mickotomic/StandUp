@@ -2,7 +2,7 @@ export const returnMessages = Object.freeze( {
 
     EmailInUse: 'Email is in use!',
 
-    UserNotCreated:  'Something went wrong! User is not created!',
+    UserNotCreated: 'Something went wrong! User is not created!',
 
     EmailPasswordValidation: 'Invalid password or email!',
 
@@ -26,7 +26,7 @@ export const returnMessages = Object.freeze( {
 
     TokenNotValid: 'Token is not valid!',
 
-    TokenIsValid:  'Token is valid!', 
+    TokenIsValid: 'Token is valid!', 
 
 });
  
