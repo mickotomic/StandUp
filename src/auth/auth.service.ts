@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { ValidationCode } from '../entities/validation-code.entity';
 import { VerificationCodeDto } from './dto/code-verification.dto';
 import { LoginDto } from './dto/loginUser.dto';
+import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { RegenerateCodeDto } from './dto/regenerate-code.dto';
 import { UserDto } from './dto/register.dto';
 
@@ -29,7 +30,7 @@ export class AuthService {
       where: { email: createUserDto.email },
     });
     if (user) {
-      throw new BadRequestException('Email is in use!');
+      throw new BadRequestException(returnMessages.EmailInUse);
     }
     const preparedUser = {
       ...createUserDto,
@@ -53,17 +54,17 @@ export class AuthService {
       return {
         user: newUser,
       };
-    }
-    throw new BadRequestException('Something went wrong! User is not created!');
+    } 
+      throw new BadRequestException(returnMessages.CodeNotValid);
   }
 
   async login(loginDto: LoginDto) {
     const user = await this.userRepository.findOneBy({ email: loginDto.email });
     if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
-      throw new BadRequestException('invalid password or email!');
+      throw new BadRequestException(returnMessages.EmailInUse);
     }
     if (user.emailVerifiedAt === null) {
-      throw new BadRequestException('Email is not verified');
+      throw new BadRequestException(returnMessages.EmailNotVerified);
     }
 
     const payload = {
@@ -73,7 +74,7 @@ export class AuthService {
       role: user.role,
     };
     return {
-      message: 'You have been successfully logged in!',
+      message: returnMessages.UserSuccessfullyLoggedIn,
       data: user,
       access_token: this.jwtService.sign(payload, {
         privateKey: process.env.JWT_SECRET,
@@ -108,7 +109,7 @@ export class AuthService {
   async codeVerification(codeDto: VerificationCodeDto) {
     const user = await this.userRepository.findOneBy({ email: codeDto.email });
     if (!user) {
-      throw new BadRequestException('User not found!');
+      throw new BadRequestException(returnMessages.UserNotFound);
     }
 
     const userCode = await this.validationCodeRepository
@@ -117,24 +118,24 @@ export class AuthService {
       .where('user.id = :userId', { userId: user.id })
       .getOne();
     if (!userCode) {
-      throw new BadRequestException('Code not found');
+      throw new BadRequestException(returnMessages.UserCodeNotFound);
     }
     if (!userCode.isValid) {
-      throw new BadRequestException('Code is not valid!');
+      throw new BadRequestException(returnMessages.CodeNotValid);
     }
 
     if (userCode.numberOfTries >= 3) {
       await this.validationCodeRepository.update(userCode.id, {
         isValid: false,
       });
-      throw new BadRequestException('Limit reached!');
+      throw new BadRequestException(returnMessages.LimitReached);
     }
 
     if (userCode.code !== codeDto.token) {
       await this.validationCodeRepository.update(userCode.id, {
         numberOfTries: ++userCode.numberOfTries,
       });
-      throw new BadRequestException('Bad code!');
+      throw new BadRequestException(returnMessages.BadUserCode);
     }
     await this.userRepository.update(user.id, {
       emailVerifiedAt: new Date(),
@@ -150,7 +151,7 @@ export class AuthService {
   public async regenerateCode(codeDto: RegenerateCodeDto) {
     const user = await this.userRepository.findOneBy({ email: codeDto.email });
     if (!user) {
-      throw new BadRequestException('User not found!');
+      throw new BadRequestException(returnMessages.UserNotFound);
     }
     await this.validationCodeRepository.update(
       { isValid: true, user: { id: user.id } },
