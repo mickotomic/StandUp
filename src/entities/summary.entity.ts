@@ -38,7 +38,7 @@ export class Summary {
   @Column()
   startedAt: Date;
 
-  @Column({ default: null})
+  @Column({ default: null })
   finishedAt: Date;
 
   @CreateDateColumn()
@@ -49,6 +49,4 @@ export class Summary {
 
   @DeleteDateColumn()
   deletedAt: Date;
-
-  
 }
