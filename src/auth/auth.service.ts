@@ -1,16 +1,16 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { UserDto } from './dto/register.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ValidationCode } from '../entities/validation-code.entity';
 import { VerificationCodeDto } from './dto/code-verification.dto';
-import { RegenerateCodeDto } from './dto/regenerate-code.dto';
 import { LoginDto } from './dto/loginUser.dto';
+import { RegenerateCodeDto } from './dto/regenerate-code.dto';
+import { UserDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -46,18 +46,15 @@ export class AuthService {
           email: createUserDto.email,
           password: createUserDto.password,
         });
-      } else {
-        this.eventEmitter.emit('user.created', newUser);
       }
+      this.eventEmitter.emit('user.created', newUser);
+
       delete newUser.password;
       return {
         user: newUser,
       };
-    } else {
-      throw new BadRequestException(
-        'Something went wrong! User is not created!',
-      );
     }
+    throw new BadRequestException('Something went wrong! User is not created!');
   }
 
   async login(loginDto: LoginDto) {
@@ -85,7 +82,7 @@ export class AuthService {
     };
   }
 
-  public async mailVerification(user: User) {
+  public mailVerification(user: User) {
     const token = Math.random().toString(36).toUpperCase().slice(2, 8);
 
     this.mailerService
@@ -160,6 +157,6 @@ export class AuthService {
       { isValid: false },
     );
 
-    return await this.mailVerification(user);
+    return this.mailVerification(user);
   }
 }

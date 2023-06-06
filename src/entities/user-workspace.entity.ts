@@ -6,9 +6,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Workspace } from './workspace.entity';
-import { User } from './user.entity';
 import { Task } from './task.entity';
+import { User } from './user.entity';
+import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'users_workspaces' })
 export class UserWorkspace {
