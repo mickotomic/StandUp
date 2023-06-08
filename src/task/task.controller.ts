@@ -41,7 +41,7 @@ export class TaskController {
     return await this.taskService.createTask(user, dto);
   }
 
-  @Put()
+  @Put('/:id')
   async updateTask(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: TaskDto,
@@ -49,7 +49,7 @@ export class TaskController {
     return await this.taskService.updateTask(id, dto);
   }
 
-  @Delete()
+  @Delete('/:id')
   @HttpCode(204)
   async deleteTask(
     @Param('id', ParseIntPipe) id: number,
