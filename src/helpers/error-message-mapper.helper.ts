@@ -1,4 +1,4 @@
-export const returnMessages = Object.freeze( {
+export const returnMessages = Object.freeze({
 
     EmailInUse: 'Email is in use!',
 
