@@ -5,11 +5,13 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/entities/user.entity';
+import { returnMessages } from 'src/helpers/error-message-mapper.helper';
+import { GooglePayload } from 'src/types/google-auth-payload.type';
 import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { ValidationCode } from '../entities/validation-code.entity';
 import { VerificationCodeDto } from './dto/code-verification.dto';
 import { LoginDto } from './dto/loginUser.dto';
-import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { RegenerateCodeDto } from './dto/regenerate-code.dto';
 import { UserDto } from './dto/register.dto';
 
@@ -54,14 +56,17 @@ export class AuthService {
       return {
         user: newUser,
       };
-    } 
-      throw new BadRequestException(returnMessages.CodeNotValid);
+    }
+    throw new BadRequestException(returnMessages.CodeNotValid);
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, withGoogleAuth = false) {
     const user = await this.userRepository.findOneBy({ email: loginDto.email });
-    if (!user || !(await bcrypt.compare(loginDto.password, user.password))) {
-      throw new BadRequestException(returnMessages.EmailInUse);
+    if (
+      (!user || !(await bcrypt.compare(loginDto.password, user.password))) &&
+      !withGoogleAuth
+    ) {
+      throw new BadRequestException(returnMessages.EmailPasswordValidation);
     }
     if (user.emailVerifiedAt === null) {
       throw new BadRequestException(returnMessages.EmailNotVerified);
@@ -159,5 +164,20 @@ export class AuthService {
     );
 
     return this.mailVerification(user);
+  }
+
+  public async googleAuth(user: GooglePayload) {
+    const userExists = await this.userRepository.findOneBy({
+      email: user.email,
+    });
+    if (!userExists) {
+      return this.register({
+        name: user.firstName + ' ' + user.lastName,
+        email: user.email,
+        verifiedEmail: user.email,
+        password: uuidv4(),
+      });
+    }
+    return await this.login(userExists, true);
   }
 }
