@@ -6,13 +6,14 @@ import {
   HttpCode,
   Param,
   ParseIntPipe,
+  Post,
   Put,
   Query,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { Task } from 'src/entities/task.entity';
 import { ApiQuery } from '@nestjs/swagger';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { UpdateTaskDto } from './dto/task.dto';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 
@@ -22,30 +23,33 @@ export class TaskController {
 
   @Get()
   @ApiQuery({ name: 'workspaceId' })
-  @ApiQuery({ name: 'userId' })
   @ApiQuery({ name: 'isForCurrentUserOnly' })
   async getDefaultTaskList(
     @Query('workspaceId') workspaceId: number,
     @Query('isForCurrentUserOnly') isForCurrentUserOnly: boolean,
+    @GetUser() user: User,
   ): Promise<{ tasks: Task[] }> {
     return await this.taskService.getDefaultTaskList(
       workspaceId,
-      1,
+      user,
       isForCurrentUserOnly,
     );
   }
 
-  @Get()
-  async getSingleTask(@Param('userId', ParseIntPipe) userId: number) {
-    return await this.taskService.getSingleTask(userId);
+  @Post()
+  async createTask(
+    @GetUser() user: User,
+    @Body() dto: UpdateTaskDto,
+  ): Promise<Task> {
+    return await this.taskService.createTask(user, dto);
   }
 
   @Put()
   async updateTask(
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTaskDto,
   ) {
-    return await this.taskService.updateTask(userId, dto);
+    return await this.taskService.updateTask(id, dto);
   }
 
   @Delete()
