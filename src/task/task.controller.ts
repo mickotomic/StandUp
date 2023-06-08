@@ -13,7 +13,7 @@ import {
 import { TaskService } from './task.service';
 import { Task } from 'src/entities/task.entity';
 import { ApiQuery } from '@nestjs/swagger';
-import { UpdateTaskDto } from './dto/task.dto';
+import { TaskDto } from './dto/task.dto';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 
@@ -37,17 +37,14 @@ export class TaskController {
   }
 
   @Post()
-  async createTask(
-    @GetUser() user: User,
-    @Body() dto: UpdateTaskDto,
-  ): Promise<Task> {
+  async createTask(@GetUser() user: User, @Body() dto: TaskDto): Promise<Task> {
     return await this.taskService.createTask(user, dto);
   }
 
   @Put()
   async updateTask(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateTaskDto,
+    @Body() dto: TaskDto,
   ) {
     return await this.taskService.updateTask(id, dto);
   }
