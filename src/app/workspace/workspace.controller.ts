@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
@@ -38,6 +38,7 @@ export class WorkspaceController {
     },
   })
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Post('/:id/invite')
   async inviteUsers(
     @Param('id') workspaceId: string,
@@ -67,50 +68,68 @@ export class WorkspaceController {
     return await this.workspaceService.checkDoesEmailExists(email);
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  async createWorkspace(@Body() createWorkspaceDto: CreateWorkspaceDto, 
-  @GetUser() user: User):  Promise<{projectName: string, settings: string, ownerId: number}>
-    {
-    return this.workspaceService.createWorkspace(createWorkspaceDto,  user);
+  async createWorkspace(
+    @Body() createWorkspaceDto: CreateWorkspaceDto,
+    @GetUser() user: User,
+  ): Promise<Workspace> {
+    return await this.workspaceService.createWorkspace(
+      createWorkspaceDto,
+      user,
+    );
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAllWorkspaces(): Promise<Workspace[]> {
-    return await this.workspaceService.findAllWorkspaces();
+  async findAllWorkspaces(@GetUser() user: User): Promise<Workspace[]> {
+    return await this.workspaceService.findAllWorkspaces(user);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Get('/:id')
   async findOneWorkspace(
     @Param('id', ParseIntPipe) id: string,
+    @GetUser() user: User,
   ): Promise<Workspace> {
-    return await this.workspaceService.findOneWorkspace(+id);
+    return await this.workspaceService.findOneWorkspace(+id, user);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Put('/:id')
-   async updateWorkspace(
+  async updateWorkspace(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateWorkspaceDto: CreateWorkspaceDto,
-    @GetUser() user: User ) {
-    return await this.workspaceService.updateWorkspace(+id, updateWorkspaceDto);
+    @GetUser() user: User,
+  ) {
+    return await this.workspaceService.updateWorkspace(
+      +id,
+      updateWorkspaceDto,
+      user,
+    );
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(204)
   @Delete('/:id')
   async removeWorkspace(
-    @Param('id', ParseIntPipe) id: number, 
-    @GetUser() user: User) {
-    return await this.workspaceService.removeWorkspace(+id);
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ) {
+    return await this.workspaceService.removeWorkspace(+id, user);
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Patch('/:id/restore')     
+  @Patch('/:id/restore')
   async restoreWorkspace(
     @Param('id', ParseIntPipe) id: number,
-    @GetUser() user: User ) {
-    return await this.workspaceService.restoreWorkspace(+id);
+    @GetUser() user: User,
+  ) {
+    return await this.workspaceService.restoreWorkspace(+id, user);
   }
-
 }
