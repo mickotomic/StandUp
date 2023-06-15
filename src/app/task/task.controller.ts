@@ -12,16 +12,18 @@ import {
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { Task } from 'src/entities/task.entity';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { TaskDto } from './dto/task.dto';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 
+@ApiTags('Task')
+@ApiBearerAuth()
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
-  @Get()
+  @Get('/')
   @ApiQuery({ name: 'workspaceId' })
   @ApiQuery({ name: 'isForCurrentUserOnly' })
   async getDefaultTaskList(

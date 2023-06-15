@@ -3,12 +3,10 @@ import { IsDate, IsOptional, IsString } from 'class-validator';
 
 export class TaskDto {
   @ApiProperty()
-  @IsOptional()
   @IsString()
   name: string;
 
   @ApiProperty()
-  @IsOptional()
   @IsString()
   priority: string;
 
