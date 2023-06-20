@@ -4,6 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -18,8 +19,8 @@ export class Summary {
   @ManyToOne(() => Workspace, (workspace) => workspace.summaries)
   workspace: Workspace;
 
-  @ManyToOne(() => Task, (task) => task.summaries)
-  tasks: Task;
+  @OneToMany(() => Task, (task) => task.summary)
+  tasks: Task[];
 
   @Column()
   tasksCompleted: number;

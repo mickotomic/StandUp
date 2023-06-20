@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from 'src/entities/task.entity';
-import { formatDate } from 'src/helpers/date-and-time.helper';
 import { Repository } from 'typeorm';
 import { TaskDto } from './dto/task.dto';
 import { User } from 'src/entities/user.entity';
@@ -22,9 +21,7 @@ export class TaskService {
       .createQueryBuilder('tasks')
       .leftJoinAndSelect('tasks.user', 'user')
       .select('*')
-      .where('tasks.createdAt like :currentDate', {
-        currentDate: formatDate() + '%',
-      })
+      .where('tasks.summary = :summary', { summary: null })
       .andWhere('tasks.workspace = :workspaceId', { workspaceId });
     if (isForCurrentUserOnly) {
       qb.andWhere('tasks.user = :userId', { user });
