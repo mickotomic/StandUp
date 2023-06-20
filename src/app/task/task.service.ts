@@ -35,11 +35,27 @@ export class TaskService {
   }
 
   async createTask(user: User, dto: TaskDto): Promise<Task> {
-    return this.taskRepository.save({ user, dto });
+    return await this.taskRepository.save({
+      user,
+      name: dto.name,
+      status: dto.status,
+      workspaceId: dto.workspaceId,
+      deadline: dto.deadline,
+    });
   }
 
-  async updateTask(id: number, dto: TaskDto) {
-    return await this.taskRepository.update(id, dto);
+  async updateTask(id: number, user: User, dto: TaskDto) {
+    const task = await this.taskRepository.findOneBy({ id, user });
+    if (!task) {
+      throw new BadRequestException('Task not found!');
+    }
+
+    task.name = dto.name;
+    task.priority = dto.priority;
+    task.status = dto.status;
+    task.deadline = dto.deadline;
+
+    return await this.taskRepository.save(task);
   }
 
   async deleteTask(id: number, user: User): Promise<void> {

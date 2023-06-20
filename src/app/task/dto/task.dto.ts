@@ -16,6 +16,10 @@ export class TaskDto {
   status: string;
 
   @ApiProperty()
+  @IsString()
+  workspaceId: number;
+
+  @ApiProperty()
   @IsOptional()
   @IsDate()
   deadline: Date;
