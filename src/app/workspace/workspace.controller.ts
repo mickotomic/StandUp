@@ -84,20 +84,14 @@ export class WorkspaceController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAllWorkspaces(@GetUser() user: User): Promise<Workspace[]> {
-    return await this.workspaceService.findAllWorkspaces(user);
+  async findAllWorkspaces(
+    @GetUser() user: User,
+    @Query('withDeleted') withDeleted: string,
+  ): Promise<Workspace[]> {
+    return await this.workspaceService.findAllWorkspaces(user, withDeleted);
   }
 
   @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/:id')
-  async findOneWorkspace(
-    @Param('id', ParseIntPipe) id: string,
-    @GetUser() user: User,
-  ): Promise<Workspace> {
-    return await this.workspaceService.findOneWorkspace(+id, user);
-  }
-
   @UseGuards(AuthGuard('jwt'))
   @Put('/:id')
   async updateWorkspace(

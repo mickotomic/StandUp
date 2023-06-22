@@ -11,7 +11,7 @@ import { UserToken } from 'src/entities/user-token.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
-import { Repository } from 'typeorm';
+import { Repository, createQueryBuilder } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { VerifyTokenDto } from './dto/verify-token.dto';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
@@ -120,53 +120,34 @@ export class WorkspaceService {
     createWorkspaceDto: CreateWorkspaceDto,
     owner: User,
   ): Promise<Workspace> {
-    const workspace = { ...createWorkspaceDto, owner };
-    return await this.workspaceRepository.save(workspace);
-  }
-
-  async findAllWorkspaces(user: User): Promise<Workspace[]> {
-    const workspaces = await this.workspaceRepository.find({
-      where: { owner: user },
-      relations: ['users'],
-      withDeleted: true,
+    const workspace = await this.workspaceRepository.save({
+      ...createWorkspaceDto,
+      owner,
     });
-
-    return workspaces;
+    await this.userWorkspaceRepository.save({
+      workspace: { id: workspace.id },
+      user: owner,
+    });
+    return workspace;
   }
 
-  // async findAllWorkspaces(user: User): Promise<Workspace[]> {
-  //   return await this.workspaceRepository.find();
-  // }
-
-  // async findAllWorkspaces(user: User): Promise<Workspace[]> {
-  //   // return await this.workspaceRepository
-  //   // .createQueryBuilder('workspaces')
-  //   // .leftJoin('workspaces.owner', 'owner')
-  //   // .withDeleted()
-  //   // .where('owner.id = :ownerId', { ownerId: user.id })
-  //   // .getMany();
-  //   return await this.workspaceRepository.find(); //or findAll(), check
-  // }
-
-  async findOneWorkspace(id: number, user: User): Promise<Workspace> {
-    // const workspace = await this.workspaceRepository.findOneBy({ id });
-    const workspace = await this.workspaceRepository
+  async findAllWorkspaces(user: User, withDeleted: string): Promise<any> {
+    const qb = this.workspaceRepository
       .createQueryBuilder('workspaces')
-      .leftJoinAndSelect('workspaces.owner', 'owner')
-      .where('workspaces.id = :id', { id })
-      .andWhere('owner.id = :ownerId', { ownerId: user.id })
-      .getOne(); // .execute()
+      .leftJoin('workspaces.owner', 'owner')
+      .leftJoin('workspaces.users', 'users_workspaces');
 
-    if (!workspace) {
-      throw new Error('Workspace not found');
+    if (withDeleted === 'true') {
+      qb.withDeleted().where(
+        'workspaces.deletedAt IS NOT NULL AND owner.id = :ownerId',
+        { ownerId: user.id },
+      );
     }
-    if (workspace.deletedAt !== null) {
-      throw new Error('Workspace with id: ' + id + ' was deleted');
-    }
-    if (workspace.owner.id !== user.id) {
-      throw new Error('You are not allowed to see this workspace');
-    }
-    return workspace;
+    qb.orWhere(
+      'workspaces.deletedAt IS NULL AND users_workspaces.user = :userId',
+      { userId: user.id },
+    );
+    return await qb.getManyAndCount();
   }
 
   async updateWorkspace(
@@ -174,17 +155,22 @@ export class WorkspaceService {
     updateWorkspaceDto: CreateWorkspaceDto,
     user: User,
   ) {
-    const workspace = await this.workspaceRepository.findOneBy({ id });
-    const workspaceToUpdate = { ...workspace, user };
+    const workspace = await this.workspaceRepository
+      .createQueryBuilder('workspaces')
+      .leftJoin('workspaces.owner', 'owner')
+      .where({ id, owner: user.id })
+      .getOne();
+
     if (!workspace) {
       throw new Error('Workspace not found');
     }
-    if (workspace.owner.id !== user.id) {
-      throw new UnauthorizedException(
-        'Only workspace owner can update workspace',
-      );
-    }
-    return await this.workspaceRepository.update(id, updateWorkspaceDto);
+
+    await this.workspaceRepository.save({
+      ...workspace,
+      projectName: updateWorkspaceDto.projectName,
+      settings: updateWorkspaceDto.settings,
+    });
+    return workspace;
   }
 
   async removeWorkspace(id: number, user: User) {
