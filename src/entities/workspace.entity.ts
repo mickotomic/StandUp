@@ -37,7 +37,7 @@ export class Workspace {
   @Column({ type: 'varchar' })
   projectName: string;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'varchar' })
   settings: string;
 
   @CreateDateColumn()
