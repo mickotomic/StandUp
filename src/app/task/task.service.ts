@@ -54,6 +54,7 @@ export class TaskService {
     return await this.taskRepository.save({
       user,
       name: dto.name,
+      priority: dto.priority,
       status: dto.status,
       workspace: { id: dto.workspaceId },
       deadline: dto.deadline,
