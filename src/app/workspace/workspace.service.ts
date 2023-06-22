@@ -15,6 +15,7 @@ import { Repository, createQueryBuilder } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { VerifyTokenDto } from './dto/verify-token.dto';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 
 @Injectable()
 export class WorkspaceService {
@@ -39,10 +40,10 @@ export class WorkspaceService {
       relations: { owner: true },
     });
     if (!workspace) {
-      throw new NotFoundException('Workspace not found');
+      throw new NotFoundException(returnMessages.WorkspaceNotFound);
     }
     if (workspace.owner.id !== user.id) {
-      throw new UnauthorizedException('Only workspace owners can invite users');
+      throw new UnauthorizedException(returnMessages.WorkspaceOwnerInvite);
     }
     const arrOfEmails = invitedEmails.emails.split(',');
 
@@ -86,7 +87,7 @@ export class WorkspaceService {
       id: verifyTokenDto.workspaceId,
     });
     if (!workspace) {
-      throw new BadRequestException('Workspace not found');
+      throw new BadRequestException(returnMessages.WorkspaceNotFound);
     }
 
     const userToken = await this.userTokenRepository.findOne({
@@ -97,7 +98,7 @@ export class WorkspaceService {
       },
     });
     if (!userToken || userToken.userEmail !== user.email) {
-      throw new BadRequestException('Token is not valid');
+      throw new BadRequestException(returnMessages.TokenNotValid);
     }
 
     this.userTokenRepository.update(userToken.id, { isValid: false });
@@ -106,7 +107,7 @@ export class WorkspaceService {
       user,
     });
 
-    return { message: 'Token is valid', workspace };
+    return { message: returnMessages.TokenIsValid, workspace };
   }
 
   public async checkDoesEmailExists(

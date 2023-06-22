@@ -5,9 +5,11 @@ module.exports = {
     tsconfigRootDir: __dirname,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint/eslint-plugin'],
+  plugins: ['@typescript-eslint/eslint-plugin', 'unused-imports'],
   extends: [
-
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
   ],
   root: true,
   env: {
@@ -16,9 +18,19 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    quotes: ['warn', 'single'],
+    'default-param-last': 'error',
+    'require-await': 'error',
+    'no-else-return': 'error',
+    'no-var': 'error',
+    eqeqeq: 'error',
+    // 'operator-linebreak': ['warn', 'before'],
+    'prettier/prettier': 'warn',
+    'unused-imports/no-unused-imports': 'error',
+    '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-explicit-any': 'error',
   },
 };

@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
-import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
 import { ValidationCode } from '../entities/validation-code.entity';
 import { MailVerificationListener } from '../events/mail-verification.listener';
+import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { GoogleStrategy } from './google-oauth.strategy';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
@@ -18,7 +19,12 @@ import { AuthService } from './auth.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, MailVerificationListener],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    MailVerificationListener,
+    GoogleStrategy,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

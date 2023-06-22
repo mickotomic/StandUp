@@ -8,11 +8,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserWorkspace } from './user-workspace.entity';
-import { Task } from './task.entity';
 import { Summary } from './summary.entity';
-import { User } from './user.entity';
+import { Task } from './task.entity';
 import { UserToken } from './user-token.entity';
+import { UserWorkspace } from './user-workspace.entity';
+import { User } from './user.entity';
 
 @Entity({ name: 'workspaces' })
 export class Workspace {
