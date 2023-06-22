@@ -34,9 +34,6 @@ export class Task {
   @Column({ type: 'varchar' })
   status: string;
 
-  @Column()
-  taskType: string;
-
   @Column({ nullable: true })
   deadline: Date;
 
