@@ -6,7 +6,7 @@ export class CreateWorkspaceDto {
   @IsString()
   projectName: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Settings is not currently supported' })
   @IsString()
   settings: string;
 }

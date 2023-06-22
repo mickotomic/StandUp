@@ -13,13 +13,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
+import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { VerifyTokenDto } from './dto/verify-token.dto';
 import { WorkspaceService } from './workspace.service';
-import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 
 @ApiTags('app-workspace')
 @Controller('/app/workspaces')
@@ -37,8 +37,8 @@ export class WorkspaceController {
       },
     },
   })
-  @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Post('/:id/invite')
   async inviteUsers(
     @Param('id') workspaceId: string,
@@ -52,6 +52,7 @@ export class WorkspaceController {
     );
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post('/verify')
   async verifyInvitation(
@@ -61,6 +62,7 @@ export class WorkspaceController {
     return await this.workspaceService.verifyInvitation(verifyTokenDto, user);
   }
 
+  @ApiBearerAuth()
   @Get('/check/email')
   async checkDoesEmailExists(
     @Query('email') email: string,
@@ -82,6 +84,7 @@ export class WorkspaceController {
   }
 
   @ApiBearerAuth()
+  @ApiQuery({ name: 'withDeleted', description: 'Can be true or false' })
   @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAllWorkspaces(
