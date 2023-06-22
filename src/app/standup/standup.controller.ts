@@ -13,12 +13,15 @@ import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { StandupService } from './standup.service';
+import { StandUpDto } from './dto/standup.dto';
 
 
 @ApiTags('app-standup')
 @Controller('/app/standup')
 export class StandupController {
   constructor(private readonly standupService: StandupService) {}
+
+
 
   // @ApiBody({
   //   description: 'Multiple emails separated by comma',
@@ -45,14 +48,15 @@ export class StandupController {
   //   );
   // }
 
-  // @UseGuards(AuthGuard('jwt'))
-  // @Post('/verify')
-  // async verifyInvitation(
-  //   @Body() verifyTokenDto: VerifyTokenDto,
-  //   @GetUser() user: User,
-  // ): Promise<{ message: string; workspace: Workspace }> {
-  //   return await this.workspaceService.verifyInvitation(verifyTokenDto, user);
-  // }
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/start-standup')
+  async startStandup(
+    @GetUser() user: User,
+    @Body() workspaceId: { id: number },
+    @Body() startFinistStandup: StandUpDto,
+  ): Promise<any> {
+    return await this.standupService.startStandup(+workspaceId, user, startFinistStandup);
+  }
 
   // @Get('/check/email')
   // async checkDoesEmailExists(

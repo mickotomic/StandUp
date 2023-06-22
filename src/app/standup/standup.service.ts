@@ -13,6 +13,8 @@ import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { Repository } from 'typeorm';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
+import { StandUpDto } from './dto/standup.dto';
+import { Summary } from 'src/entities/summary.entity';
 
 @Injectable()
 export class StandupService {
@@ -23,9 +25,19 @@ export class StandupService {
     private readonly userTokenRepository: Repository<UserToken>,
     @InjectRepository(UserWorkspace)
     private readonly userWorkspaceRepository: Repository<UserWorkspace>,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectQueue('workspace') private readonly mailerQueue: Queue,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Summary)
+    private readonly summaryRepository: Repository<Summary>,
   ) {}
+
+  async startStandup(workspaceId : number, user: User, startFinistStandup: StandUpDto ) { 
+
+
+
+    return await this.summaryRepository.save
+  }
+
 
   // public async inviteUsers(
   //   worksapceId: number,
