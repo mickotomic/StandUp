@@ -18,7 +18,7 @@ export class TaskService {
   async getDefaultTaskList(
     workspaceId: number,
     user: User,
-    isForCurrentUserOnly = false,
+    isForCurrentUserOnly = '',
   ): Promise<{ tasks: Task[]; count: number }> {
     const workspace = await this.userworkspaceRepository.findOne({
       where: { user: { id: user.id }, workspace: { id: workspaceId } },
@@ -31,11 +31,10 @@ export class TaskService {
     const qb = this.taskRepository
       .createQueryBuilder('tasks')
       .leftJoinAndSelect('tasks.user', 'user')
-      .select('*')
-      .where('tasks.summary = :summary', { summary: null })
+      .where('tasks.summary IS NULL')
       .andWhere('tasks.workspace = :workspaceId', { workspaceId });
-    if (isForCurrentUserOnly) {
-      qb.andWhere('tasks.user = :userId', { user });
+    if (isForCurrentUserOnly === 'true') {
+      qb.andWhere('tasks.user = :userId', { userId: user.id });
     }
 
     const [tasks, count] = await qb.getManyAndCount();
@@ -80,6 +79,6 @@ export class TaskService {
     if (!task) {
       throw new BadRequestException('Task not found!');
     }
-    await this.taskRepository.delete(task);
+    await this.taskRepository.remove(task);
   }
 }

@@ -31,7 +31,7 @@ export class TaskController {
   @ApiQuery({ name: 'isForCurrentUserOnly' })
   async getDefaultTaskList(
     @Query('workspaceId') workspaceId: number,
-    @Query('isForCurrentUserOnly') isForCurrentUserOnly: boolean,
+    @Query('isForCurrentUserOnly') isForCurrentUserOnly: string,
     @GetUser() user: User,
   ): Promise<{ tasks: Task[]; count: number }> {
     return await this.taskService.getDefaultTaskList(
