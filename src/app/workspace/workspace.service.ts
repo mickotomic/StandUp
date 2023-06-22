@@ -163,7 +163,7 @@ export class WorkspaceService {
       .getOne();
 
     if (!workspace) {
-      throw new Error('Workspace not found');
+      throw new BadRequestException(returnMessages.WorkspaceNotFound);
     }
 
     await this.workspaceRepository.save({
