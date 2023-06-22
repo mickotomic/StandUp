@@ -4,12 +4,15 @@ import { Task } from 'src/entities/task.entity';
 import { Repository } from 'typeorm';
 import { TaskDto } from './dto/task.dto';
 import { User } from 'src/entities/user.entity';
+import { UserWorkspace } from 'src/entities/user-workspace.entity';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
+    @InjectRepository(UserWorkspace)
+    private userworkspaceRepository: Repository<UserWorkspace>,
   ) {}
 
   async getDefaultTaskList(
@@ -17,6 +20,14 @@ export class TaskService {
     user: User,
     isForCurrentUserOnly = false,
   ): Promise<{ tasks: Task[]; count: number }> {
+    const workspace = await this.userworkspaceRepository.findOne({
+      where: { user: { id: user.id }, workspace: { id: workspaceId } },
+    });
+
+    if (!workspace) {
+      throw new BadRequestException("User doesn't belong to this workspace!");
+    }
+
     const qb = this.taskRepository
       .createQueryBuilder('tasks')
       .leftJoinAndSelect('tasks.user', 'user')
@@ -32,11 +43,19 @@ export class TaskService {
   }
 
   async createTask(user: User, dto: TaskDto): Promise<Task> {
+    const workspace = await this.userworkspaceRepository.findOne({
+      where: { user: { id: user.id }, workspace: { id: dto.workspaceId } },
+    });
+
+    if (!workspace) {
+      throw new BadRequestException("User doesn't belong to this workspace!");
+    }
+
     return await this.taskRepository.save({
       user,
       name: dto.name,
       status: dto.status,
-      workspaceId: dto.workspaceId,
+      workspace: { id: dto.workspaceId },
       deadline: dto.deadline,
     });
   }

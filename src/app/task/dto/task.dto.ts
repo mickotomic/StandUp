@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class TaskDto {
   @ApiProperty()
@@ -16,7 +16,7 @@ export class TaskDto {
   status: string;
 
   @ApiProperty()
-  @IsString()
+  @IsNumber()
   workspaceId: number;
 
   @ApiProperty()
