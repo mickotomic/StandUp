@@ -52,10 +52,18 @@ export class StandupController {
   @Post('/start-standup')
   async startStandup(
     @GetUser() user: User,
-    @Body() workspaceId: { id: number },
-    @Body() startFinistStandup: StandUpDto,
+    @Body() workspaceId: { id: number }
   ): Promise<any> {
-    return await this.standupService.startStandup(+workspaceId, user, startFinistStandup);
+    return await this.standupService.startStandup(+workspaceId, user);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/finish-standup')
+  async finishStandup(
+    @GetUser() user: User,
+    @Body() workspaceId: { id: number }
+  ): Promise<any> {
+    return await this.standupService.finishStandup(+workspaceId, user);
   }
 
   // @Get('/check/email')

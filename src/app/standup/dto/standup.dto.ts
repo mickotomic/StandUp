@@ -1,12 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+
+
+type actionTypeT =  "start" | "finish"
 
 export class StandUpDto {
-  @ApiProperty()
-  @IsString()
-  start: 'start';
-
-  @ApiProperty()
-  @IsString()
-  finish: 'finish';
+  type: actionTypeT;
 }

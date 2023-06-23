@@ -2,8 +2,6 @@ import { InjectQueue } from '@nestjs/bull';
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bull';
@@ -31,13 +29,43 @@ export class StandupService {
     private readonly summaryRepository: Repository<Summary>,
   ) {}
 
-  async startStandup(workspaceId : number, user: User, startFinistStandup: StandUpDto ) { 
+  async startStandup(workspaceId : number, user: User ) { 
 
+      const existingStartedStandup = await this.summaryRepository.createQueryBuilder('summary')
+        .where('summary.workspace = :workspaceId', { workspaceId })
+        .andWhere('summary.startedAt IS NOT NULL')
+        .andWhere('summary.finishedAt IS NULL')
+        .getOne();
+      
+    if (existingStartedStandup) {
+      throw new BadRequestException("Standup already in progress");
+    }
+    
+    const workspace = await this.workspaceRepository.findOneBy({ id: workspaceId });
+    await this.summaryRepository.save({ workspace, startedAt: new Date() });
 
-
-    return await this.summaryRepository.save
+    const [users, count]  = await this.userRepository.findAndCount({
+      where: { workspaces: { workspace: { id: workspaceId } }},
+      relations: ['tasks']
+    })
+    // tasks: {summary: null} 
+  console.log(users, count);
+    return { users, count };
   }
 
+
+  async finishStandup(workspaceId : number, user: User ) { 
+    const existingStartedStandup = await this.summaryRepository.createQueryBuilder('summary')
+        .where('summary.workspace = :workspaceId', { workspaceId })
+        .andWhere('summary.startedAt IS NOT NULL')
+        .andWhere('summary.finishedAt IS NULL')
+        .getOne();
+      
+    if (!existingStartedStandup) {
+      throw new BadRequestException("There is no started standup for this workspace");
+    }
+    
+  }
 
   // public async inviteUsers(
   //   worksapceId: number,
