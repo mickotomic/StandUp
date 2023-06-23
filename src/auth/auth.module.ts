@@ -6,6 +6,7 @@ import { ValidationCode } from '../entities/validation-code.entity';
 import { MailVerificationListener } from '../events/mail-verification.listener';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { GoogleStrategy } from './google-oauth.strategy';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
@@ -18,7 +19,12 @@ import { JwtStrategy } from './jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, MailVerificationListener],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    MailVerificationListener,
+    GoogleStrategy,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
