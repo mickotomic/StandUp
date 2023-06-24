@@ -11,9 +11,11 @@ import { UserToken } from 'src/entities/user-token.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
-import { Repository } from 'typeorm';
+import { Repository, createQueryBuilder } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { VerifyTokenDto } from './dto/verify-token.dto';
+import { CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 
 @Injectable()
 export class WorkspaceService {
@@ -29,19 +31,19 @@ export class WorkspaceService {
   ) {}
 
   public async inviteUsers(
-    worksapceId: number,
+    workspaceId: number,
     invitedEmails: { emails: string },
     user: User,
   ): Promise<void> {
     const workspace = await this.workspaceRepository.findOne({
-      where: { id: worksapceId },
+      where: { id: workspaceId },
       relations: { owner: true },
     });
     if (!workspace) {
-      throw new NotFoundException('Workspace not found');
+      throw new NotFoundException(returnMessages.WorkspaceNotFound);
     }
     if (workspace.owner.id !== user.id) {
-      throw new UnauthorizedException('Only workspace owners can invite users');
+      throw new UnauthorizedException(returnMessages.WorkspaceOwnerInvite);
     }
     const arrOfEmails = invitedEmails.emails.split(',');
 
@@ -54,7 +56,7 @@ export class WorkspaceService {
       const link =
         process.env.BASE_URL +
         process.env.APP_PORT +
-        `/app/workspaces/verify?workspaceId=${worksapceId}&token=${token}&email=${email}`;
+        `/app/workspaces/verify?workspaceId=${workspaceId}&token=${token}&email=${email}`;
 
       this.userTokenRepository.save({
         userEmail: email,
@@ -85,7 +87,7 @@ export class WorkspaceService {
       id: verifyTokenDto.workspaceId,
     });
     if (!workspace) {
-      throw new BadRequestException('Workspace not found');
+      throw new BadRequestException(returnMessages.WorkspaceNotFound);
     }
 
     const userToken = await this.userTokenRepository.findOne({
@@ -96,7 +98,7 @@ export class WorkspaceService {
       },
     });
     if (!userToken || userToken.userEmail !== user.email) {
-      throw new BadRequestException('Token is not valid');
+      throw new BadRequestException(returnMessages.TokenNotValid);
     }
 
     this.userTokenRepository.update(userToken.id, { isValid: false });
@@ -105,7 +107,7 @@ export class WorkspaceService {
       user,
     });
 
-    return { message: 'Token is valid', workspace };
+    return { message: returnMessages.TokenIsValid, workspace };
   }
 
   public async checkDoesEmailExists(
@@ -113,5 +115,83 @@ export class WorkspaceService {
   ): Promise<{ userExists: boolean }> {
     const user = await this.userRepository.findOneBy({ email });
     return { userExists: user ? true : false };
+  }
+
+  public async createWorkspace(
+    createWorkspaceDto: CreateWorkspaceDto,
+    owner: User,
+  ): Promise<Workspace> {
+    const workspace = await this.workspaceRepository.save({
+      ...createWorkspaceDto,
+      owner,
+    });
+    await this.userWorkspaceRepository.save({
+      workspace: { id: workspace.id },
+      user: owner,
+    });
+    return workspace;
+  }
+
+  async findAllWorkspaces(user: User, withDeleted: string): Promise<any> {
+    const qb = this.workspaceRepository
+      .createQueryBuilder('workspaces')
+      .leftJoin('workspaces.owner', 'owner')
+      .leftJoin('workspaces.users', 'users_workspaces');
+
+    if (withDeleted === 'true') {
+      qb.withDeleted().where(
+        'workspaces.deletedAt IS NOT NULL AND owner.id = :ownerId',
+        { ownerId: user.id },
+      );
+    }
+    qb.orWhere(
+      'workspaces.deletedAt IS NULL AND users_workspaces.user = :userId',
+      { userId: user.id },
+    );
+    return await qb.getManyAndCount();
+  }
+
+  async updateWorkspace(
+    id: number,
+    updateWorkspaceDto: CreateWorkspaceDto,
+    user: User,
+  ) {
+    const workspace = await this.workspaceRepository
+      .createQueryBuilder('workspaces')
+      .leftJoin('workspaces.owner', 'owner')
+      .where({ id, owner: user.id })
+      .getOne();
+
+    if (!workspace) {
+      throw new BadRequestException(returnMessages.WorkspaceNotFound);
+    }
+
+    await this.workspaceRepository.save({
+      ...workspace,
+      projectName: updateWorkspaceDto.projectName,
+      settings: updateWorkspaceDto.settings,
+    });
+    return workspace;
+  }
+
+  async removeWorkspace(id: number, user: User) {
+    return await this.workspaceRepository
+      .createQueryBuilder('workspaces')
+      .leftJoin('workspaces.owner', 'owner')
+      .softDelete()
+      .where('workspaces.id = :id', { id })
+      .andWhere('owner.id = :ownerId', { ownerId: user.id })
+      .execute();
+  }
+
+  async restoreWorkspace(id: number, user: User) {
+    return await this.workspaceRepository
+      .createQueryBuilder('workspaces')
+      .leftJoin('workspaces.owner', 'owner')
+      .withDeleted()
+      .restore()
+      .where('workspaces.id = :id', { id })
+      .andWhere('owner.id = :ownerId', { ownerId: user.id })
+      .execute();
   }
 }

@@ -40,6 +40,12 @@ export class Summary {
   @Column()
   timespent: number;
 
+  @Column()
+  startedAt: Date;
+
+  @Column({ default: null })
+  finishedAt: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 
