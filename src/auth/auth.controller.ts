@@ -34,7 +34,6 @@ export class AuthController {
     return await this.authService.regenerateCode(email);
   }
 
-
   @Get('/google/redirect')
   @UseGuards(AuthGuard('google-oauth'))
   async googleAuth(@GetUser() user: GooglePayload) {
