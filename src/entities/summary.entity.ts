@@ -3,19 +3,24 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToMany,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Workspace } from './workspace.entity';
+import { Task } from './task.entity';
 
 @Entity({ name: 'summaries' })
 export class Summary {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => Workspace, (workspace) => workspace.summaries)
+  @ManyToOne(() => Workspace, (workspace) => workspace.summaries)
   workspace: Workspace;
+
+  @OneToMany(() => Task, (task) => task.summary)
+  tasks: Task[];
 
   @Column()
   tasksCompleted: number;

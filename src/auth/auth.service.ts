@@ -94,7 +94,7 @@ export class AuthService {
     this.mailerService
       .sendMail({
         to: user.email,
-        from: process.env.APP_MAIL,
+        from: process.env.APP_EMAIL,
         subject: 'User verification code',
         template: 'verification-email',
         context: {

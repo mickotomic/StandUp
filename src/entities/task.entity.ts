@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Summary } from './summary.entity';
 import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'tasks' })
@@ -20,6 +21,9 @@ export class Task {
 
   @ManyToOne(() => Workspace, (workspace) => workspace.tasks)
   workspace: Workspace;
+
+  @ManyToOne(() => Summary, (summary) => summary.tasks)
+  summary: Summary;
 
   @Column({ type: 'varchar' })
   name: string;
