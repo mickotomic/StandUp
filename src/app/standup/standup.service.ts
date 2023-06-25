@@ -44,10 +44,9 @@ export class StandupService {
     await this.summaryRepository.save({ workspace, startedAt: new Date() });
 
     const [users, count]  = await this.userRepository.findAndCount({
-      where: { workspaces: { workspace: { id: workspaceId } }},
+      where: { workspaces: { workspace: { id: workspaceId }}, tasks: {summary: null}},
       relations: ['tasks']
     })
-    // tasks: {summary: null} 
   console.log(users, count);
     return { users, count };
   }
