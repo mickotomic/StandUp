@@ -3,14 +3,12 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Queue } from 'bull';
 import { UserToken } from 'src/entities/user-token.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { Repository } from 'typeorm';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
-import { StandUpDto } from './dto/standup.dto';
 import { Summary } from 'src/entities/summary.entity';
 
 @Injectable()
@@ -28,16 +26,16 @@ export class StandupService {
     private readonly summaryRepository: Repository<Summary>,
   ) {}
 
-  async startStandup(workspaceId : number, user: User ) { 
-
-      const existingStartedStandup = await this.summaryRepository.createQueryBuilder('summary')
-        .where('summary.workspace = :workspaceId', { workspaceId })
-        .andWhere('summary.startedAt IS NOT NULL')
-        .andWhere('summary.finishedAt IS NULL')
-        .getOne();
+  async startStandup(workspaceId: number, user: User) { 
+    
+    const existingStartedStandup = await this.summaryRepository.createQueryBuilder('summary')
+    .where('summary.workspace = :workspaceId', { workspaceId })
+    .andWhere('summary.startedAt IS NOT NULL')
+    .andWhere('summary.finishedAt IS NULL')
+    .getOne();
       
     if (existingStartedStandup) {
-      throw new BadRequestException("Standup already in progress");
+      throw new BadRequestException(returnMessages.StandupInProgress);
     }
     
     const workspace = await this.workspaceRepository.findOneBy({ id: workspaceId });
@@ -60,8 +58,8 @@ export class StandupService {
         .getOne();
       
     if (!existingStartedStandup) {
-      throw new BadRequestException("There is no started standup for this workspace");
+      throw new BadRequestException(returnMessages.NoStandupForWorkspace);
     }
-    
+    return { status: 'ok' };
   }
 }

@@ -26,4 +26,8 @@ export const returnMessages = Object.freeze({
   TokenNotValid: 'Token is not valid!',
 
   TokenIsValid: 'Token is valid!',
+
+  StandupInProgress: 'Standup already in progress!',
+
+  NoStandupForWorkspace: "There is no started standup for this workspace"
 });
