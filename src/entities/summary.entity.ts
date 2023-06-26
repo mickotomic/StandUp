@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Workspace } from './workspace.entity';
 import { Task } from './task.entity';
+import { defaultIfEmpty } from 'rxjs';
 
 @Entity({ name: 'summaries' })
 export class Summary {
@@ -22,23 +23,23 @@ export class Summary {
   @OneToMany(() => Task, (task) => task.summary)
   tasks: Task[];
 
-  @Column()
+  @Column({default: null})
   tasksCompleted: number;
 
-  @Column()
+  @Column({default: null})
   tasksDue: number;
 
-  @Column()
+  @Column({default: null})
   tasksPastDue: number;
 
-  @Column()
+  @Column({default: null})
   attendees: string;
 
-  @Column()
+  @Column({default: null})
   absentUsers: string;
 
-  @Column()
-  timespent: number;
+  @Column({default: null})
+  timespent: string;
 
   @Column()
   startedAt: Date;

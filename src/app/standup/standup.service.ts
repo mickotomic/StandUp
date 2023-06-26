@@ -7,26 +7,23 @@ import { UserToken } from 'src/entities/user-token.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
-import { Repository } from 'typeorm';
+import { MongoInvalidArgumentError, Repository } from 'typeorm';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { Summary } from 'src/entities/summary.entity';
+import { shuffle } from 'src/helpers/shuffle.helper';
 
 @Injectable()
 export class StandupService {
   constructor(
     @InjectRepository(Workspace)
     private readonly workspaceRepository: Repository<Workspace>,
-    @InjectRepository(UserToken)
-    private readonly userTokenRepository: Repository<UserToken>,
-    @InjectRepository(UserWorkspace)
-    private readonly userWorkspaceRepository: Repository<UserWorkspace>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Summary)
     private readonly summaryRepository: Repository<Summary>,
   ) {}
 
-  async startStandup(workspaceId: number, user: User) { 
+  async startStandup(workspaceId: number) { 
     
     const existingStartedStandup = await this.summaryRepository.createQueryBuilder('summary')
     .where('summary.workspace = :workspaceId', { workspaceId })
@@ -39,18 +36,29 @@ export class StandupService {
     }
     
     const workspace = await this.workspaceRepository.findOneBy({ id: workspaceId });
-    await this.summaryRepository.save({ workspace, startedAt: new Date() });
+
+    if (!workspace) { 
+      throw new BadRequestException(returnMessages.WorkspaceNotFound); 
+    }
+   
+    await this.summaryRepository.save({
+      workspace: { id: workspace.id },
+      startedAt: new Date()
+    });
 
     const [users, count]  = await this.userRepository.findAndCount({
       where: { workspaces: { workspace: { id: workspaceId }}, tasks: {summary: null}},
       relations: ['tasks']
     })
-  console.log(users, count);
-    return { users, count };
+
+    const shuffledUsers = shuffle(users);
+
+    return {shuffledUsers, count };
   }
 
 
-  async finishStandup(workspaceId : number, user: User ) { 
+  async finishStandup(workspaceId: number) { 
+    
     const existingStartedStandup = await this.summaryRepository.createQueryBuilder('summary')
         .where('summary.workspace = :workspaceId', { workspaceId })
         .andWhere('summary.startedAt IS NOT NULL')
@@ -60,6 +68,17 @@ export class StandupService {
     if (!existingStartedStandup) {
       throw new BadRequestException(returnMessages.NoStandupForWorkspace);
     }
-    return { status: 'ok' };
+
+  const timeSpentMilliseconds = new Date().getTime() - existingStartedStandup.startedAt.getTime();
+  const timeSpentSeconds = Math.floor(timeSpentMilliseconds / 1000);
+  const minutes = Math.floor(timeSpentSeconds / 60);
+  const seconds = timeSpentSeconds % 60;
+
+    await this.summaryRepository.update(existingStartedStandup.id, {
+    finishedAt: new Date(),
+    timespent: `${minutes} minutes ${seconds} seconds`
+  });
+    
+    return { message: returnMessages.StandupFinished };
   }
 }
