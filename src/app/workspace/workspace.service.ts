@@ -11,11 +11,11 @@ import { UserToken } from 'src/entities/user-token.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
-import { Repository, createQueryBuilder } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
-import { VerifyTokenDto } from './dto/verify-token.dto';
-import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+import { CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { VerifyTokenDto } from './dto/verify-token.dto';
 
 @Injectable()
 export class WorkspaceService {

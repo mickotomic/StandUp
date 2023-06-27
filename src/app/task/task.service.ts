@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from 'src/entities/task.entity';
+import { UserWorkspace } from 'src/entities/user-workspace.entity';
+import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { TaskDto } from './dto/task.dto';
-import { User } from 'src/entities/user.entity';
-import { UserWorkspace } from 'src/entities/user-workspace.entity';
 
 @Injectable()
 export class TaskService {

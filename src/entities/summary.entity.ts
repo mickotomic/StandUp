@@ -8,9 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Workspace } from './workspace.entity';
 import { Task } from './task.entity';
-import { defaultIfEmpty } from 'rxjs';
+import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'summaries' })
 export class Summary {
@@ -23,22 +22,22 @@ export class Summary {
   @OneToMany(() => Task, (task) => task.summary)
   tasks: Task[];
 
-  @Column({default: null})
+  @Column({ default: null })
   tasksCompleted: number;
 
-  @Column({default: null})
+  @Column({ default: null })
   tasksDue: number;
 
-  @Column({default: null})
+  @Column({ default: null })
   tasksPastDue: number;
 
-  @Column({default: null})
+  @Column({ default: null })
   attendees: string;
 
-  @Column({default: null})
+  @Column({ default: null })
   absentUsers: string;
 
-  @Column({default: null})
+  @Column({ default: null })
   timespent: string;
 
   @Column()

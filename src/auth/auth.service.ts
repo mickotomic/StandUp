@@ -166,7 +166,6 @@ export class AuthService {
     return this.mailVerification(user);
   }
 
-
   public async googleAuth(user: GooglePayload) {
     const userExists = await this.userRepository.findOneBy({
       email: user.email,

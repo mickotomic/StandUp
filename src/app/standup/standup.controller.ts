@@ -1,9 +1,4 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { StandupService } from './standup.service';
@@ -12,7 +7,6 @@ import { StandupService } from './standup.service';
 @Controller('/app/standup')
 export class StandupController {
   constructor(private readonly standupService: StandupService) {}
-
 
   @ApiBearerAuth()
   @ApiBody({
@@ -28,9 +22,7 @@ export class StandupController {
   })
   @UseGuards(AuthGuard('jwt'))
   @Post('/start-standup')
-  async startStandup(
-    @Body() workspace: { id: number }
-  ): Promise<any> {
+  async startStandup(@Body() workspace: { id: number }): Promise<any> {
     return await this.standupService.startStandup(+workspace.id);
   }
 
@@ -48,9 +40,7 @@ export class StandupController {
   })
   @UseGuards(AuthGuard('jwt'))
   @Post('/finish-standup')
-  async finishStandup(
-    @Body() workspace: { id: number }
-  ): Promise<any> {
+  async finishStandup(@Body() workspace: { id: number }): Promise<any> {
     return await this.standupService.finishStandup(+workspace.id);
   }
 }
