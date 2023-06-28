@@ -121,6 +121,7 @@ export class WorkspaceService {
         token: verifyTokenDto.token,
         userEmail: verifyTokenDto.email,
         workspace: { id: verifyTokenDto.workspaceId },
+        isValid: true,
       },
     });
     if (!userToken || userToken.userEmail !== user.email) {
