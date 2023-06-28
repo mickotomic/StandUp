@@ -11,11 +11,12 @@ import { UserToken } from 'src/entities/user-token.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
-import { Repository, createQueryBuilder } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
-import { VerifyTokenDto } from './dto/verify-token.dto';
-import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
+import { isEmail } from 'src/helpers/is-email.helper';
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+import { CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { VerifyTokenDto } from './dto/verify-token.dto';
 
 @Injectable()
 export class WorkspaceService {
@@ -34,7 +35,12 @@ export class WorkspaceService {
     workspaceId: number,
     invitedEmails: { emails: string },
     user: User,
-  ): Promise<void> {
+  ): Promise<{ status: string; email: string }[]> {
+    const returnArr: { status: string; email: string }[] = [];
+
+    if (!invitedEmails.emails) {
+      throw new BadRequestException(returnMessages.EmailsNotValid);
+    }
     const workspace = await this.workspaceRepository.findOne({
       where: { id: workspaceId },
       relations: { owner: true },
@@ -47,42 +53,62 @@ export class WorkspaceService {
     }
     const arrOfEmails = invitedEmails.emails.split(',');
 
-    arrOfEmails.forEach(async (email) => {
-      this.userTokenRepository.update(
-        { userEmail: email, workspace: { id: workspace.id }, isValid: true },
-        { isValid: false },
-      );
-      const token = uuidv4();
-      const link =
-        process.env.BASE_URL +
-        process.env.APP_PORT +
-        `/app/workspaces/verify?workspaceId=${workspaceId}&token=${token}&email=${email}`;
-
-      this.userTokenRepository.save({
-        userEmail: email,
+    for (const email of arrOfEmails) {
+      const userWorkspace = await this.userWorkspaceRepository.findOneBy({
         workspace: { id: workspace.id },
-        token,
+        user: { email: email },
       });
+      if (userWorkspace) {
+        returnArr.push({
+          status: returnMessages.UserExistsInWorkspace,
+          email: email,
+        });
+      } else if (!isEmail(email)) {
+        returnArr.push({
+          status: returnMessages.EmailsNotValid,
+          email: email,
+        });
+      } else {
+        this.userTokenRepository.update(
+          { userEmail: email, workspace: { id: workspace.id }, isValid: true },
+          { isValid: false },
+        );
+        const token = uuidv4();
+        const link =
+          process.env.BASE_URL +
+          process.env.APP_PORT +
+          `/app/workspaces/verify?workspaceId=${workspaceId}&token=${token}&email=${email}`;
 
-      await this.mailerQueue.add(
-        'inviteEmail',
-        {
-          email,
-          link,
-          name: user.name,
-          workspaceName: workspace.projectName,
-        },
-        {
-          attempts: 5,
-        },
-      );
-    });
+        this.userTokenRepository.save({
+          userEmail: email,
+          workspace: { id: workspace.id },
+          token,
+        });
+
+        await this.mailerQueue.add(
+          'inviteEmail',
+          {
+            email,
+            link,
+            name: user.name,
+            workspaceName: workspace.projectName,
+          },
+          {
+            attempts: 5,
+          },
+        );
+      }
+    }
+    return returnArr;
   }
 
   public async verifyInvitation(
     verifyTokenDto: VerifyTokenDto,
     user: User,
-  ): Promise<{ message: string; workspace: Workspace }> {
+  ): Promise<{
+    message: string;
+    workspace: Pick<Workspace, 'id' | 'projectName'>;
+  }> {
     const workspace = await this.workspaceRepository.findOneBy({
       id: verifyTokenDto.workspaceId,
     });
@@ -107,7 +133,10 @@ export class WorkspaceService {
       user,
     });
 
-    return { message: returnMessages.TokenIsValid, workspace };
+    return {
+      message: returnMessages.TokenIsValid,
+      workspace: { id: workspace.id, projectName: workspace.projectName },
+    };
   }
 
   public async checkDoesEmailExists(

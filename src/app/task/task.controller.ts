@@ -11,13 +11,13 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { TaskService } from './task.service';
-import { Task } from 'src/entities/task.entity';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { TaskDto } from './dto/task.dto';
-import { GetUser } from 'src/decorator/get-user.decorator';
-import { User } from 'src/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { GetUser } from 'src/decorator/get-user.decorator';
+import { Task } from 'src/entities/task.entity';
+import { User } from 'src/entities/user.entity';
+import { TaskDto } from './dto/task.dto';
+import { TaskService } from './task.service';
 
 @ApiTags('Task')
 @ApiBearerAuth()

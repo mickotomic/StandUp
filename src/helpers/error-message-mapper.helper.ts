@@ -26,4 +26,8 @@ export const returnMessages = Object.freeze({
   TokenNotValid: 'Token is not valid!',
 
   TokenIsValid: 'Token is valid!',
+
+  EmailsNotValid: 'Emails is not valid!',
+
+  UserExistsInWorkspace: 'User already exists in workspace',
 });
