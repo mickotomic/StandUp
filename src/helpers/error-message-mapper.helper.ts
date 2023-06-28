@@ -30,4 +30,6 @@ export const returnMessages = Object.freeze({
   EmailsNotValid: 'Emails is not valid!',
 
   UserExistsInWorkspace: 'User already exists in workspace',
+
+  UserAlradyVerified: 'User is already verified',
 });
