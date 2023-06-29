@@ -32,4 +32,6 @@ export const returnMessages = Object.freeze({
   UserExistsInWorkspace: 'User already exists in workspace',
 
   UserAlradyVerified: 'User is already verified',
+
+  BooleanValueExpected: 'Can be "true" or "false"!',
 });

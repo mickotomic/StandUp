@@ -73,13 +73,13 @@ export class AuthService {
     if (user.emailVerifiedAt === null) {
       throw new BadRequestException(returnMessages.EmailNotVerified);
     }
-
     const payload = {
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
     };
+    delete user.password;
     return {
       message: returnMessages.UserSuccessfullyLoggedIn,
       data: user,
@@ -182,5 +182,13 @@ export class AuthService {
       });
     }
     return await this.login(userExists, true);
+  }
+  public async getMe(user: User): Promise<{ data: User }> {
+    const loggedUser = await this.userRepository.findOneBy(user);
+    if (!loggedUser) {
+      throw new BadRequestException(returnMessages.UserNotFound);
+    }
+    delete loggedUser.password;
+    return { data: loggedUser };
   }
 }
