@@ -1,6 +1,7 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { StandupService } from './standup.service';
 
 @ApiTags('app-standup')
@@ -22,7 +23,9 @@ export class StandupController {
   })
   @UseGuards(AuthGuard('jwt'))
   @Post('/start-standup')
-  async startStandup(@Body() workspace: { id: number }): Promise<any> {
+  async startStandup(
+    @Body() workspace: { id: number },
+  ): Promise<{ shuffledUsers: UsersWidthTasksT[]; count: number }> {
     return await this.standupService.startStandup(+workspace.id);
   }
 
@@ -40,7 +43,7 @@ export class StandupController {
   })
   @UseGuards(AuthGuard('jwt'))
   @Post('/finish-standup')
-  async finishStandup(@Body() workspace: { id: number }): Promise<any> {
+  async finishStandup(@Body() workspace: { id: number }) {
     return await this.standupService.finishStandup(+workspace.id);
   }
 }

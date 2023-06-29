@@ -5,6 +5,7 @@ import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
+import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -18,7 +19,9 @@ export class StandupService {
     private readonly summaryRepository: Repository<Summary>,
   ) {}
 
-  async startStandup(workspaceId: number) {
+  async startStandup(
+    workspaceId: number,
+  ): Promise<{ shuffledUsers: UsersWidthTasksT[]; count: number }> {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -68,10 +71,8 @@ export class StandupService {
       throw new BadRequestException(returnMessages.NoStandupForWorkspace);
     }
 
-    const timeSpent = new Date().getTime() - existingStartedStandup.startedAt.getTime();
-    // const timeSpentSeconds = Math.floor(timeSpentMilliseconds / 1000);
-    // const minutes = Math.floor(timeSpentSeconds / 60);
-    // const seconds = timeSpentSeconds % 60;
+    const timeSpent =
+      new Date().getTime() - existingStartedStandup.startedAt.getTime();
 
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),
