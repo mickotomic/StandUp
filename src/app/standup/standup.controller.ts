@@ -43,7 +43,14 @@ export class StandupController {
   })
   @UseGuards(AuthGuard('jwt'))
   @Post('/finish-standup')
-  async finishStandup(@Body() workspace: { id: number }) {
-    return await this.standupService.finishStandup(+workspace.id);
+  async finishStandup(
+    @Body() workspace: { id: number },
+    @Body()
+    listOfUsersAndTasks: Array<UsersWidthTasksT & { attendees: boolean }>,
+  ) {
+    return await this.standupService.finishStandup(
+      +workspace.id,
+      listOfUsersAndTasks,
+    );
   }
 }

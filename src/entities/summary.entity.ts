@@ -32,10 +32,10 @@ export class Summary {
   tasksPastDue: number;
 
   @Column({ default: null })
-  attendees: string;
+  attendees: number;
 
   @Column({ default: null })
-  absentUsers: string;
+  absentUsers: number;
 
   @Column({ default: null })
   timespent: number;

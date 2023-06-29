@@ -59,7 +59,10 @@ export class StandupService {
     return { shuffledUsers, count };
   }
 
-  async finishStandup(workspaceId: number) {
+  async finishStandup(
+    workspaceId: number,
+    listOfUsersAndTasks: Array<UsersWidthTasksT & { attendees: boolean }>,
+  ) {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -74,9 +77,21 @@ export class StandupService {
     const timeSpent =
       new Date().getTime() - existingStartedStandup.startedAt.getTime();
 
+    let attendees = 0;
+    let absentUsers = 0;
+    for (const user of listOfUsersAndTasks) {
+      if (user.attendees === true) {
+        attendees += 1;
+      } else {
+        absentUsers += 1;
+      }
+    }
+
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),
       timespent: timeSpent,
+      attendees,
+      absentUsers,
     });
 
     return { message: returnMessages.StandupFinished };
