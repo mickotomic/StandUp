@@ -71,13 +71,13 @@ export class AuthService {
     if (user.emailVerifiedAt === null) {
       throw new BadRequestException(returnMessages.EmailNotVerified);
     }
-
     const payload = {
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
     };
+    delete user.password;
     return {
       message: returnMessages.UserSuccessfullyLoggedIn,
       data: user,
