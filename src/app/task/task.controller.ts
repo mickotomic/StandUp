@@ -19,10 +19,10 @@ import { User } from 'src/entities/user.entity';
 import { TaskDto } from './dto/task.dto';
 import { TaskService } from './task.service';
 
-@ApiTags('Task')
+@ApiTags('app-tasks')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
-@Controller('task')
+@Controller('/app/tasks')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
