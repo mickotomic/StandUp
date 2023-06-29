@@ -36,7 +36,7 @@ export class WorkspaceService {
     invitedEmails: { emails: string },
     user: User,
   ): Promise<{ status: string; email: string }[]> {
-    const returnArr: { status: string; email: string }[] = [];
+    const invalidEmails: { status: string; email: string }[] = [];
 
     if (!invitedEmails.emails) {
       throw new BadRequestException(returnMessages.EmailsNotValid);
@@ -59,12 +59,12 @@ export class WorkspaceService {
         user: { email: email },
       });
       if (userWorkspace) {
-        returnArr.push({
+        invalidEmails.push({
           status: returnMessages.UserExistsInWorkspace,
           email: email,
         });
       } else if (!isEmail(email)) {
-        returnArr.push({
+        invalidEmails.push({
           status: returnMessages.EmailsNotValid,
           email: email,
         });
@@ -99,7 +99,7 @@ export class WorkspaceService {
         );
       }
     }
-    return returnArr;
+    return invalidEmails;
   }
 
   public async verifyInvitation(
