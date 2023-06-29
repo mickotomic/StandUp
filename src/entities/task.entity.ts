@@ -1,14 +1,13 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 import { Summary } from './summary.entity';
+import { User } from './user.entity';
 import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'tasks' })
@@ -28,10 +27,10 @@ export class Task {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', default: 'low' })
   priority: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', default: 'not_started' })
   status: string;
 
   @Column({ nullable: true })
@@ -42,7 +41,4 @@ export class Task {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date;
 }
