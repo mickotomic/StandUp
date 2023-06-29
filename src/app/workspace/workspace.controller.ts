@@ -90,7 +90,7 @@ export class WorkspaceController {
   async findAllWorkspaces(
     @GetUser() user: User,
     @Query('withDeleted') withDeleted: string,
-  ): Promise<Workspace[]> {
+  ): Promise<{ workspaces: Workspace[]; count: number }> {
     return await this.workspaceService.findAllWorkspaces(user, withDeleted);
   }
 
@@ -126,7 +126,7 @@ export class WorkspaceController {
   async restoreWorkspace(
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: User,
-  ) {
+  ): Promise<Workspace> {
     return await this.workspaceService.restoreWorkspace(+id, user);
   }
 }

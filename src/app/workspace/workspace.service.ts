@@ -11,11 +11,11 @@ import { UserToken } from 'src/entities/user-token.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
-import { Repository, createQueryBuilder } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
-import { VerifyTokenDto } from './dto/verify-token.dto';
-import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+import { CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { VerifyTokenDto } from './dto/verify-token.dto';
 
 @Injectable()
 export class WorkspaceService {
@@ -132,7 +132,10 @@ export class WorkspaceService {
     return workspace;
   }
 
-  async findAllWorkspaces(user: User, withDeleted: string): Promise<any> {
+  async findAllWorkspaces(
+    user: User,
+    withDeleted: string,
+  ): Promise<{ workspaces: Workspace[]; count: number }> {
     const qb = this.workspaceRepository
       .createQueryBuilder('workspaces')
       .leftJoin('workspaces.owner', 'owner')
@@ -144,11 +147,22 @@ export class WorkspaceService {
         { ownerId: user.id },
       );
     }
+    if (withDeleted === 'false') {
+      qb.withDeleted().where(
+        'workspaces.deletedAt IS NULL AND owner.id = :ownerId',
+        { ownerId: user.id },
+      );
+    }
+    if (withDeleted !== 'true' && withDeleted !== 'false') {
+      throw new BadRequestException(returnMessages.BooleanValueExpected);
+    }
+
     qb.orWhere(
       'workspaces.deletedAt IS NULL AND users_workspaces.user = :userId',
       { userId: user.id },
     );
-    return await qb.getManyAndCount();
+    const [workspaces, count] = await qb.getManyAndCount();
+    return { workspaces, count };
   }
 
   async updateWorkspace(
@@ -166,12 +180,11 @@ export class WorkspaceService {
       throw new BadRequestException(returnMessages.WorkspaceNotFound);
     }
 
-    await this.workspaceRepository.save({
+    return await this.workspaceRepository.save({
       ...workspace,
       projectName: updateWorkspaceDto.projectName,
       settings: updateWorkspaceDto.settings,
     });
-    return workspace;
   }
 
   async removeWorkspace(id: number, user: User) {
@@ -184,8 +197,8 @@ export class WorkspaceService {
       .execute();
   }
 
-  async restoreWorkspace(id: number, user: User) {
-    return await this.workspaceRepository
+  async restoreWorkspace(id: number, user: User): Promise<Workspace> {
+    await this.workspaceRepository
       .createQueryBuilder('workspaces')
       .leftJoin('workspaces.owner', 'owner')
       .withDeleted()
@@ -193,5 +206,11 @@ export class WorkspaceService {
       .where('workspaces.id = :id', { id })
       .andWhere('owner.id = :ownerId', { ownerId: user.id })
       .execute();
+    const workspace = await this.workspaceRepository.findOneBy({ id });
+
+    if (!workspace) {
+      throw new NotFoundException(returnMessages.WorkspaceNotFound);
+    }
+    return workspace;
   }
 }
