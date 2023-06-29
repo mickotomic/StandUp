@@ -1,7 +1,4 @@
-export function isEmail(email: string): boolean {
+export function isEmail(email: string): RegExpMatchArray | null {
   const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-  if (email.match(regex)) {
-    return true;
-  }
-  return false;
+  return email.match(regex);
 }
