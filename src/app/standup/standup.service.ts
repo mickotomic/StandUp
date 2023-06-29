@@ -68,15 +68,14 @@ export class StandupService {
       throw new BadRequestException(returnMessages.NoStandupForWorkspace);
     }
 
-    const timeSpentMilliseconds =
-      new Date().getTime() - existingStartedStandup.startedAt.getTime();
-    const timeSpentSeconds = Math.floor(timeSpentMilliseconds / 1000);
-    const minutes = Math.floor(timeSpentSeconds / 60);
-    const seconds = timeSpentSeconds % 60;
+    const timeSpent = new Date().getTime() - existingStartedStandup.startedAt.getTime();
+    // const timeSpentSeconds = Math.floor(timeSpentMilliseconds / 1000);
+    // const minutes = Math.floor(timeSpentSeconds / 60);
+    // const seconds = timeSpentSeconds % 60;
 
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),
-      timespent: `${minutes} minutes ${seconds} seconds`,
+      timespent: timeSpent,
     });
 
     return { message: returnMessages.StandupFinished };

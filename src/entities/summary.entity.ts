@@ -38,7 +38,7 @@ export class Summary {
   absentUsers: string;
 
   @Column({ default: null })
-  timespent: string;
+  timespent: number;
 
   @Column()
   startedAt: Date;
