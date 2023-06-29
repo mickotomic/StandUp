@@ -34,4 +34,8 @@ export const returnMessages = Object.freeze({
   UserAlradyVerified: 'User is already verified',
 
   BooleanValueExpected: 'Can be "true" or "false"!',
+
+  UserDoesNotBelong: "User doesn't belong to this workspace!",
+
+  TaskNotFound: 'Task not found!',
 });
