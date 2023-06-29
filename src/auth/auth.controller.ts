@@ -1,7 +1,8 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
+import { User } from 'src/entities/user.entity';
 import { GooglePayload } from 'src/types/google-auth-payload.type';
 import { AuthService } from './auth.service';
 import { VerificationCodeDto } from './dto/code-verification.dto';
@@ -38,5 +39,12 @@ export class AuthController {
   @UseGuards(AuthGuard('google-oauth'))
   async googleAuth(@GetUser() user: GooglePayload) {
     return await this.authService.googleAuth(user);
+  }
+
+  @ApiBearerAuth()
+  @Get('/me')
+  @UseGuards(AuthGuard('jwt'))
+  getMe(@GetUser() user: User) {
+    return this.authService.getMe(user);
   }
 }
