@@ -22,7 +22,7 @@ import { TaskService } from './task.service';
 @ApiTags('app-tasks')
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
-@Controller('/app/task')
+@Controller('/app/tasks')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
