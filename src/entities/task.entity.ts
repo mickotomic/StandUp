@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 import { Summary } from './summary.entity';
+import { User } from './user.entity';
 import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'tasks' })

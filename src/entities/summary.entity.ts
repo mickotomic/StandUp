@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Workspace } from './workspace.entity';
 import { Task } from './task.entity';
+import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'summaries' })
 export class Summary {
