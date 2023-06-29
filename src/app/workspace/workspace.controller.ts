@@ -44,7 +44,7 @@ export class WorkspaceController {
     @Param('id') workspaceId: string,
     @Body() invitedEmails: { emails: string },
     @GetUser() user: User,
-  ): Promise<void> {
+  ): Promise<{ status: string; email: string }[]> {
     return await this.workspaceService.inviteUsers(
       +workspaceId,
       invitedEmails,
@@ -58,11 +58,13 @@ export class WorkspaceController {
   async verifyInvitation(
     @Body() verifyTokenDto: VerifyTokenDto,
     @GetUser() user: User,
-  ): Promise<{ message: string; workspace: Workspace }> {
+  ): Promise<{
+    message: string;
+    workspace: Pick<Workspace, 'id' | 'projectName'>;
+  }> {
     return await this.workspaceService.verifyInvitation(verifyTokenDto, user);
   }
 
-  @ApiBearerAuth()
   @Get('/check/email')
   async checkDoesEmailExists(
     @Query('email') email: string,
