@@ -61,7 +61,8 @@ export class StandupService {
 
   async finishStandup(
     workspaceId: number,
-    listOfUsersAndTasks: Array<UsersWidthTasksT & { attendees: boolean }>,
+    absentUsers: User[],
+    users: User[],
   ) {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
@@ -77,21 +78,24 @@ export class StandupService {
     const timeSpent =
       new Date().getTime() - existingStartedStandup.startedAt.getTime();
 
-    let attendees = 0;
-    let absentUsers = 0;
-    for (const user of listOfUsersAndTasks) {
-      if (user.attendees === true) {
-        attendees += 1;
-      } else {
-        absentUsers += 1;
-      }
-    }
+    const absentUsersIds = absentUsers.map((user) => user.id);
+    const usersIds = users.map((user) => user.id);
+ 
+    // let attendees = 0;
+    // let absentUsers = 0;
+    // for (const user of listOfUsersAndTasks) {
+    //   if (user.attendees === true) {
+    //     attendees += 1;
+    //   } else {
+    //     absentUsers += 1;
+    //   }
+    // }
 
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),
       timespent: timeSpent,
-      attendees,
-      absentUsers,
+      absentUsers: absentUsersIds,
+      users: usersIds,
     });
 
     return { message: returnMessages.StandupFinished };

@@ -22,8 +22,8 @@ export class Summary {
   @OneToMany(() => Task, (task) => task.summary)
   tasks: Task[];
 
-  @Column({ default: null })
-  tasksCompleted: number;
+  @Column({ default: null, type: 'simple-json'})
+  tasksCompleted: number[];
 
   @Column({ default: null })
   tasksDue: number;
@@ -31,11 +31,11 @@ export class Summary {
   @Column({ default: null })
   tasksPastDue: number;
 
-  @Column({ default: null })
+  @Column({ default: null, type: 'simple-json' })
   attendees: number;
 
-  @Column({ default: null })
-  absentUsers: number;
+  @Column({ default: null, type: 'simple-json' })
+  absentUsers: number[];
 
   @Column({ default: null })
   timespent: number;
@@ -54,4 +54,7 @@ export class Summary {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @Column({ default: null, type: 'simple-json' })
+  users: number[];
 }

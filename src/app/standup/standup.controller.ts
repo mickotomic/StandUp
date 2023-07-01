@@ -3,6 +3,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { StandupService } from './standup.service';
+import { User } from 'src/entities/user.entity';
+import { GetUser } from 'src/decorator/get-user.decorator';
 
 @ApiTags('app-standup')
 @Controller('/app/standup')
@@ -46,11 +48,13 @@ export class StandupController {
   async finishStandup(
     @Body() workspace: { id: number },
     @Body()
-    listOfUsersAndTasks: Array<UsersWidthTasksT & { attendees: boolean }>,
+    absentUsers: User[],
+    @GetUser() users: User[],
   ) {
     return await this.standupService.finishStandup(
       +workspace.id,
-      listOfUsersAndTasks,
+      absentUsers,
+      users,
     );
   }
 }
