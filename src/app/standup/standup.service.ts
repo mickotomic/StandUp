@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Summary } from 'src/entities/summary.entity';
-import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
@@ -18,8 +17,6 @@ export class StandupService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Summary)
     private readonly summaryRepository: Repository<Summary>,
-    @InjectRepository(UserWorkspace)
-    private readonly userWorkspaceRepository: Repository<UserWorkspace>,
   ) {}
 
   async startStandup(
@@ -51,6 +48,10 @@ export class StandupService {
       },
       relations: ['tasks'],
     });
+
+    if (!users) { 
+      throw new BadRequestException(returnMessages.UsersForWorkspaceNotFound);
+    }
 
     const usersIds = users.map((user) => {
       delete user.password;
@@ -92,6 +93,10 @@ export class StandupService {
     });
 
     const usersIds = users.map((user) => user.id);
+
+    if (!absentUsers.every((element) => usersIds.includes(element))) {
+      throw new BadRequestException(returnMessages.UsersNotInWorkspace);
+    }
 
     const attendeesIds = usersIds.filter((id) => {
       return absentUsers.indexOf(id) === -1;

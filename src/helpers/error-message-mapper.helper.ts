@@ -32,4 +32,8 @@ export const returnMessages = Object.freeze({
   StandupFinished: 'Standup finished successfully!',
 
   NoStandupForWorkspace: 'There is no started standup for this workspace',
+
+  UsersForWorkspaceNotFound: 'Users for this workspace not found!',
+
+  UsersNotInWorkspace: 'Some users are not from this workspace',
 });
