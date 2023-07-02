@@ -1,14 +1,13 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber } from "class-validator";
-import { User } from "src/entities/user.entity";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsNumber } from 'class-validator';
 
+export class StandupDto {
+  @ApiProperty()
+  @IsNumber()
+  workspaceId: number;
 
-export class StandupDto { 
-    
-    @ApiProperty()
-    @IsNumber()
-    workspaceId: number;
-
-    @ApiProperty()
-  absentUsersId: User[];
+  @ApiProperty({ type: [Number] })
+  @IsArray()
+  @IsNumber({}, { each: true })
+  absentUsersId: number[];
 }

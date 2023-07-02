@@ -2,9 +2,8 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
+import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
-import { User } from 'src/entities/user.entity';
-import { GetUser } from 'src/decorator/get-user.decorator';
 
 @ApiTags('app-standup')
 @Controller('/app/standup')
@@ -32,29 +31,12 @@ export class StandupController {
   }
 
   @ApiBearerAuth()
-  @ApiBody({
-    description: 'WorkspaceID object',
-    schema: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'number',
-        },
-      },
-    },
-  })
   @UseGuards(AuthGuard('jwt'))
   @Post('/finish-standup')
-  async finishStandup(
-    @Body() workspace: { id: number },
-    @Body()
-    absentUsers: User[],
-    @GetUser() users: User[],
-  ) {
+  async finishStandup(@Body() dto: StandupDto) {
     return await this.standupService.finishStandup(
-      +workspace.id,
-      absentUsers,
-      users,
+      +dto.workspaceId,
+      dto.absentUsersId,
     );
   }
 }

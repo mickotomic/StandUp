@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Summary } from 'src/entities/summary.entity';
+import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
@@ -17,6 +18,8 @@ export class StandupService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Summary)
     private readonly summaryRepository: Repository<Summary>,
+    @InjectRepository(UserWorkspace)
+    private readonly userWorkspaceRepository: Repository<UserWorkspace>,
   ) {}
 
   async startStandup(
@@ -41,11 +44,6 @@ export class StandupService {
       throw new BadRequestException(returnMessages.WorkspaceNotFound);
     }
 
-    await this.summaryRepository.save({
-      workspace: { id: workspace.id },
-      startedAt: new Date(),
-    });
-
     const [users, count] = await this.userRepository.findAndCount({
       where: {
         workspaces: { workspace: { id: workspaceId } },
@@ -54,16 +52,24 @@ export class StandupService {
       relations: ['tasks'],
     });
 
+    const usersIds = users.map((user) => {
+      delete user.password;
+      return user.id;
+    });
+
     const shuffledUsers = shuffle(users);
+
+    await this.summaryRepository.save({
+      workspace: { id: workspace.id },
+      startedAt: new Date(),
+      users: usersIds,
+      currentUser: shuffledUsers[0].id,
+    });
 
     return { shuffledUsers, count };
   }
 
-  async finishStandup(
-    workspaceId: number,
-    absentUsers: User[],
-    users: User[],
-  ) {
+  async finishStandup(workspaceId: number, absentUsers: number[]) {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -78,24 +84,28 @@ export class StandupService {
     const timeSpent =
       new Date().getTime() - existingStartedStandup.startedAt.getTime();
 
-    const absentUsersIds = absentUsers.map((user) => user.id);
-    const usersIds = users.map((user) => user.id);
- 
-    // let attendees = 0;
-    // let absentUsers = 0;
-    // for (const user of listOfUsersAndTasks) {
-    //   if (user.attendees === true) {
-    //     attendees += 1;
-    //   } else {
-    //     absentUsers += 1;
-    //   }
-    // }
+    const [users] = await this.userRepository.findAndCount({
+      where: {
+        workspaces: { workspace: { id: workspaceId } },
+        tasks: { summary: null },
+      },
+    });
+
+    const usersIds = users.map((user) => {
+      delete user.password;
+      return user.id;
+    });
+
+    const attendeesIds = usersIds.filter((id) => {
+      return absentUsers.indexOf(id) === -1;
+    });
+    console.log(attendeesIds);
 
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),
       timespent: timeSpent,
-      absentUsers: absentUsersIds,
-      users: usersIds,
+      absentUsers: absentUsers,
+      attendees: attendeesIds,
     });
 
     return { message: returnMessages.StandupFinished };
