@@ -49,7 +49,7 @@ export class StandupService {
       relations: ['tasks'],
     });
 
-    if (!users) { 
+    if (!users) {
       throw new BadRequestException(returnMessages.UsersForWorkspaceNotFound);
     }
 
@@ -101,7 +101,6 @@ export class StandupService {
     const attendeesIds = usersIds.filter((id) => {
       return absentUsers.indexOf(id) === -1;
     });
-    console.log(attendeesIds);
 
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),

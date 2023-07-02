@@ -61,7 +61,10 @@ export class TaskService {
   }
 
   async updateTask(id: number, user: User, dto: TaskDto) {
-    const task = await this.taskRepository.findOneBy({ id, user });
+    const task = await this.taskRepository.findOneBy({
+      id,
+      user: { id: user.id },
+    });
     if (!task) {
       throw new BadRequestException('Task not found!');
     }
@@ -75,7 +78,10 @@ export class TaskService {
   }
 
   async deleteTask(id: number, user: User): Promise<void> {
-    const task = await this.taskRepository.findOneBy({ id, user });
+    const task = await this.taskRepository.findOneBy({
+      id,
+      user: { id: user.id },
+    });
     if (!task) {
       throw new BadRequestException('Task not found!');
     }
