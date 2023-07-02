@@ -28,22 +28,4 @@ export class StandupController {
   ): Promise<{ shuffledUsers: UsersWidthTasksT[]; count: number }> {
     return await this.standupService.startStandup(+workspace.id);
   }
-
-  @ApiBearerAuth()
-  @ApiBody({
-    description: 'WorkspaceID object',
-    schema: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'number',
-        },
-      },
-    },
-  })
-  @UseGuards(AuthGuard('jwt'))
-  @Post('/finish-standup')
-  async finishStandup(@Body() workspace: { id: number }) {
-    return await this.standupService.finishStandup(+workspace.id);
-  }
 }

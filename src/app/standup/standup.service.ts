@@ -58,27 +58,4 @@ export class StandupService {
 
     return { shuffledUsers, count };
   }
-
-  async finishStandup(workspaceId: number) {
-    const existingStartedStandup = await this.summaryRepository
-      .createQueryBuilder('summary')
-      .where('summary.workspace = :workspaceId', { workspaceId })
-      .andWhere('summary.startedAt IS NOT NULL')
-      .andWhere('summary.finishedAt IS NULL')
-      .getOne();
-
-    if (!existingStartedStandup) {
-      throw new BadRequestException(returnMessages.NoStandupForWorkspace);
-    }
-
-    const timeSpent =
-      new Date().getTime() - existingStartedStandup.startedAt.getTime();
-
-    await this.summaryRepository.update(existingStartedStandup.id, {
-      finishedAt: new Date(),
-      timespent: timeSpent,
-    });
-
-    return { message: returnMessages.StandupFinished };
-  }
 }

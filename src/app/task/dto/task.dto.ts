@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class TaskDto {
   @ApiProperty()
@@ -8,11 +14,13 @@ export class TaskDto {
 
   @ApiProperty()
   @IsString()
+  @IsIn(['low', 'medium', 'high'])
   priority: string;
 
   @ApiProperty()
   @IsOptional()
   @IsString()
+  @IsIn(['not_started', 'in_progress', 'done'])
   status: string;
 
   @ApiProperty()
