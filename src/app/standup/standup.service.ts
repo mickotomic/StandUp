@@ -91,10 +91,7 @@ export class StandupService {
       },
     });
 
-    const usersIds = users.map((user) => {
-      delete user.password;
-      return user.id;
-    });
+    const usersIds = users.map((user) => user.id);
 
     const attendeesIds = usersIds.filter((id) => {
       return absentUsers.indexOf(id) === -1;
