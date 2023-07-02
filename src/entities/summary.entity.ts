@@ -46,6 +46,12 @@ export class Summary {
   @Column({ default: null })
   finishedAt: Date;
 
+  @Column()
+  currentUser: number;
+
+  @Column({ type: 'simple-json' })
+  users: number[];
+
   @CreateDateColumn()
   createdAt: Date;
 

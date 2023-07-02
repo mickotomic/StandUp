@@ -13,8 +13,7 @@ export class StandupService {
   constructor(
     @InjectRepository(Workspace)
     private readonly workspaceRepository: Repository<Workspace>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Summary)
     private readonly summaryRepository: Repository<Summary>,
   ) {}
@@ -41,11 +40,6 @@ export class StandupService {
       throw new BadRequestException(returnMessages.WorkspaceNotFound);
     }
 
-    await this.summaryRepository.save({
-      workspace: { id: workspace.id },
-      startedAt: new Date(),
-    });
-
     const [users, count] = await this.userRepository.findAndCount({
       where: {
         workspaces: { workspace: { id: workspaceId } },
@@ -54,8 +48,49 @@ export class StandupService {
       relations: ['tasks'],
     });
 
-    const shuffledUsers = shuffle(users);
+    const shuffledUsers: User[] = shuffle(users);
+    const usersId: number[] = shuffledUsers.map((user: User) => {
+      delete user.password;
+      return user.id;
+    });
+
+    await this.summaryRepository.save({
+      workspace: { id: workspace.id },
+      startedAt: new Date(),
+      currentUser: shuffledUsers[0].id,
+      users: usersId,
+    });
 
     return { shuffledUsers, count };
+  }
+
+  public async getCurrentUser(
+    workspaceId: number,
+    user: User,
+  ): Promise<{
+    user?: User;
+    isStandupInProgress: boolean;
+    isLastMember: boolean;
+  }> {
+    const standup = await this.summaryRepository
+      .createQueryBuilder('summary')
+      .where('summary.workspace = :workspaceId', { workspaceId })
+      .andWhere('summary.startedAt IS NOT NULL')
+      .andWhere('summary.finishedAt IS NULL')
+      .getOne();
+    if (!standup || !standup.users.includes(user.id)) {
+      return { isStandupInProgress: false, isLastMember: false };
+    }
+
+    const currentUser = await this.userRepository.findOne({
+      where: { id: standup.currentUser },
+      relations: { tasks: true },
+    });
+    delete currentUser.password;
+    return {
+      user: currentUser,
+      isStandupInProgress: true,
+      isLastMember: standup.users.pop() === standup.currentUser,
+    };
   }
 }

@@ -183,8 +183,9 @@ export class AuthService {
     }
     return await this.login(userExists, true);
   }
+
   public async getMe(user: User): Promise<{ data: User }> {
-    const loggedUser = await this.userRepository.findOneBy(user);
+    const loggedUser = await this.userRepository.findOneBy({ id: user.id });
     if (!loggedUser) {
       throw new BadRequestException(returnMessages.UserNotFound);
     }
