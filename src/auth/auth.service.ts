@@ -10,9 +10,7 @@ import { sendMail } from 'src/helpers/send-mail.helper';
 import { GooglePayload } from 'src/types/google-auth-payload.type';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-
 import { ValidationCode } from '../entities/validation-code.entity';
-
 import { VerificationCodeDto } from './dto/code-verification.dto';
 import { LoginDto } from './dto/loginUser.dto';
 import { RegenerateCodeDto } from './dto/regenerate-code.dto';
