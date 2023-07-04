@@ -15,7 +15,7 @@ export class StandupService {
     workspaceId: number,
     user: User,
   ): Promise<{
-    user?: number;
+    userId?: number;
     isStandupInProgress: boolean;
     isLastMember: boolean;
   }> {
@@ -26,11 +26,11 @@ export class StandupService {
       .andWhere('summary.finishedAt IS NULL')
       .getOne();
     if (!standup || !standup.users.includes(user.id)) {
-      return { isStandupInProgress: false, isLastMember: false };
+      return { userId: null, isStandupInProgress: false, isLastMember: false };
     }
 
     return {
-      user: standup.currentUser,
+      userId: standup.currentUser,
       isStandupInProgress: true,
       isLastMember: standup.users.pop() === standup.currentUser,
     };

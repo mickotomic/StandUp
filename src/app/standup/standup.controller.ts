@@ -1,6 +1,6 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { StandupService } from './standup.service';
@@ -10,15 +10,14 @@ import { StandupService } from './standup.service';
 export class StandupController {
   constructor(private readonly standupService: StandupService) {}
 
-  @ApiParam({ name: 'id', description: 'Workspace id', type: 'number' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Get('/:id/polling')
+  @Get('/:workspaceId/polling')
   async getCurrentUser(
     @GetUser() user: User,
-    @Param('id') workspaceId: string,
+    @Param('workspaceId') workspaceId: string,
   ): Promise<{
-    user?: number;
+    userId?: number;
     isStandupInProgress: boolean;
     isLastMember: boolean;
   }> {
