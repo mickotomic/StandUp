@@ -6,13 +6,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Summary } from 'src/entities/summary.entity';
 import { Task } from 'src/entities/task.entity';
-import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
-
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -26,8 +24,6 @@ export class StandupService {
     private readonly summaryRepository: Repository<Summary>,
     @InjectRepository(Task)
     private readonly tasksRepository: Repository<Task>,
-    @InjectRepository(UserWorkspace)
-    private userworkspaceRepository: Repository<UserWorkspace>,
   ) {}
 
   async startStandup(
