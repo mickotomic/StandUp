@@ -46,6 +46,12 @@ export class Summary {
   @Column({ default: null })
   finishedAt: Date;
 
+  @Column()
+  users: number[];
+
+  @Column()
+  currentUsers: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -54,4 +60,5 @@ export class Summary {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
 }

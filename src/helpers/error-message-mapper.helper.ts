@@ -26,4 +26,6 @@ export const returnMessages = Object.freeze({
   TokenNotValid: 'Token is not valid!',
 
   TokenIsValid: 'Token is valid!',
+
+  SummaryNotFound: 'Summary not found!',
 });
