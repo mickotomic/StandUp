@@ -1,7 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
-import { emailLogger } from 'src/helpers/winston-logger.helper';
+import { sendMail } from 'src/helpers/send-mail.helper';
 
 @Processor('workspace')
 export class WorkspaceProcess {
@@ -16,22 +16,16 @@ export class WorkspaceProcess {
       link: string;
     }>,
   ) {
-    this.mailerService
-      .sendMail({
-        from: process.env.APP_EMAIL,
-        to: job.data.email,
-        template: 'invitation-email',
-        context: {
-          link: job.data.link,
-          workspace: job.data.workspaceName,
-          name: job.data.name,
-        },
-      })
-      .then((response) => {
-        emailLogger.log({ level: 'info', message: JSON.stringify(response) });
-      })
-      .catch((error) => {
-        emailLogger.log({ level: 'error', message: JSON.stringify(error) });
-      });
+    sendMail(
+      job.data.email,
+      'Invite to workspace',
+      'invitation-email',
+      {
+        link: job.data.link,
+        workspace: job.data.workspaceName,
+        name: job.data.name,
+      },
+      this.mailerService,
+    );
   }
 }

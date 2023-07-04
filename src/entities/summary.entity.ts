@@ -45,10 +45,10 @@ export class Summary {
   @Column({ default: null })
   finishedAt: Date;
 
-  @Column({ default: null })
+  @Column({ default: null, type: 'simple-json' })
   currentUser: number;
 
-  @Column({ default: null, type: 'simple-json' })
+  @Column({ type: 'simple-json' })
   users: number[];
 
   @CreateDateColumn()

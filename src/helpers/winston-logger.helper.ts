@@ -1,8 +1,8 @@
 import { createLogger, format, transports } from 'winston';
 
 const { combine, timestamp, printf } = format;
-const myFormat = printf(({ level, message, timestamp }) => {
-  return `[${level}] ${timestamp} ${message}`;
+const myFormat = printf(({ level, type, message, timestamp }) => {
+  return `[${level}] ${timestamp} [${type}] ${message}`;
 });
 
 export const emailLogger = createLogger({

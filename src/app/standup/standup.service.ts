@@ -1,12 +1,18 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Summary } from 'src/entities/summary.entity';
 import { Task } from 'src/entities/task.entity';
+import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
+
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -20,6 +26,8 @@ export class StandupService {
     private readonly summaryRepository: Repository<Summary>,
     @InjectRepository(Task)
     private readonly tasksRepository: Repository<Task>,
+    @InjectRepository(UserWorkspace)
+    private userworkspaceRepository: Repository<UserWorkspace>,
   ) {}
 
   async startStandup(
@@ -111,7 +119,7 @@ export class StandupService {
     });
 
     if (!tasks) {
-      throw new BadRequestException(returnMessages.TasksNotFound);
+      throw new BadRequestException(returnMessages.TaskNotFound);
     }
 
     const tasksCompleted = [];
@@ -144,5 +152,73 @@ export class StandupService {
     });
 
     return { message: returnMessages.StandupFinished };
+  }
+
+  async next(workspaceId: number, direction: string, user: User) {
+    const summary = await this.summaryRepository
+      .createQueryBuilder('summary')
+      .where('summary.workspace = :workspaceId', { workspaceId })
+      .andWhere('summary.startedAt IS NOT NULL')
+      .andWhere('summary.finishedAt IS NULL')
+      .getOne();
+
+    if (!summary) {
+      throw new BadRequestException(returnMessages.SummaryNotFound);
+    }
+
+    if (!summary.users.includes(user.id)) {
+      throw new UnauthorizedException(
+        returnMessages.UserDoesNotExistsInWorkspace,
+      );
+    }
+    if (direction === 'next') {
+      const lastMember = summary.users.slice(-1)[0];
+      if (lastMember === summary.currentUser) {
+        return { userId: summary.currentUser, isLastMember: true };
+      }
+      const currentUser =
+        summary.users[summary.users.indexOf(summary.currentUser) + 1];
+      summary.currentUser = currentUser;
+      this.summaryRepository.update(summary.id, summary);
+      return {
+        userId: summary.currentUser,
+        isLastMember: lastMember === currentUser,
+      };
+    } else if (direction === 'previous') {
+      const firstMember = summary.users[0];
+      if (firstMember === summary.currentUser) {
+        return { userId: summary.currentUser, isLastMember: false };
+      }
+      const currentUser =
+        summary.users[summary.users.indexOf(summary.currentUser) - 1];
+      summary.currentUser = currentUser;
+      this.summaryRepository.update(summary.id, summary);
+      return { userId: summary.currentUser, isLastMember: false };
+    }
+  }
+
+  public async getCurrentUser(
+    workspaceId: number,
+    user: User,
+  ): Promise<{
+    userId?: number;
+    isStandupInProgress: boolean;
+    isLastMember: boolean;
+  }> {
+    const standup = await this.summaryRepository
+      .createQueryBuilder('summary')
+      .where('summary.workspace = :workspaceId', { workspaceId })
+      .andWhere('summary.startedAt IS NOT NULL')
+      .andWhere('summary.finishedAt IS NULL')
+      .getOne();
+    if (!standup || !standup.users.includes(user.id)) {
+      return { userId: null, isStandupInProgress: false, isLastMember: false };
+    }
+
+    return {
+      userId: standup.currentUser,
+      isStandupInProgress: true,
+      isLastMember: standup.users.pop() === standup.currentUser,
+    };
   }
 }

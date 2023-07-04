@@ -1,7 +1,6 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -28,10 +27,10 @@ export class Task {
   @Column({ type: 'varchar' })
   name: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', default: 'low' })
   priority: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', default: 'not_started' })
   status: string;
 
   @Column({ nullable: true })
@@ -42,7 +41,4 @@ export class Task {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date;
 }
