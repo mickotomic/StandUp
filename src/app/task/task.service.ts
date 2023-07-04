@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from 'src/entities/task.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
+import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { Repository } from 'typeorm';
 import { TaskDto } from './dto/task.dto';
 
@@ -25,7 +26,7 @@ export class TaskService {
     });
 
     if (!workspace) {
-      throw new BadRequestException("User doesn't belong to this workspace!");
+      throw new BadRequestException(returnMessages.UserDoesNotBelong);
     }
 
     const qb = this.taskRepository
@@ -47,7 +48,7 @@ export class TaskService {
     });
 
     if (!workspace) {
-      throw new BadRequestException("User doesn't belong to this workspace!");
+      throw new BadRequestException(returnMessages.UserDoesNotBelong);
     }
 
     return await this.taskRepository.save({
@@ -63,7 +64,7 @@ export class TaskService {
   async updateTask(id: number, user: User, dto: TaskDto) {
     const task = await this.taskRepository.findOneBy({ id, user });
     if (!task) {
-      throw new BadRequestException('Task not found!');
+      throw new BadRequestException(returnMessages.TaskNotFound);
     }
 
     task.name = dto.name;
@@ -77,7 +78,7 @@ export class TaskService {
   async deleteTask(id: number, user: User): Promise<void> {
     const task = await this.taskRepository.findOneBy({ id, user });
     if (!task) {
-      throw new BadRequestException('Task not found!');
+      throw new BadRequestException(returnMessages.TaskNotFound);
     }
     await this.taskRepository.remove(task);
   }
