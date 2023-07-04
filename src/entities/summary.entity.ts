@@ -22,22 +22,22 @@ export class Summary {
   @OneToMany(() => Task, (task) => task.summary)
   tasks: Task[];
 
-  @Column()
+  @Column({ default: null })
   tasksCompleted: number;
 
-  @Column()
+  @Column({ default: null })
   tasksDue: number;
 
-  @Column()
+  @Column({ default: null })
   tasksPastDue: number;
 
-  @Column()
+  @Column({ default: null })
   attendees: string;
 
-  @Column()
+  @Column({ default: null })
   absentUsers: string;
 
-  @Column()
+  @Column({ default: null })
   timespent: number;
 
   @Column()
@@ -45,6 +45,12 @@ export class Summary {
 
   @Column({ default: null })
   finishedAt: Date;
+
+  @Column()
+  currentUser: number;
+
+  @Column({ type: 'simple-json' })
+  users: number[];
 
   @CreateDateColumn()
   createdAt: Date;
