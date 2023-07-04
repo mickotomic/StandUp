@@ -19,19 +19,19 @@ export class StandupController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Post('/start-standup/:id')
+  @Post('/:workspaceId/start-standup')
   async startStandup(
-    @Param('id', ParseIntPipe) workspaceId: number,
+    @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ): Promise<{ shuffledUsers: UsersWidthTasksT[]; count: number }> {
     return await this.standupService.startStandup(+workspaceId);
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Post('/finish-standup/:id')
+  @Post('/:workspaceId/finish-standup')
   async finishStandup(
     @Body() dto: StandupDto,
-    @Param('id', ParseIntPipe) workspaceId: number,
+    @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ) {
     return await this.standupService.finishStandup(
       +workspaceId,
