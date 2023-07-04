@@ -35,6 +35,10 @@ export const returnMessages = Object.freeze({
 
   NoStandupForWorkspace: 'There is no started standup for this workspace',
 
+  UsersForWorkspaceNotFound: 'Users for this workspace not found!',
+
+  UsersNotInWorkspace: 'Some users are not from this workspace',
+
   EmailsNotValid: 'Emails is not valid!',
 
   UserExistsInWorkspace: 'User already exists in workspace!',

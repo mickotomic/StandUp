@@ -1,7 +1,6 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
@@ -22,20 +21,20 @@ export class Summary {
   @OneToMany(() => Task, (task) => task.summary)
   tasks: Task[];
 
-  @Column({ default: null })
-  tasksCompleted: number;
+  @Column({ default: null, type: 'simple-json' })
+  tasksCompleted: number[];
 
-  @Column({ default: null })
-  tasksDue: number;
+  @Column({ default: null, type: 'simple-json' })
+  tasksDue: number[];
 
-  @Column({ default: null })
-  tasksPastDue: number;
+  @Column({ default: null, type: 'simple-json' })
+  tasksPastDue: number[];
 
-  @Column({ default: null })
-  attendees: string;
+  @Column({ default: null, type: 'simple-json' })
+  attendees: number[];
 
-  @Column({ default: null })
-  absentUsers: string;
+  @Column({ default: null, type: 'simple-json' })
+  absentUsers: number[];
 
   @Column({ default: null })
   timespent: number;
@@ -46,7 +45,7 @@ export class Summary {
   @Column({ default: null })
   finishedAt: Date;
 
-  @Column()
+  @Column({ default: null, type: 'simple-json' })
   currentUser: number;
 
   @Column({ type: 'simple-json' })
@@ -57,7 +56,4 @@ export class Summary {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date;
 }
