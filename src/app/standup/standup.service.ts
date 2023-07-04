@@ -7,7 +7,6 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class StandupService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Summary)
     private readonly summaryRepository: Repository<Summary>,
   ) {}
@@ -16,7 +15,7 @@ export class StandupService {
     workspaceId: number,
     user: User,
   ): Promise<{
-    user?: User;
+    user?: number;
     isStandupInProgress: boolean;
     isLastMember: boolean;
   }> {
@@ -30,13 +29,8 @@ export class StandupService {
       return { isStandupInProgress: false, isLastMember: false };
     }
 
-    const currentUser = await this.userRepository.findOne({
-      where: { id: standup.currentUser },
-      relations: { tasks: true },
-    });
-    delete currentUser.password;
     return {
-      user: currentUser,
+      user: standup.currentUser,
       isStandupInProgress: true,
       isLastMember: standup.users.pop() === standup.currentUser,
     };

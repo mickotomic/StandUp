@@ -18,7 +18,7 @@ export class StandupController {
     @GetUser() user: User,
     @Param('id') workspaceId: string,
   ): Promise<{
-    user?: User;
+    user?: number;
     isStandupInProgress: boolean;
     isLastMember: boolean;
   }> {
