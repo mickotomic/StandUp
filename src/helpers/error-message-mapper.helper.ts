@@ -35,11 +35,15 @@ export const returnMessages = Object.freeze({
 
   EmailsNotValid: 'Emails is not valid!',
 
-  UserExistsInWorkspace: 'User already exists in workspace',
+  UserExistsInWorkspace: 'User already exists in workspace!',
 
   UserDoesNotExistsInWorkspace: 'User does not exist in workspace',
 
   UserAlradyVerified: 'User is already verified',
 
   BooleanValueExpected: 'Can be "true" or "false"!',
+
+  UserDoesNotBelong: 'User does not belong to this workspace!',
+
+  TaskNotFound: 'Task not found!',
 });
