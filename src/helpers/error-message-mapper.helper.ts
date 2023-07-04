@@ -28,7 +28,7 @@ export const returnMessages = Object.freeze({
   TokenIsValid: 'Token is valid!',
 
   SummaryNotFound: 'Summary not found!',
-  
+
   StandupInProgress: 'Standup already in progress!',
 
   StandupFinished: 'Standup finished successfully!',
