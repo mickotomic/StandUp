@@ -35,7 +35,7 @@ export const returnMessages = Object.freeze({
 
   BooleanValueExpected: 'Can be "true" or "false"!',
 
-  UserDoesNotBelong: "User doesn't belong to this workspace!",
+  UserDoesNotBelong: 'User doesn`t belong to this workspace!',
 
   TaskNotFound: 'Task not found!',
 });
