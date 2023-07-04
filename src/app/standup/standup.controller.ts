@@ -1,9 +1,8 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
-import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { StandupService } from './standup.service';
 
 @ApiTags('app-standup')
@@ -11,26 +10,7 @@ import { StandupService } from './standup.service';
 export class StandupController {
   constructor(private readonly standupService: StandupService) {}
 
-  @ApiBearerAuth()
-  @ApiBody({
-    description: 'WorkspaceID object',
-    schema: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'number',
-        },
-      },
-    },
-  })
-  @UseGuards(AuthGuard('jwt'))
-  @Post('/start-standup')
-  async startStandup(
-    @Body() workspace: { id: number },
-  ): Promise<{ shuffledUsers: UsersWidthTasksT[]; count: number }> {
-    return await this.standupService.startStandup(+workspace.id);
-  }
-
+  @ApiParam({ name: 'id', description: 'Workspace id', type: 'number' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('/:id/polling')
