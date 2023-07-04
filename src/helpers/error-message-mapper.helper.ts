@@ -36,4 +36,6 @@ export const returnMessages = Object.freeze({
   UsersForWorkspaceNotFound: 'Users for this workspace not found!',
 
   UsersNotInWorkspace: 'Some users are not from this workspace',
+
+  TasksNotFound: 'Tasks not found!',
 });

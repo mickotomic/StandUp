@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Summary } from 'src/entities/summary.entity';
+import { Task } from 'src/entities/task.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
@@ -17,6 +18,8 @@ export class StandupService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Summary)
     private readonly summaryRepository: Repository<Summary>,
+    @InjectRepository(Task)
+    private readonly tasksRepository: Repository<Task>,
   ) {}
 
   async startStandup(
@@ -102,11 +105,43 @@ export class StandupService {
       return absentUsers.indexOf(id) === -1;
     });
 
+    await this.tasksRepository.query(
+      'UPDATE tasks SET summaryId = ? WHERE workspaceId = ?',
+      [existingStartedStandup.id, workspaceId],
+    );
+
+    const tasks = await this.tasksRepository.findBy({
+      summary: { id: existingStartedStandup.id },
+    });
+
+    if (!tasks) {
+      throw new BadRequestException(returnMessages.TasksNotFound);
+    }
+
+    const tasksCompleted = [];
+    const tasksDue = [];
+    const tasksPastDue = [];
+
+    tasks.forEach((task) => {
+      const deadline = new Date(task.deadline).getDate();
+      const date = new Date(existingStartedStandup.startedAt).getDate();
+
+      if (task.status === 'done') {
+        tasksCompleted.push(task.id);
+      } else if (deadline === date && task.status === 'in_progress') {
+        tasksDue.push(task.id);
+      } else if (deadline < date && task.status === 'not_started')
+        tasksPastDue.push(task.id);
+    });
+
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),
       timespent: timeSpent,
       absentUsers: absentUsers,
       attendees: attendeesIds,
+      tasksCompleted,
+      tasksDue,
+      tasksPastDue,
     });
 
     return { message: returnMessages.StandupFinished };

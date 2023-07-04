@@ -25,11 +25,11 @@ export class Summary {
   @Column({ default: null, type: 'simple-json' })
   tasksCompleted: number[];
 
-  @Column({ default: null })
-  tasksDue: number;
+  @Column({ default: null, type: 'simple-json' })
+  tasksDue: number[];
 
-  @Column({ default: null })
-  tasksPastDue: number;
+  @Column({ default: null, type: 'simple-json' })
+  tasksPastDue: number[];
 
   @Column({ default: null, type: 'simple-json' })
   attendees: number[];
