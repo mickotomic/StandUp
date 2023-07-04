@@ -1,6 +1,13 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
@@ -11,31 +18,23 @@ export class StandupController {
   constructor(private readonly standupService: StandupService) {}
 
   @ApiBearerAuth()
-  @ApiBody({
-    description: 'WorkspaceID object',
-    schema: {
-      type: 'object',
-      properties: {
-        id: {
-          type: 'number',
-        },
-      },
-    },
-  })
   @UseGuards(AuthGuard('jwt'))
-  @Post('/start-standup')
+  @Post('/start-standup/:id')
   async startStandup(
-    @Body() workspace: { id: number },
+    @Param('id', ParseIntPipe) workspaceId: number,
   ): Promise<{ shuffledUsers: UsersWidthTasksT[]; count: number }> {
-    return await this.standupService.startStandup(+workspace.id);
+    return await this.standupService.startStandup(+workspaceId);
   }
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Post('/finish-standup')
-  async finishStandup(@Body() dto: StandupDto) {
+  @Post('/finish-standup/:id')
+  async finishStandup(
+    @Body() dto: StandupDto,
+    @Param('id', ParseIntPipe) workspaceId: number,
+  ) {
     return await this.standupService.finishStandup(
-      +dto.workspaceId,
+      +workspaceId,
       dto.absentUsersId,
     );
   }

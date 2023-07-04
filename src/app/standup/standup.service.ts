@@ -52,16 +52,12 @@ export class StandupService {
       relations: ['tasks'],
     });
 
-    if (!users) {
-      throw new BadRequestException(returnMessages.UsersForWorkspaceNotFound);
-    }
+    const shuffledUsers = shuffle(users);
 
-    const usersIds = users.map((user) => {
+    const usersIds = shuffledUsers.map((user) => {
       delete user.password;
       return user.id;
     });
-
-    const shuffledUsers = shuffle(users);
 
     await this.summaryRepository.save({
       workspace: { id: workspace.id },
@@ -88,7 +84,7 @@ export class StandupService {
     const timeSpent =
       new Date().getTime() - existingStartedStandup.startedAt.getTime();
 
-    const [users] = await this.userRepository.findAndCount({
+    const users = await this.userRepository.find({
       where: {
         workspaces: { workspace: { id: workspaceId } },
         tasks: { summary: null },
@@ -128,10 +124,13 @@ export class StandupService {
 
       if (task.status === 'done') {
         tasksCompleted.push(task.id);
-      } else if (deadline === date && task.status === 'in_progress') {
+      }
+
+      if (deadline === date && task.status !== 'done') {
         tasksDue.push(task.id);
-      } else if (deadline < date && task.status === 'not_started')
-        tasksPastDue.push(task.id);
+      }
+
+      if (deadline < date && task.status !== 'done') tasksPastDue.push(task.id);
     });
 
     await this.summaryRepository.update(existingStartedStandup.id, {
