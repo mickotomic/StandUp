@@ -53,7 +53,7 @@ export class StandupService {
     } else if (direction === 'previous') {
       const firstMember = summary.users[0];
       if (firstMember === summary.currentUser) {
-        return { userId: summary.currentUser, isFirstMember: false };
+        return { userId: summary.currentUser, isLastMember: false };
       } else {
         const currentUser =
           summary.users[summary.users.indexOf(summary.currentUser) - 1];
