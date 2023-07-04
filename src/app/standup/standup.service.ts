@@ -8,7 +8,7 @@ import { Summary } from 'src/entities/summary.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class StandupService {
@@ -20,11 +20,12 @@ export class StandupService {
   ) {}
 
   async next(workspaceId: number, direction: string, user: User) {
-    const summary = await this.summaryRepository.findOneBy({
-      workspace: { id: workspaceId },
-      startedAt: Not(null),
-      finishedAt: null,
-    });
+    const summary = await this.summaryRepository
+      .createQueryBuilder('summary')
+      .where('summary.workspace = :workspaceId', { workspaceId })
+      .andWhere('summary.startedAt IS NOT NULL')
+      .andWhere('summary.finishedAt IS NULL')
+      .getOne();
 
     if (!summary) {
       throw new BadRequestException(returnMessages.SummaryNotFound);
