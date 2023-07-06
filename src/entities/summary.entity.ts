@@ -1,15 +1,14 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Workspace } from './workspace.entity';
 import { Task } from './task.entity';
+import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'summaries' })
 export class Summary {
@@ -22,22 +21,22 @@ export class Summary {
   @OneToMany(() => Task, (task) => task.summary)
   tasks: Task[];
 
-  @Column()
-  tasksCompleted: number;
+  @Column({ default: null, type: 'simple-json' })
+  tasksCompleted: number[];
 
-  @Column()
-  tasksDue: number;
+  @Column({ default: null, type: 'simple-json' })
+  tasksDue: number[];
 
-  @Column()
-  tasksPastDue: number;
+  @Column({ default: null, type: 'simple-json' })
+  tasksPastDue: number[];
 
-  @Column()
-  attendees: string;
+  @Column({ default: null, type: 'simple-json' })
+  attendees: number[];
 
-  @Column()
-  absentUsers: string;
+  @Column({ default: null, type: 'simple-json' })
+  absentUsers: number[];
 
-  @Column()
+  @Column({ default: null })
   timespent: number;
 
   @Column()
@@ -46,12 +45,15 @@ export class Summary {
   @Column({ default: null })
   finishedAt: Date;
 
+  @Column({ default: null, type: 'simple-json' })
+  currentUser: number;
+
+  @Column({ type: 'simple-json' })
+  users: number[];
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt: Date;
 }

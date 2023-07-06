@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/entities/user.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
+import { sendMail } from 'src/helpers/send-mail.helper';
 import { GooglePayload } from 'src/types/google-auth-payload.type';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -18,8 +19,7 @@ import { UserDto } from './dto/register.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService,
     private eventEmitter: EventEmitter2,
     private mailerService: MailerService,
@@ -88,27 +88,29 @@ export class AuthService {
     };
   }
 
-  public mailVerification(user: User) {
+  public async mailVerification(user: User) {
     const token = Math.random().toString(36).toUpperCase().slice(2, 8);
 
-    this.mailerService
-      .sendMail({
-        to: user.email,
-        from: process.env.APP_EMAIL,
-        subject: 'User verification code',
-        template: 'verification-email',
-        context: {
+    const isUserVerified = await this.userRepository.findOneBy({ id: user.id });
+    if (isUserVerified.emailVerifiedAt !== null) {
+      throw new BadRequestException(returnMessages.UserAlradyVerified);
+    }
+
+    if (
+      await sendMail(
+        user.email,
+        'User verification code',
+        'verification-email',
+        {
           name: user.name,
           token,
         },
-      })
-      .then(() => {
-        this.validationCodeRepository.save({ user: user, code: token });
-        return { status: 'ok' };
-      })
-      .catch((error) => {
-        throw new BadRequestException(error);
-      });
+        this.mailerService,
+      )
+    ) {
+      this.validationCodeRepository.save({ user: user, code: token });
+      return { status: 'ok' };
+    }
   }
 
   async codeVerification(codeDto: VerificationCodeDto) {
@@ -121,24 +123,23 @@ export class AuthService {
       .createQueryBuilder('validation_code')
       .leftJoinAndSelect('validation_code.user', 'user')
       .where('user.id = :userId', { userId: user.id })
+      .andWhere('validation_code.isValid = :isValid', { isValid: true })
       .getOne();
     if (!userCode) {
       throw new BadRequestException(returnMessages.UserCodeNotFound);
     }
-    if (!userCode.isValid) {
-      throw new BadRequestException(returnMessages.CodeNotValid);
-    }
-
-    if (userCode.numberOfTries >= 3) {
-      await this.validationCodeRepository.update(userCode.id, {
-        isValid: false,
-      });
-      throw new BadRequestException(returnMessages.LimitReached);
-    }
 
     if (userCode.code !== codeDto.token) {
+      userCode.numberOfTries++;
+      if (userCode.numberOfTries >= 3) {
+        await this.validationCodeRepository.update(userCode.id, {
+          isValid: false,
+          numberOfTries: userCode.numberOfTries,
+        });
+        throw new BadRequestException(returnMessages.LimitReached);
+      }
       await this.validationCodeRepository.update(userCode.id, {
-        numberOfTries: ++userCode.numberOfTries,
+        numberOfTries: userCode.numberOfTries,
       });
       throw new BadRequestException(returnMessages.BadUserCode);
     }
@@ -179,5 +180,14 @@ export class AuthService {
       });
     }
     return await this.login(userExists, true);
+  }
+
+  public async getMe(user: User): Promise<{ data: User }> {
+    const loggedUser = await this.userRepository.findOneBy({ id: user.id });
+    if (!loggedUser) {
+      throw new BadRequestException(returnMessages.UserNotFound);
+    }
+    delete loggedUser.password;
+    return { data: loggedUser };
   }
 }
