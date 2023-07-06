@@ -42,6 +42,7 @@
     "class-validator": "^0.14.0",
     "handlebars": "^4.7.7",
     "mysql2": "^3.3.1",
+    "nestjs-paginate": "^8.1.4",
     "nodemailer": "^6.9.2",
     "passport-google-oauth": "^2.0.0",
     "passport-google-oauth20": "^2.0.0",
