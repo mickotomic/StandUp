@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
@@ -45,6 +45,10 @@ export class StandupController {
     );
   }
 
+  @ApiOperation({
+    description: `This endpoint should be used for fetching current 
+    standup status in intervals`,
+  })
   @Get('/:workspaceId/polling')
   async getCurrentUser(
     @GetUser() user: User,

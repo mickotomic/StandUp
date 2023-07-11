@@ -13,7 +13,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
@@ -52,6 +58,13 @@ export class WorkspaceController {
     );
   }
 
+  @ApiOperation({
+    description: `The idea is that user when gets the invitation, clicks on the link
+      lands on FE then FE checks if user exist in the app by calling /check/email
+      and if user exists, then it should be redirected to the login screen
+      if doesn't exist then it should be redirect to the registration from 
+      and only then this endpoint should be called`,
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post('/verify')
@@ -65,6 +78,9 @@ export class WorkspaceController {
     return await this.workspaceService.verifyInvitation(verifyTokenDto, user);
   }
 
+  @ApiOperation({
+    description: 'Checks if there is an user entity with provided email',
+  })
   @Get('/check/email')
   async checkDoesEmailExists(
     @Query('email') email: string,
