@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { SubscriptionService } from './subscription.service';
 
 @ApiTags('app-subscriptions')
-@Controller('subscription')
+@Controller('subscriptions')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
 }
