@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { GooglePayload } from 'src/types/google-auth-payload.type';
@@ -15,6 +15,11 @@ import { UserDto } from './dto/register.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({
+    description: `This endpoint should be used for the registration
+      generally it is used with name, email and password, but if users registers
+      through the invitation flow, then verifiedEmail is also needed`,
+  })
   @Post('/register')
   async register(@Body() body: UserDto) {
     return await this.authService.register(body);
@@ -30,6 +35,9 @@ export class AuthController {
     return await this.authService.codeVerification(code);
   }
 
+  @ApiOperation({
+    description: 'Intended to be used foe generating new verification code',
+  })
   @Post('/regenerate-code')
   async regenerateCode(@Body() email: RegenerateCodeDto) {
     return await this.authService.regenerateCode(email);
