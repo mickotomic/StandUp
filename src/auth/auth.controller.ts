@@ -36,7 +36,7 @@ export class AuthController {
   }
 
   @ApiOperation({
-    description: 'Intended to be used foe generating new verification code',
+    description: 'Intended to be used for generating new verification code',
   })
   @Post('/regenerate-code')
   async regenerateCode(@Body() email: RegenerateCodeDto) {
