@@ -7,15 +7,14 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { SubscriptionItems } from './subscription-items.entity';
 import { Task } from './task.entity';
 import { UserWorkspace } from './user-workspace.entity';
 import { ValidationCode } from './validation-code.entity';
 import { Workspace } from './workspace.entity';
-import { SubscriptionItems } from './subscription-items.entity';
 
 @Entity({ name: 'users' })
 export class User {
-  
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -25,7 +24,10 @@ export class User {
   @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.user)
   workspaces: UserWorkspace[];
 
-  @OneToMany(() => SubscriptionItems, (subscriptionItems) => subscriptionItems.user)
+  @OneToMany(
+    () => SubscriptionItems,
+    (subscriptionItems) => subscriptionItems.user,
+  )
   subscriptionItems: SubscriptionItems[];
 
   @OneToMany(() => Task, (task) => task.user)

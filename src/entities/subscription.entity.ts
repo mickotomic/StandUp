@@ -1,49 +1,47 @@
-import { 
-    Column,
-    CreateDateColumn,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from "typeorm";
-import { Workspace } from "./workspace.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { SubscriptionItems } from './subscription-items.entity';
+import { Workspace } from './workspace.entity';
 
 @Entity({ name: 'subscriptions' })
 export class Subscription {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ManyToOne(() => Workspace, (workspace) => workspace.subscriptions)
+  workspace: Workspace;
 
-//   subscription entity:
-// workspace
-// numberOfActiveUsers
-// price
-// status(paid, unpaid, refunded)
-// transactionId
-// errorStatus
+  @OneToMany(
+    () => SubscriptionItems,
+    (subscriptionItems) => subscriptionItems.subscription,
+  )
+  subscriptionItems: SubscriptionItems[];
 
-@ManyToOne(() => Workspace, (workspace) => workspace.subscription)
-workspace: Workspace;
+  @Column()
+  numberOfActiveUsers: number;
 
-@Column()
-numberOfActiveUsers: number;
+  @Column()
+  price: number;
 
-@Column()
-price: number;
+  @Column({ type: 'varchar', default: 'unpaid' })
+  status: string;
 
-@Column({ type: 'varchar', default: 'unpaid', })
-status: string;
+  @Column({ default: null })
+  transactionId: string;
 
-@Column({ default: null })
-transactionId: string;
+  @Column({ default: null })
+  errorStatus: string;
 
-@Column({ default: null })
-errorStatus: string;
+  @CreateDateColumn()
+  createdAt: Date;
 
-@CreateDateColumn()
-createdAt: Date;
-
-@UpdateDateColumn()
-updatedAt: Date;
-
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

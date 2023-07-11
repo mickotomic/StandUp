@@ -1,8 +1,15 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { User } from "./user.entity";
-import { Workspace } from "./workspace.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Subscription } from './subscription.entity';
+import { User } from './user.entity';
 
-@Entity({ name: 'subscriptionsItems' })
+@Entity({ name: 'subscriptions_items' })
 export class SubscriptionItems {
   @PrimaryGeneratedColumn()
   id: number;
@@ -10,8 +17,11 @@ export class SubscriptionItems {
   @ManyToOne(() => User, (user) => user.subscriptionItems)
   user: User;
 
-  @ManyToOne(() => Workspace, (workspace) => workspace.subscriptionItems)
-  workspace: Workspace;
+  @ManyToOne(
+    () => Subscription,
+    (subscription) => subscription.subscriptionItems,
+  )
+  subscription: Subscription;
 
   @Column()
   price: number;

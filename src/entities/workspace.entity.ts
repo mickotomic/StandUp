@@ -8,13 +8,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Subscription } from './subscription.entity';
 import { Summary } from './summary.entity';
 import { Task } from './task.entity';
 import { UserToken } from './user-token.entity';
 import { UserWorkspace } from './user-workspace.entity';
 import { User } from './user.entity';
-import { Subscription } from './subscription.entity';
-import { SubscriptionItems } from './subscription-items.entity';
 
 @Entity({ name: 'workspaces' })
 export class Workspace {
@@ -25,12 +24,7 @@ export class Workspace {
   users: UserWorkspace[];
 
   @OneToMany(() => Subscription, (subscription) => subscription.workspace)
-  subscription: Subscription[];
-
-  @OneToMany(() => SubscriptionItems, (subscriptionItems) => subscriptionItems.workspace)
-  subscriptionItems: SubscriptionItems[];
-
-  
+  subscriptions: Subscription[];
 
   @ManyToOne(() => User, (user) => user.ownerWorkspaces)
   owner: User;
