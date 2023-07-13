@@ -17,6 +17,6 @@ export class SummaryController {
     @Param('workspaceId') workspaceId: number,
     @Paginate() query: PaginateQuery,
   ): Promise<Paginated<Summary>> {
-    return this.summaryService.getSummaryHistory(workspaceId, query);
+    return await this.summaryService.getSummaryHistory(workspaceId, query);
   }
 }
