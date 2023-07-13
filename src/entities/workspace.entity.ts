@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Subscription } from './subscription.entity';
 import { Summary } from './summary.entity';
 import { Task } from './task.entity';
 import { UserToken } from './user-token.entity';
@@ -21,6 +22,9 @@ export class Workspace {
 
   @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.workspace)
   users: UserWorkspace[];
+
+  @OneToMany(() => Subscription, (subscription) => subscription.workspace)
+  subscriptions: Subscription[];
 
   @ManyToOne(() => User, (user) => user.ownerWorkspaces)
   owner: User;

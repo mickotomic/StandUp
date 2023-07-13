@@ -9,7 +9,6 @@ import { SummaryService } from './summary.service';
 export class SummaryController {
   constructor(private readonly summaryService: SummaryService) {}
 
-  @ApiTags('summary')
   @ApiQuery({ name: 'page', required: false, type: 'number' })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @Get('/:workspaceId')
