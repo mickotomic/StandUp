@@ -9,7 +9,7 @@ import getDateDifference from 'src/helpers/get-date-difference.helper';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class SubscriptionService {
+export class CronSubscriptionService {
   constructor(
     @InjectRepository(Workspace)
     private readonly workspaceRepository: Repository<Workspace>,
@@ -19,9 +19,9 @@ export class SubscriptionService {
     private readonly subscriptionItemsRepository: Repository<SubscriptionItems>,
   ) {}
 
-  @Cron('0 0 4 * * *')
+  @Cron('0 * * * * *')
   async checkWorkspaceSubscription() {
-    let price = 0;
+    let pricePerUser = 0;
     const workspaces = await this.workspaceRepository.find({
       where: { isActive: true },
       relations: { owner: true, subscriptions: true, users: true },
@@ -36,22 +36,22 @@ export class SubscriptionService {
             getDateDifference(new Date(), subscription.createdAt) > 30 &&
             new Date().getMonth() !== subscription.createdAt.getMonth()
           ) {
-            price = calculateSubscriptionPrice(workspace.users.length);
+            pricePerUser = calculateSubscriptionPrice(workspace.users.length);
           }
         }
       } else if (workspace.users.length > 4) {
         if (getDateDifference(new Date(), workspace.createdAt) > 30) {
-          price = calculateSubscriptionPrice(workspace.users.length);
+          pricePerUser = calculateSubscriptionPrice(workspace.users.length);
         }
       }
-      if (price > 0) {
+      if (pricePerUser > 0) {
         const subscription = await this.subscriptionRepository.save({
           workspace: { id: workspace.id },
           numberOfActiveUsers: workspace.users.length,
-          price,
+          price: pricePerUser * workspace.users.length,
         });
         this.subscriptionItemsRepository.save({
-          price,
+          price: pricePerUser,
           subscription: { id: subscription.id },
           user: { id: workspace.owner.id },
         });
