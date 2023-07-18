@@ -18,22 +18,24 @@ export class SubscriptionService {
     private mailerService: MailerService,
   ) {}
 
-  @Cron('00 30 12 * * *')
+  @Cron('0 0 4 * * *')
   async paymentChecking() {
     const subscriotions = await this.subscriptionRepository.find({
       where: { status: 'unpaid' },
-      relations: ['workspace'],
+      relations: {workspace: {owner: true}},
     });
-    subscriotions.forEach((element) => {
-      const ownersEmail = element.workspace.owner.email;
-      const days = getDateDifference(new Date(), element.createdAt);
+    subscriotions.forEach((subscription) => {
+      console.log(subscription)
+      const ownersEmail = subscription.workspace.owner.email;
+      const days = Math.floor(getDateDifference(new Date(), subscription.createdAt));
+      console.log(days)
       if (days === 12 || days === 13) {
         sendMail(
           ownersEmail,
-          'your subscription will be cancelled in 2 days!',
+          `your subscription will be cancelled in ${(days === 12 ? 2:1)}  days!`,
           'workspace-deletion-notice',
           {
-            workspaceName: element.workspace.projectName,
+            workspaceName: subscription.workspace.projectName,
             numOfDays: days === 12 ? 2 : 1,
           },
           this.mailerService,
@@ -45,12 +47,12 @@ export class SubscriptionService {
           'your subscription has been cancelled!',
           'workspace-deletion-confirmed',
           {
-            workspaceName: element.workspace.projectName,
+            workspaceName: subscription.workspace.projectName,
           },
           this.mailerService,
         );
 
-        this.workspaceRepository.update({ workspace : { id: this.workspaceRepository.id , isActive: false}});
+        this.workspaceRepository.update( {id: subscription.id} ,  {isActive: false})
       }
     });
   }

@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { MainModule } from './app/main.module';
 import { AuthModule } from './auth/auth.module';
+import { CronModule } from './cron/cron.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     MainModule,
     ScheduleModule.forRoot(),
+    CronModule,
   ],
 })
 export class AppModule {}
