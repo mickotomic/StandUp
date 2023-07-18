@@ -4,6 +4,7 @@ import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { MainModule } from './app/main.module';
@@ -52,6 +53,7 @@ import { AuthModule } from './auth/auth.module';
       },
     }),
     MainModule,
+    ScheduleModule.forRoot(),
   ],
 })
 export class AppModule {}
