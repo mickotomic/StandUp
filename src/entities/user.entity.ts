@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { SubscriptionItems } from './subscription-items.entity';
 import { Task } from './task.entity';
 import { UserWorkspace } from './user-workspace.entity';
 import { ValidationCode } from './validation-code.entity';
@@ -22,6 +23,12 @@ export class User {
 
   @OneToMany(() => UserWorkspace, (userWorkspace) => userWorkspace.user)
   workspaces: UserWorkspace[];
+
+  @OneToMany(
+    () => SubscriptionItems,
+    (subscriptionItems) => subscriptionItems.user,
+  )
+  subscriptionItems: SubscriptionItems[];
 
   @OneToMany(() => Task, (task) => task.user)
   tasks: Task[];
