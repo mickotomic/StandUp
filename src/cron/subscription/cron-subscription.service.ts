@@ -19,7 +19,7 @@ export class CronSubscriptionService {
     private readonly subscriptionItemsRepository: Repository<SubscriptionItems>,
   ) {}
 
-  @Cron('0 * * * * *')
+  @Cron('0 0 4 * * *')
   async checkWorkspaceSubscription() {
     let pricePerUser = 0;
     const workspaces = await this.workspaceRepository.find({
