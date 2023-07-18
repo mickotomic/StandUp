@@ -50,7 +50,7 @@ export class SubscriptionService {
           this.mailerService,
         );
 
-        this.workspaceRepository.update({ isActive: false});
+        this.workspaceRepository.update({ workspace : { id: this.workspaceRepository.id , isActive: false}});
       }
     });
   }
