@@ -1,0 +1,40 @@
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
+import { AdminRoleGuard } from 'src/auth/admin-role.guard';
+import { User } from 'src/entities/user.entity';
+import { AdminUserService } from './admin-user.service';
+import { UpdateAdminUserDto } from './dto/update-user.dto';
+
+@ApiTags('admin-users')
+@ApiBearerAuth()
+@UseGuards(AdminRoleGuard)
+@Controller('admin-user')
+export class AdminUserController {
+  constructor(private readonly userService: AdminUserService) {}
+
+  @ApiQuery({ name: 'page', required: false, type: 'number' })
+  @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @Get()
+  async getUsersList(
+    @Paginate() query: PaginateQuery,
+  ): Promise<Paginated<User>> {
+    return await this.userService.getUsersList(query);
+  }
+
+  @Put('/:id')
+  async updateUser(
+    @Param('id', ParseIntPipe) userId: number,
+    @Body() updateUserDto: UpdateAdminUserDto,
+  ) {
+    return await this.userService.updateUser(userId, updateUserDto);
+  }
+}
