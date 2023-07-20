@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Subscription } from 'src/entities/subscription.entity';
-import { SubscriptionService } from './subscription.service';
+import { CronSubscriptionService } from './cron-subscription.service';
 import { Workspace } from 'src/entities/workspace.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Subscription, Workspace])],
-  providers: [SubscriptionService],
+  providers: [CronSubscriptionService],
 })
-export class SubscriptionsModule {}
+export class CronSubscriptionsModule {}

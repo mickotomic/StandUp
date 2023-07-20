@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Subscription } from 'rxjs';
-import { SubscriptionService } from './subscriptions/subscription.service';
+import { CronSubscriptionsModule } from './cron-subscriptins/cron-subscription.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Subscription])],
-  providers: [SubscriptionService],
+  imports: [CronSubscriptionsModule],
 })
 export class CronModule {}

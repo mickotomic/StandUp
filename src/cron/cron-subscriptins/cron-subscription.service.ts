@@ -9,7 +9,7 @@ import { sendMail } from 'src/helpers/send-mail.helper';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class SubscriptionService {
+export class CronSubscriptionService {
   constructor(
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
@@ -18,25 +18,24 @@ export class SubscriptionService {
     private mailerService: MailerService,
   ) {}
 
-  @Cron('0 0 4 * * *')
+  @Cron('0 0 5 * * *')
   async paymentChecking() {
-    const subscriotions = await this.subscriptionRepository.find({
+    const subscriptions = await this.subscriptionRepository.find({
       where: { status: 'unpaid' },
       relations: {workspace: {owner: true}},
     });
-    subscriotions.forEach((subscription) => {
-      console.log(subscription)
+    subscriptions.forEach((subscription) => {
       const ownersEmail = subscription.workspace.owner.email;
       const days = Math.floor(getDateDifference(new Date(), subscription.createdAt));
-      console.log(days)
+      const numberOfDays = 12 ? 2 : 1;
       if (days === 12 || days === 13) {
         sendMail(
           ownersEmail,
-          `your subscription will be cancelled in ${(days === 12 ? 2:1)}  days!`,
+          `your subscription will be cancelled in ${(numberOfDays)} days!`,
           'workspace-deletion-notice',
           {
             workspaceName: subscription.workspace.projectName,
-            numOfDays: days === 12 ? 2 : 1,
+            numOfDays: numberOfDays,
           },
           this.mailerService,
         );
@@ -52,7 +51,7 @@ export class SubscriptionService {
           this.mailerService,
         );
 
-        this.workspaceRepository.update( {id: subscription.id} ,  {isActive: false})
+        this.workspaceRepository.update( {id: subscription.workspace.id} ,  {isActive: false})
       }
     });
   }
