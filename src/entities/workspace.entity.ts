@@ -38,9 +38,6 @@ export class Workspace {
   @OneToMany(() => UserToken, (userToken) => userToken.workspace)
   userTokens: UserToken[];
 
-  @Column({ default: true })
-  isActive: boolean;
-
   @Column({ type: 'varchar' })
   projectName: string;
 

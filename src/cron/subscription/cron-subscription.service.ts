@@ -21,7 +21,6 @@ export class CronSubscriptionService {
 
   @Cron('0 0 4 * * *')
   async checkWorkspaceSubscription() {
-    let pricePerUser = 0;
     const workspaces = await this.workspaceRepository.find({
       where: { isActive: true },
       relations: { owner: true, subscriptions: true, users: true },
@@ -29,38 +28,33 @@ export class CronSubscriptionService {
 
     for (let i = 0; i < workspaces.length; i++) {
       if (
-        workspaces[i].subscriptions.length > 0 &&
-        workspaces[i].users.length > 4
+        workspaces[i].users.length < 5 ||
+        getDateDifference(new Date(), workspaces[i].createdAt) < 30
       ) {
-        const subscription =
-          workspaces[i].subscriptions[workspaces[i].subscriptions.length - 1];
-        if (subscription.status === 'paid') {
-          if (
-            getDateDifference(new Date(), subscription.createdAt) > 30 &&
-            new Date().getMonth() !== subscription.createdAt.getMonth()
-          ) {
-            pricePerUser = calculateSubscriptionPrice(
-              workspaces[i].users.length,
-            );
-          }
-        }
-      } else if (workspaces[i].users.length > 4) {
-        if (getDateDifference(new Date(), workspaces[i].createdAt) > 30) {
-          pricePerUser = calculateSubscriptionPrice(workspaces[i].users.length);
-        }
+        continue;
       }
-      if (pricePerUser > 0) {
-        const subscription = await this.subscriptionRepository.save({
-          workspaces: { id: workspaces[i].id },
-          numberOfActiveUsers: workspaces[i].users.length,
-          price: pricePerUser * workspaces[i].users.length,
-        });
-        this.subscriptionItemsRepository.save({
-          price: pricePerUser,
-          subscription: { id: subscription.id },
-          user: { id: workspaces[i].owner.id },
-        });
+      const lastSubscription =
+        workspaces[i].subscriptions[workspaces[i].subscriptions.length - 1];
+      if (
+        lastSubscription &&
+        lastSubscription.status !== 'paid' &&
+        new Date().getMonth() === lastSubscription.createdAt.getMonth()
+      ) {
+        continue;
       }
+      const pricePerUser = calculateSubscriptionPrice(
+        workspaces[i].users.length,
+      );
+      const subscription = await this.subscriptionRepository.save({
+        workspaces: { id: workspaces[i].id },
+        numberOfActiveUsers: workspaces[i].users.length,
+        price: pricePerUser * workspaces[i].users.length,
+      });
+      this.subscriptionItemsRepository.save({
+        price: pricePerUser,
+        subscription: { id: subscription.id },
+        user: { id: workspaces[i].owner.id },
+      });
     }
   }
 }
