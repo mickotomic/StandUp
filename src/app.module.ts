@@ -7,6 +7,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { AdminWorkspaceModule } from './admin/admin-main.module';
 import { MainModule } from './app/main.module';
 import { AuthModule } from './auth/auth.module';
 import { CronModule } from './cron/cron.module';
@@ -56,6 +57,7 @@ import { CronModule } from './cron/cron.module';
     }),
     MainModule,
     CronModule,
+    AdminWorkspaceModule,
   ],
 })
 export class AppModule {}
