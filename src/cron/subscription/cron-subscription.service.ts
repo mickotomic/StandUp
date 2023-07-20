@@ -27,35 +27,40 @@ export class CronSubscriptionService {
       relations: { owner: true, subscriptions: true, users: true },
     });
 
-    workspaces.forEach(async (workspace) => {
-      if (workspace.subscriptions.length > 0 && workspace.users.length > 4) {
+    for (let i = 0; i < workspaces.length; i++) {
+      if (
+        workspaces[i].subscriptions.length > 0 &&
+        workspaces[i].users.length > 4
+      ) {
         const subscription =
-          workspace.subscriptions[workspace.subscriptions.length - 1];
+          workspaces[i].subscriptions[workspaces[i].subscriptions.length - 1];
         if (subscription.status === 'paid') {
           if (
             getDateDifference(new Date(), subscription.createdAt) > 30 &&
             new Date().getMonth() !== subscription.createdAt.getMonth()
           ) {
-            pricePerUser = calculateSubscriptionPrice(workspace.users.length);
+            pricePerUser = calculateSubscriptionPrice(
+              workspaces[i].users.length,
+            );
           }
         }
-      } else if (workspace.users.length > 4) {
-        if (getDateDifference(new Date(), workspace.createdAt) > 30) {
-          pricePerUser = calculateSubscriptionPrice(workspace.users.length);
+      } else if (workspaces[i].users.length > 4) {
+        if (getDateDifference(new Date(), workspaces[i].createdAt) > 30) {
+          pricePerUser = calculateSubscriptionPrice(workspaces[i].users.length);
         }
       }
       if (pricePerUser > 0) {
         const subscription = await this.subscriptionRepository.save({
-          workspace: { id: workspace.id },
-          numberOfActiveUsers: workspace.users.length,
-          price: pricePerUser * workspace.users.length,
+          workspaces: { id: workspaces[i].id },
+          numberOfActiveUsers: workspaces[i].users.length,
+          price: pricePerUser * workspaces[i].users.length,
         });
         this.subscriptionItemsRepository.save({
           price: pricePerUser,
           subscription: { id: subscription.id },
-          user: { id: workspace.owner.id },
+          user: { id: workspaces[i].owner.id },
         });
       }
-    });
+    }
   }
 }
