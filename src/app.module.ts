@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { AdminWorkspaceModule } from './admin/admin-main.module';
 import { MainModule } from './app/main.module';
 import { AuthModule } from './auth/auth.module';
 
@@ -52,6 +53,7 @@ import { AuthModule } from './auth/auth.module';
       },
     }),
     MainModule,
+    AdminWorkspaceModule,
   ],
 })
 export class AppModule {}
