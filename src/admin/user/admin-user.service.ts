@@ -9,10 +9,10 @@ import {
 import { User } from 'src/entities/user.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { Repository } from 'typeorm';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateAdminUserDto } from './dto/update-user.dto';
 
 @Injectable()
-export class UserService {
+export class AdminUserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -23,7 +23,7 @@ export class UserService {
       defaultLimit: 50,
       sortableColumns: ['id'],
       relations: [],
-      defaultSortBy: [['id', 'ASC']],
+      defaultSortBy: [['id', 'DESC']],
       select: [
         'id',
         'name',
@@ -37,11 +37,10 @@ export class UserService {
       ],
     };
     const qb = this.userRepository.createQueryBuilder('users');
-    const result = await paginate<User>(query, qb, paginateConfig);
-    return result;
+    return await paginate<User>(query, qb, paginateConfig);
   }
 
-  async updateUser(userId: number, updateUserDto: UpdateUserDto) {
+  async updateUser(userId: number, updateUserDto: UpdateAdminUserDto) {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!userId || !user) {
       throw new BadRequestException(returnMessages.UserNotFound);
@@ -50,6 +49,6 @@ export class UserService {
     user.isActive = updateUserDto.isActive;
     await this.userRepository.save(user);
     delete user.password;
-    return { user };
+    return user;
   }
 }

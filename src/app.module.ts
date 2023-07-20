@@ -7,7 +7,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AdminModule } from './admin/admin.module';
-import { UserModule } from './admin/user/user.module';
+import { UserModule } from './admin/user/admin-user.module';
 import { MainModule } from './app/main.module';
 import { AuthModule } from './auth/auth.module';
 
