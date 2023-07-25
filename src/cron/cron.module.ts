@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { CronSubscriptionsModule } from './cron-subscriptins/cron-subscription.module';
+import { CronSubscriptionsModule } from './cron-subscriptins/cron-subscriptions.module';
 
 @Module({
   imports: [CronSubscriptionsModule],
