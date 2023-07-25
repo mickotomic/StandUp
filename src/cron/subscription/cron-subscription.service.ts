@@ -37,8 +37,8 @@ export class CronSubscriptionService {
         workspaces[i].subscriptions[workspaces[i].subscriptions.length - 1];
       if (
         lastSubscription &&
-        lastSubscription.status !== 'paid' &&
-        new Date().getMonth() === lastSubscription.createdAt.getMonth()
+        (lastSubscription.status !== 'paid' ||
+          new Date().getMonth() === lastSubscription.createdAt.getMonth())
       ) {
         continue;
       }
