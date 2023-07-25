@@ -67,7 +67,7 @@ export class PaymantService {
       );
       return session.url;
     } catch (e) {
-      throw new BadRequestException('Error creating payment intent', e);
+      throw new BadRequestException(returnMessages.PaymentFailed);
     }
   }
 
