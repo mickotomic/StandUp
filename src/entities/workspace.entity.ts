@@ -44,7 +44,7 @@ export class Workspace {
   @Column({ type: 'varchar' })
   settings: string;
 
-  @Column({ type: 'boolean', default: true})
+  @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
   @CreateDateColumn()

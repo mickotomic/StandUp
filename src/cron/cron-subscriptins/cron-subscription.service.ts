@@ -18,23 +18,29 @@ export class CronSubscriptionService {
     private mailerService: MailerService,
   ) {}
 
-  @Cron('0 0 5 * * *')
+  @Cron('0 * * * * *')
   async paymentChecking() {
-    const subscriptions = await this.subscriptionRepository.find({
-      where: { status: 'unpaid' },
-      relations: {workspace: {owner: true}},
-    });
-    subscriptions.forEach((subscription) => {
-      const ownersEmail = subscription.workspace.owner.email;
-      const days = Math.floor(getDateDifference(new Date(), subscription.createdAt));
+    const subscription = await this.subscriptionRepository
+      .createQueryBuilder('subscription')
+      .leftJoinAndSelect('subscription.workspace', 'workspace')
+      .leftJoinAndSelect('workspace.owner', 'owner')
+      .where('workspace.isActive = :isActive ', { isActive: true })
+      .andWhere('subscription.status = :status', { status: 'unpaid' })
+      .getMany();
+
+    for (let i = 0; i >= subscription.length; i++) {
+      const ownersEmail = subscription[i].workspace.owner.email;
+      const days = Math.floor(
+        getDateDifference(new Date(), subscription[i].createdAt),
+      );
       const numberOfDays = 12 ? 2 : 1;
       if (days === 12 || days === 13) {
         sendMail(
           ownersEmail,
-          `your subscription will be cancelled in ${(numberOfDays)} days!`,
+          `your subscription will be cancelled in ${numberOfDays} days!`,
           'workspace-deletion-notice',
           {
-            workspaceName: subscription.workspace.projectName,
+            workspaceName: subscription[i].workspace.projectName,
             numOfDays: numberOfDays,
           },
           this.mailerService,
@@ -46,13 +52,16 @@ export class CronSubscriptionService {
           'your subscription has been cancelled!',
           'workspace-deletion-confirmed',
           {
-            workspaceName: subscription.workspace.projectName,
+            workspaceName: subscription[i].workspace.projectName,
           },
           this.mailerService,
         );
 
-        this.workspaceRepository.update( {id: subscription.workspace.id} ,  {isActive: false})
+        this.workspaceRepository.update(
+          { id: subscription[i].workspace.id },
+          { isActive: false, deletedAt: new Date() },
+        );
       }
-    });
+    }
   }
 }
