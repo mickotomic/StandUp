@@ -68,7 +68,7 @@ export class CronSubscriptionService {
       .leftJoinAndSelect('subscription.workspace', 'workspace')
       .leftJoinAndSelect('workspace.owner', 'owner')
       .where('workspace.isActive = :isActive ', { isActive: true })
-      .andWhere('subscription.status = :status', { status: 'unpaid' })
+      .andWhere('subscription.status <> :status', { status: 'paid' })
       .getMany();
 
     for (let i = 0; i >= subscription.length; i++) {
