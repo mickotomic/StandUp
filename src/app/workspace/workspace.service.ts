@@ -169,16 +169,17 @@ export class WorkspaceService {
     const qb = this.workspaceRepository
       .createQueryBuilder('workspaces')
       .leftJoin('workspaces.owner', 'owner')
-      .leftJoin('workspaces.users', 'users_workspaces');
+      .leftJoin('workspaces.users', 'users_workspaces')
+      .where('workspaces.isActive = :isActive', { isActive: true });
 
     if (withDeleted === 'true') {
-      qb.withDeleted().where(
+      qb.withDeleted().andWhere(
         'workspaces.deletedAt IS NOT NULL AND owner.id = :ownerId',
         { ownerId: user.id },
       );
     }
     if (withDeleted === 'false') {
-      qb.withDeleted().where(
+      qb.withDeleted().andWhere(
         'workspaces.deletedAt IS NULL AND owner.id = :ownerId',
         { ownerId: user.id },
       );
@@ -188,8 +189,8 @@ export class WorkspaceService {
     }
 
     qb.orWhere(
-      'workspaces.deletedAt IS NULL AND users_workspaces.user = :userId',
-      { userId: user.id },
+      'workspaces.deletedAt IS NULL AND users_workspaces.user = :userId AND workspaces.isActive = :isActive',
+      { userId: user.id, isActive: true },
     );
     const [workspaces, count] = await qb.getManyAndCount();
     return { workspaces, count };
