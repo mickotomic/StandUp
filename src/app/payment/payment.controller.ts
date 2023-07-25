@@ -1,23 +1,33 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { PaymentDto } from './dto/payment.dto';
 import { PaymantService } from './payment.service';
 
 @ApiTags('app-payment')
 @Controller('payment')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
 export class PaymantController {
   constructor(private readonly paymentService: PaymantService) {}
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  async finishStandup(@Body() dto: PaymentDto) {
-    return await this.paymentService.paymentStripe(
-      +dto.subscriptionId,
-      +dto.amount,
-    );
+  async finishStandup(@Param('subscriptionId') subscriptionId: number) {
+    return await this.paymentService.paymentStripe(+subscriptionId);
+  }
+
+  @ApiBearerAuth()
+  @Get('/sucess/:subscriptionId')
+  async sucess(
+    @Param('subscriptionId') subscriptionId: number,
+    @Query('token') token: string,
+  ) {
+    return await this.paymentService.sucess(+subscriptionId, token);
+  }
+
+  @ApiBearerAuth()
+  @Get('/cancel/:subscriptionId')
+  async cancel(@Param('subscriptionId') subscriptionId: number) {
+    return await this.paymentService.cancel(+subscriptionId);
   }
 }
