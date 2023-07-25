@@ -7,6 +7,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { AdminMainModule } from './admin/admin-main.module';
 import { MainModule } from './app/main.module';
 import { AuthModule } from './auth/auth.module';
 import { CronModule } from './cron/cron.module';
@@ -14,6 +15,7 @@ import { CronModule } from './cron/cron.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DATABASE_HOST,
@@ -55,6 +57,7 @@ import { CronModule } from './cron/cron.module';
     }),
     MainModule,
     ScheduleModule.forRoot(),
+    AdminMainModule,
     CronModule,
   ],
 })
