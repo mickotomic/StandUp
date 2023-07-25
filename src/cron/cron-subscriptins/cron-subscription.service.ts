@@ -18,7 +18,7 @@ export class CronSubscriptionService {
     private mailerService: MailerService,
   ) {}
 
-  @Cron('0 * * * * *')
+  @Cron('0 0 5 * * *')
   async paymentChecking() {
     const subscription = await this.subscriptionRepository
       .createQueryBuilder('subscription')
