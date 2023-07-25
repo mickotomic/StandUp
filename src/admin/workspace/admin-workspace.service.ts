@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   paginate,
@@ -7,6 +7,7 @@ import {
   PaginateQuery,
 } from 'nestjs-paginate';
 import { Workspace } from 'src/entities/workspace.entity';
+import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -29,5 +30,28 @@ export class AdminWorkspaceService {
       .createQueryBuilder('workspaces')
       .leftJoinAndSelect('workspaces.owner', 'owner');
     return await paginate(query, qb, paginateConfig);
+  }
+
+  async controlWorkspaceStatus(
+    workspaceId: number,
+  ): Promise<{ isActive: boolean }> {
+    const workspace = await this.workspaceRepository.findOne({
+      where: {
+        id: workspaceId,
+      },
+      withDeleted: true,
+    });
+
+    if (!workspace) {
+      throw new BadRequestException(returnMessages.WorkspaceNotFound);
+    }
+
+    await this.workspaceRepository.save({
+      ...workspace,
+      isActive: !workspace.isActive,
+      deletedAt: workspace.isActive ? new Date() : null,
+    });
+
+    return workspace;
   }
 }
