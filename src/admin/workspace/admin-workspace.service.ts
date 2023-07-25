@@ -32,9 +32,7 @@ export class AdminWorkspaceService {
     return await paginate(query, qb, paginateConfig);
   }
 
-  async controlWorkspaceStatus(
-    workspaceId: number,
-  ): Promise<{ isActive: boolean }> {
+  async controlWorkspaceStatus(workspaceId: number): Promise<Workspace> {
     const workspace = await this.workspaceRepository.findOne({
       where: {
         id: workspaceId,
