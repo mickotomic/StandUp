@@ -23,6 +23,8 @@ export class AdminUserController {
 
   @ApiQuery({ name: 'page', required: false, type: 'number' })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'search', required: false, type: 'string' })
+  @ApiQuery({ name: 'filter.isActive', required: false, type: 'string' })
   @Get()
   async getUsersList(
     @Paginate() query: PaginateQuery,
