@@ -1,28 +1,27 @@
 import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { PaymantService } from './payment.service';
+import { PaymentService } from './payment.service';
 
 @ApiTags('app-payment')
 @Controller('payment')
-@ApiBearerAuth()
-export class PaymantController {
-  constructor(private readonly paymentService: PaymantService) {}
+export class PaymentController {
+  constructor(private readonly paymentService: PaymentService) {}
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Post()
-  async finishStandup(@Param('subscriptionId') subscriptionId: number) {
+  @Post('/:subscriptionId')
+  async paymentStripe(@Param('subscriptionId') subscriptionId: number) {
     return await this.paymentService.paymentStripe(+subscriptionId);
   }
 
   @ApiBearerAuth()
   @Get('/sucess/:subscriptionId')
-  async sucess(
+  async success(
     @Param('subscriptionId') subscriptionId: number,
     @Query('token') token: string,
   ) {
-    return await this.paymentService.sucess(+subscriptionId, token);
+    return await this.paymentService.success(+subscriptionId, token);
   }
 
   @ApiBearerAuth()

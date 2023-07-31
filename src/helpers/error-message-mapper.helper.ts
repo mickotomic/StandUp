@@ -56,4 +56,6 @@ export const returnMessages = Object.freeze({
   SubscriptionNotFound: 'Subscription not found!',
 
   PaymentFailed: 'Payment failed!',
+
+  PaymentCanceled: 'Payment canceled!',
 });

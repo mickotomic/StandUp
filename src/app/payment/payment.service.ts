@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
-export class PaymantService {
+export class PaymentService {
   constructor(
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
@@ -58,20 +58,20 @@ export class PaymantService {
           subscriptionId +
           '?token=' +
           hash,
-        cancel_url:
-          process.env.APP_PORT + '/payment/canceled/' + subscriptionId,
+        cancel_url: process.env.APP_PORT + '/payment/cancel/' + subscriptionId,
       });
       await this.subscriptionRepository.update(
         { id: subscriptionId },
         { transactionId: session.id },
       );
+      console.log(session);
       return session.url;
     } catch (e) {
       throw new BadRequestException(returnMessages.PaymentFailed);
     }
   }
 
-  async sucess(subscriptionId: number, token: string) {
+  async success(subscriptionId: number, token: string) {
     const subscription = await this.subscriptionRepository.findOneBy({
       id: subscriptionId,
     });
@@ -92,10 +92,19 @@ export class PaymantService {
       throw new BadRequestException(returnMessages.SubscriptionNotFound);
     }
 
-    await this.subscriptionRepository.update(
+    const subscription1 = {
+      payment: subscription,
+      action: returnMessages.PaymentCanceled,
+    };
+
+     await this.subscriptionRepository.update(
       { id: subscriptionId },
-      { status: 'canceled' },
-    );
-    return await { status: 'cancel' };
+      {
+        status: 'canceled',
+        errorObject: subscription1,
+      },
+     );
+    
+    return subscription1;
   }
 }
