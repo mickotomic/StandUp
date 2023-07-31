@@ -97,14 +97,14 @@ export class PaymentService {
       action: returnMessages.PaymentCanceled,
     };
 
-     await this.subscriptionRepository.update(
+    await this.subscriptionRepository.update(
       { id: subscriptionId },
       {
         status: 'canceled',
         errorObject: subscription1,
       },
-     );
-    
+    );
+
     return subscription1;
   }
 }
