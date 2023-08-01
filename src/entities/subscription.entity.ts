@@ -36,12 +36,15 @@ export class Subscription {
   @Column({ default: null })
   transactionId: string;
 
-  @Column({ default: null })
-  errorStatus: string;
+  @Column({ default: null, type: 'json' })
+  errorObject: object;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ default: null })
+  paymentAuthToken: string;
 }
