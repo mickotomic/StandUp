@@ -16,7 +16,7 @@ export class PaymentController {
   }
 
   @ApiBearerAuth()
-  @Get('/sucess/:subscriptionId')
+  @Get('/success/:subscriptionId')
   async success(
     @Param('subscriptionId') subscriptionId: number,
     @Query('token') token: string,

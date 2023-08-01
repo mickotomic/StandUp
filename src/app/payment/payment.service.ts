@@ -23,11 +23,13 @@ export class PaymentService {
     }
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2022-11-15',
+      apiVersion: process.env.STRIPE_API_VERSION as Stripe.LatestApiVersion,
     });
 
     const token = uuidv4();
-    const hash = createHmac('sha256', 'micko').update(token).digest('hex');
+    const hash = createHmac('sha256', process.env.TOKEN_HASH_KEY)
+      .update(token)
+      .digest('hex');
 
     await this.subscriptionRepository.update(
       { id: subscriptionId },
@@ -46,19 +48,22 @@ export class PaymentService {
               currency: 'EUR',
               unit_amount: subscription.price * 100,
               product_data: {
-                name: 'subscription',
+                name: `Subscription #${subscriptionId}`,
               },
             },
             quantity: 1,
           },
         ],
         success_url:
-          process.env.APP_PORT +
-          '/payment/sucess/' +
+          `${process.env.BASE_URL}:${process.env.APP_PORT}` +
+          '/payment/success/' +
           subscriptionId +
           '?token=' +
           hash,
-        cancel_url: process.env.APP_PORT + '/payment/cancel/' + subscriptionId,
+        cancel_url:
+          `${process.env.BASE_URL}:${process.env.APP_PORT}` +
+          '/payment/cancel/' +
+          subscriptionId,
       });
       await this.subscriptionRepository.update(
         { id: subscriptionId },
@@ -91,17 +96,14 @@ export class PaymentService {
     if (!subscription) {
       throw new BadRequestException(returnMessages.SubscriptionNotFound);
     }
-    delete subscription.errorObject;
-    const subscription1 = {
-      subscription: subscription,
-      action: returnMessages.PaymentCanceled,
-    };
 
     return await this.subscriptionRepository.update(
       { id: subscriptionId },
       {
         status: 'canceled',
-        errorObject: subscription1,
+        errorObject: {
+          action: returnMessages.PaymentCanceled,
+        },
       },
     );
   }
