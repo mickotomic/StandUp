@@ -1,5 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, ParseIntPipe, Put } from '@nestjs/common';
+import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { Workspace } from 'src/entities/workspace.entity';
 import { AdminWorkspaceService } from './admin-workspace.service';
@@ -16,5 +16,11 @@ export class AdminWorkspaceController {
     @Paginate() query: PaginateQuery,
   ): Promise<Paginated<Workspace>> {
     return await this.workspaceService.getWorkspaceList(query);
+  }
+
+  @ApiParam({ name: 'id' })
+  @Put('/:id')
+  async controlWorkspaceStatus(@Param('id', ParseIntPipe) workspaceId: number) {
+    return await this.workspaceService.controlWorkspaceStatus(workspaceId);
   }
 }

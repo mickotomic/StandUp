@@ -53,5 +53,9 @@ export const returnMessages = Object.freeze({
 
   TaskNotFound: 'Task not found!',
 
-  SubscriptionNotFound: 'Subscription not found',
+  SubscriptionNotFound: 'Subscription not found!',
+
+  PaymentFailed: 'Payment failed!',
+
+  PaymentCanceled: 'Payment canceled!',
 });
