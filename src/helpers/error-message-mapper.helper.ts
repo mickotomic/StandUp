@@ -52,4 +52,6 @@ export const returnMessages = Object.freeze({
   UserDoesNotBelong: 'User does not belong to this workspace!',
 
   TaskNotFound: 'Task not found!',
+
+  SubscriptionNotFound: 'Subscription not found',
 });
