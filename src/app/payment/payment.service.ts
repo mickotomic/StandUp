@@ -27,7 +27,7 @@ export class PaymentService {
     });
 
     const token = uuidv4();
-    const hash = createHmac('sha256', process.env.TOKEN_HASH_KEY)
+    const hash = createHmac('sha256', process.env.TOKEN_SALT)
       .update(token)
       .digest('hex');
 
@@ -69,7 +69,6 @@ export class PaymentService {
         { id: subscriptionId },
         { transactionId: session.id },
       );
-      console.log(session);
       return session.url;
     } catch (e) {
       throw new BadRequestException(returnMessages.PaymentFailed);
