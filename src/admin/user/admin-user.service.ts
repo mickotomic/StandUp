@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  FilterOperator,
   paginate,
   PaginateConfig,
   Paginated,
@@ -24,6 +25,7 @@ export class AdminUserService {
       sortableColumns: ['id'],
       relations: [],
       defaultSortBy: [['id', 'DESC']],
+      searchableColumns: ['name', 'email'],
       select: [
         'id',
         'name',
@@ -35,6 +37,7 @@ export class AdminUserService {
         'deletedAt',
         'emailVerifiedAt',
       ],
+      filterableColumns: { isActive: [FilterOperator.EQ] },
     };
     const qb = this.userRepository.createQueryBuilder('users');
     return await paginate<User>(query, qb, paginateConfig);
