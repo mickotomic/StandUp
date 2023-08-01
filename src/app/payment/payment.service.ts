@@ -91,20 +91,18 @@ export class PaymentService {
     if (!subscription) {
       throw new BadRequestException(returnMessages.SubscriptionNotFound);
     }
-
+    delete subscription.errorObject;
     const subscription1 = {
       payment: subscription,
       action: returnMessages.PaymentCanceled,
     };
 
-    await this.subscriptionRepository.update(
+    return await this.subscriptionRepository.update(
       { id: subscriptionId },
       {
         status: 'canceled',
         errorObject: subscription1,
       },
     );
-
-    return subscription1;
   }
 }
