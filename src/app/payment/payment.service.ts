@@ -93,7 +93,7 @@ export class PaymentService {
     }
     delete subscription.errorObject;
     const subscription1 = {
-      payment: subscription,
+      subscription: subscription,
       action: returnMessages.PaymentCanceled,
     };
 
