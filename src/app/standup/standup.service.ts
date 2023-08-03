@@ -202,6 +202,7 @@ export class StandupService {
     isStandupInProgress: boolean;
     isLastMember: boolean;
     isStandupFinishedForToday: boolean;
+    serverDate: Date;
   }> {
     const serverDate = new Date();
     const finishedStandup = await this.summaryRepository
@@ -226,6 +227,7 @@ export class StandupService {
         isStandupInProgress: false,
         isLastMember: false,
         isStandupFinishedForToday,
+        serverDate,
       };
     }
 
@@ -234,6 +236,7 @@ export class StandupService {
       isStandupInProgress: true,
       isLastMember: standup.users.pop() === standup.currentUser,
       isStandupFinishedForToday,
+      serverDate,
     };
   }
 }
