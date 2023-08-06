@@ -95,6 +95,7 @@ export class WorkspaceService {
           },
           {
             attempts: 5,
+            backoff: { type: 'exponential', delay: 5000 },
           },
         );
       }

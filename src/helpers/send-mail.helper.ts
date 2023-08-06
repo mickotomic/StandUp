@@ -7,6 +7,7 @@ export function sendMail(
   template: string,
   context: object,
   mailerService: MailerService,
+  attachments: { filename: string; path: string }[] = [],
 ): Promise<boolean> {
   return mailerService
     .sendMail({
@@ -15,6 +16,7 @@ export function sendMail(
       subject,
       template,
       context,
+      attachments,
     })
     .then((response) => {
       emailLogger.log({
