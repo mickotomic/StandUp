@@ -35,9 +35,9 @@ export class CronSubscriptionProcess {
         ],
       )
     ) {
-      cb(null, 'Email sent');
+      cb(null, 'Completed');
     } else {
-      cb(new Error('test'), false);
+      cb(new Error('Faild'), false);
     }
   }
 
