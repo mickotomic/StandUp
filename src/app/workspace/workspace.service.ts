@@ -94,8 +94,11 @@ export class WorkspaceService {
             workspaceName: workspace.projectName,
           },
           {
-            attempts: 5,
-            backoff: { type: 'exponential', delay: 5000 },
+            attempts: +process.env.QUEUES_NUMBER_OF_ATTEMPTS,
+            backoff: {
+              type: process.env.QUEUES_BACKOFF_TYPE,
+              delay: +process.env.QUEUES_BACKOFF_DELAY,
+            },
           },
         );
       }

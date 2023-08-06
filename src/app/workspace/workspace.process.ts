@@ -32,7 +32,7 @@ export class WorkspaceProcess {
     ) {
       cb(null, 'Completed');
     } else {
-      cb(new Error('Faild'), false);
+      cb(new Error('Failed'), false);
     }
   }
 }
