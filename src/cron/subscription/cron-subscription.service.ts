@@ -1,11 +1,14 @@
 import { MailerService } from '@nestjs-modules/mailer';
+import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Queue } from 'bull';
 import { SubscriptionItems } from 'src/entities/subscription-items.entity';
 import { Subscription } from 'src/entities/subscription.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import calculateSubscriptionPrice from 'src/helpers/calculate-subscription-price.helper';
+import { generatePDF } from 'src/helpers/generate-pdf-invoice.helper';
 import getDateDifference from 'src/helpers/get-date-difference.helper';
 import { sendMail } from 'src/helpers/send-mail.helper';
 import { Repository } from 'typeorm';
@@ -20,6 +23,7 @@ export class CronSubscriptionService {
     @InjectRepository(SubscriptionItems)
     private readonly subscriptionItemsRepository: Repository<SubscriptionItems>,
     private mailerService: MailerService,
+    @InjectQueue('invoice-email') private readonly mailerQueue: Queue,
   ) {}
 
   @Cron('0 0 4 * * *')
@@ -49,15 +53,17 @@ export class CronSubscriptionService {
         workspaces[i].users.length,
       );
       const subscription = await this.subscriptionRepository.save({
-        workspaces: { id: workspaces[i].id },
+        workspace: { id: workspaces[i].id },
         numberOfActiveUsers: workspaces[i].users.length,
         price: pricePerUser * workspaces[i].users.length,
       });
+
       this.subscriptionItemsRepository.save({
         price: pricePerUser,
         subscription: { id: subscription.id },
         user: { id: workspaces[i].owner.id },
       });
+      this.sendInvoiceEmail(workspaces[i], subscription, pricePerUser);
     }
   }
 
@@ -106,5 +112,27 @@ export class CronSubscriptionService {
         );
       }
     }
+  }
+
+  async sendInvoiceEmail(
+    workspace: Workspace,
+    subscription: Subscription,
+    pricePerUser: number,
+  ) {
+    generatePDF(workspace, workspace.owner, subscription, pricePerUser);
+
+    await this.mailerQueue.add(
+      'invoiceEmail',
+      {
+        workspace,
+      },
+      {
+        attempts: +process.env.QUEUES_NUMBER_OF_ATTEMPTS,
+        backoff: {
+          type: process.env.QUEUES_BACKOFF_TYPE,
+          delay: +process.env.QUEUES_BACKOFF_DELAY,
+        },
+      },
+    );
   }
 }
