@@ -2,14 +2,12 @@ import { Module } from '@nestjs/common';
 import { TaskModule } from 'src/app/task/task.module';
 import { StandupModule } from './standup/standup.module';
 import { SubscriptionModule } from './subscription/subscription.module';
-import { SummaryModule } from './summary/summary.module';
-import { WorkspaceUsersModule } from './workspace/workspace-users/workspace-users.module';
+import { SummaryModule } from './summary/summary.module'; 
 import { WorkspaceModule } from './workspace/workspace.module';
 
 @Module({
   imports: [
     WorkspaceModule,
-    WorkspaceUsersModule,
     StandupModule,
     TaskModule,
     SummaryModule,

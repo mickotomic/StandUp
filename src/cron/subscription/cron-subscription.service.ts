@@ -71,7 +71,7 @@ export class CronSubscriptionService {
       .andWhere('subscription.status <> :status', { status: 'paid' })
       .getMany();
 
-    for (let i = 0; i > subscription.length; i++) {
+    for (let i = 0; i < subscription.length; i++) {
       const ownersEmail = subscription[i].workspace.owner.email;
       const days = Math.floor(
         getDateDifference(new Date(), subscription[i].createdAt),

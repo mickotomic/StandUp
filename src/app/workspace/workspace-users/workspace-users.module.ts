@@ -11,4 +11,4 @@ import { WorkspaceUsersService } from './workspace-users.service';
   controllers: [WorkspaceUsersController],
   providers: [WorkspaceUsersService],
 })
-export class WorkspaceUsersModule {}
+export class UserWorkspaceModule {}

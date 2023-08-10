@@ -37,10 +37,7 @@ export class WorkspaceUsersService {
     for (let i = 0; i < data.length; i++) {
       delete data[i].user.password;
     }
-    return {
-      data: data.map((item) => item.user),
-      count,
-    };
+    return { data, count };
   }
   async removeUser(workspaceId: number, user: User, userId: number) {
     const workspace = await this.workspaceRepository

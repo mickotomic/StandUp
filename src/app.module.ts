@@ -56,7 +56,6 @@ import { CronModule } from './cron/cron.module';
       },
     }),
     MainModule,
-    ScheduleModule.forRoot(),
     AdminMainModule,
     CronModule,
   ],
