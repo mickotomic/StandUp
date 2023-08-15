@@ -40,6 +40,9 @@ export class CronSubscriptionService {
       ) {
         continue;
       }
+      workspaces[i].subscriptions.sort((a, b) => {
+        return a.id - b.id;
+      });
       const lastSubscription =
         workspaces[i].subscriptions[workspaces[i].subscriptions.length - 1];
       if (
