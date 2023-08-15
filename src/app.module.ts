@@ -34,6 +34,9 @@ import { CronModule } from './cron/cron.module';
         port: +process.env.MAILER_PORT,
         ignoreTLS: process.env.MAILER_IGNORE_TLS === 'true',
         secure: process.env.MAILER_SECURE === 'true',
+        tls:{
+          rejectUnauthorized: 'true',
+        },
         auth: {
           user: process.env.MAILER_USER,
           pass: process.env.MAILER_PASS,
