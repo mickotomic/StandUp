@@ -53,7 +53,8 @@ export class WorkspaceService {
     }
     const arrOfEmails = invitedEmails.emails.split(',');
 
-    for (const email of arrOfEmails) {
+    for (let email of arrOfEmails) {
+      email = email.trim();
       const userWorkspace = await this.userWorkspaceRepository.findOneBy({
         workspace: { id: workspace.id },
         user: { email: email },
