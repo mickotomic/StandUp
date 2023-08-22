@@ -92,7 +92,7 @@ export class CronSubscriptionService {
       if (days >= 14 && days <= 16) {
         sendMail(
           ownersEmail,
-          'your subscription has been cancelled!',
+          'Your workspace has been blocked',
           'workspace-deletion-confirmed',
           {
             workspaceName: subscription[i].workspace.projectName,

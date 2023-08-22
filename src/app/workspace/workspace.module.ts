@@ -8,11 +8,11 @@ import { Workspace } from 'src/entities/workspace.entity';
 import { WorkspaceController } from './workspace.controller';
 import { WorkspaceProcess } from './workspace.process';
 import { WorkspaceService } from './workspace.service';
-import { UserWorkspaceModule } from './workspace-users/workspace-users.module';
+import { WorkspaceUserModule } from './workspace-users/workspace-users.module';
 
 @Module({
   imports: [
-    UserWorkspaceModule,
+    WorkspaceUserModule,
     TypeOrmModule.forFeature([Workspace, User, UserToken, UserWorkspace]),
     BullModule.registerQueue({
       limiter: { max: 5, duration: 5000 },
