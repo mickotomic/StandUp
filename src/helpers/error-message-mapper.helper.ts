@@ -23,6 +23,8 @@ export const returnMessages = Object.freeze({
 
   WorkspaceOwnerInvite: 'Only workspace owners can invite users!',
 
+  WorkspaceIsActive: 'Workspace is already active',
+
   TokenNotValid: 'Token is not valid!',
 
   TokenIsValid: 'Token is valid!',

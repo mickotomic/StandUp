@@ -159,6 +159,7 @@ export class WorkspaceService {
       ...createWorkspaceDto,
       owner,
     });
+
     await this.userWorkspaceRepository.save({
       workspace: { id: workspace.id },
       user: owner,
@@ -243,6 +244,9 @@ export class WorkspaceService {
       .execute();
     const workspace = await this.workspaceRepository.findOneBy({ id });
 
+    if (workspace.isActive === true) {
+      throw new BadRequestException(returnMessages.WorkspaceIsActive);
+    }
     if (!workspace) {
       throw new NotFoundException(returnMessages.WorkspaceNotFound);
     }
