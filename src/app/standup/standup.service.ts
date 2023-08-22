@@ -12,7 +12,7 @@ import { formatDate } from 'src/helpers/date-and-time.helper';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 
 @Injectable()
 export class StandupService {
@@ -52,7 +52,7 @@ export class StandupService {
     const [users, count] = await this.userRepository.findAndCount({
       where: {
         workspaces: { workspace: { id: workspaceId } },
-        tasks: { summary: null },
+        tasks: { summary: IsNull() },
       },
       relations: ['tasks'],
     });
