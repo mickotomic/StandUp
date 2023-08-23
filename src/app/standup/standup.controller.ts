@@ -11,7 +11,6 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
-import { Task } from 'src/entities/task.entity';
 import { User } from 'src/entities/user.entity';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { StandupDto } from './dto/standup.dto';
@@ -58,7 +57,7 @@ export class StandupController {
     userId?: number;
     isStandupInProgress: boolean;
     isLastMember: boolean;
-    usersTasks: User[] | Task[];
+    usersTasks: User[];
   }> {
     return await this.standupService.getCurrentUser(+workspaceId, user);
   }

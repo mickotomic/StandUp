@@ -203,7 +203,7 @@ export class StandupService {
     isLastMember: boolean;
     isStandupFinishedForToday: boolean;
     serverDate: Date;
-    usersTasks: User[] | Task[];
+    usersTasks: User[];
   }> {
     const serverDate = new Date();
     const finishedStandup = await this.summaryRepository

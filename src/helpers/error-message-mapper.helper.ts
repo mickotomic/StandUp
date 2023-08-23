@@ -60,4 +60,6 @@ export const returnMessages = Object.freeze({
   PaymentFailed: 'Payment failed!',
 
   PaymentCanceled: 'Payment canceled!',
+
+  BadProjectNameLength: 'projectName must have between 1 and 255 characters',
 });
