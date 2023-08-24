@@ -13,7 +13,6 @@ import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { IsNull, Repository } from 'typeorm';
-import { IsNull, Repository } from 'typeorm';
 import { NextDto } from './dto/next.dto';
 
 @Injectable()
