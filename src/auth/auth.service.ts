@@ -93,7 +93,7 @@ export class AuthService {
 
     const isUserVerified = await this.userRepository.findOneBy({ id: user.id });
     if (isUserVerified.emailVerifiedAt !== null) {
-      throw new BadRequestException(returnMessages.UserAlradyVerified);
+      throw new BadRequestException(returnMessages.UserAlreadyVerified);
     }
 
     if (
