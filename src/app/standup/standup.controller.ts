@@ -59,6 +59,7 @@ export class StandupController {
     userId?: number;
     isStandupInProgress: boolean;
     isLastMember: boolean;
+    usersTasks: User[];
   }> {
     return await this.standupService.getCurrentUser(+workspaceId, user);
   }

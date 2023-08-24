@@ -160,6 +160,7 @@ export class WorkspaceService {
       ...createWorkspaceDto,
       owner,
     });
+
     await this.userWorkspaceRepository.save({
       workspace: { id: workspace.id },
       user: owner,

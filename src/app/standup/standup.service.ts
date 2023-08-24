@@ -12,11 +12,9 @@ import { formatDate } from 'src/helpers/date-and-time.helper';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
-
+import { IsNull, Repository } from 'typeorm';
 import { IsNull, Repository } from 'typeorm';
 import { NextDto } from './dto/next.dto';
-
-
 
 @Injectable()
 export class StandupService {
@@ -207,6 +205,7 @@ export class StandupService {
     isLastMember: boolean;
     isStandupFinishedForToday: boolean;
     serverDate: Date;
+    usersTasks: User[];
   }> {
     const serverDate = new Date();
     const finishedStandup = await this.summaryRepository
@@ -218,6 +217,14 @@ export class StandupService {
       .getOne();
 
     const isStandupFinishedForToday = !!finishedStandup;
+
+    const usersTasks = await this.userRepository.find({
+      where: {
+        workspaces: { workspace: { id: workspaceId } },
+        tasks: { summary: IsNull() },
+      },
+      relations: ['tasks'],
+    });
 
     const standup = await this.summaryRepository
       .createQueryBuilder('summary')
@@ -232,6 +239,7 @@ export class StandupService {
         isLastMember: false,
         isStandupFinishedForToday,
         serverDate,
+        usersTasks,
       };
     }
 
@@ -241,6 +249,7 @@ export class StandupService {
       isLastMember: standup.users.pop() === standup.currentUser,
       isStandupFinishedForToday,
       serverDate,
+      usersTasks,
     };
   }
 }
