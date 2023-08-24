@@ -95,7 +95,7 @@ export class StandupService {
       },
     });
 
-    const usersIds = users.map((element) => element.id);
+    const usersIds = users.map((user) => user.id);
 
     if (!absentUsers.every((element) => usersIds.includes(element))) {
       throw new BadRequestException(returnMessages.UsersNotInWorkspace);
