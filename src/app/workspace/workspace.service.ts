@@ -53,7 +53,8 @@ export class WorkspaceService {
     }
     const arrOfEmails = invitedEmails.emails.split(',');
 
-    for (const email of arrOfEmails) {
+    for (let email of arrOfEmails) {
+      email = email.trim();
       const userWorkspace = await this.userWorkspaceRepository.findOneBy({
         workspace: { id: workspace.id },
         user: { email: email },
@@ -94,7 +95,11 @@ export class WorkspaceService {
             workspaceName: workspace.projectName,
           },
           {
-            attempts: 5,
+            attempts: +process.env.QUEUES_NUMBER_OF_ATTEMPTS,
+            backoff: {
+              type: process.env.QUEUES_BACKOFF_TYPE,
+              delay: +process.env.QUEUES_BACKOFF_DELAY,
+            },
           },
         );
       }
@@ -169,16 +174,17 @@ export class WorkspaceService {
     const qb = this.workspaceRepository
       .createQueryBuilder('workspaces')
       .leftJoin('workspaces.owner', 'owner')
-      .leftJoin('workspaces.users', 'users_workspaces');
+      .leftJoin('workspaces.users', 'users_workspaces')
+      .where('workspaces.isActive = :isActive', { isActive: true });
 
     if (withDeleted === 'true') {
-      qb.withDeleted().where(
+      qb.withDeleted().andWhere(
         'workspaces.deletedAt IS NOT NULL AND owner.id = :ownerId',
         { ownerId: user.id },
       );
     }
     if (withDeleted === 'false') {
-      qb.withDeleted().where(
+      qb.withDeleted().andWhere(
         'workspaces.deletedAt IS NULL AND owner.id = :ownerId',
         { ownerId: user.id },
       );
@@ -188,8 +194,8 @@ export class WorkspaceService {
     }
 
     qb.orWhere(
-      'workspaces.deletedAt IS NULL AND users_workspaces.user = :userId',
-      { userId: user.id },
+      'workspaces.deletedAt IS NULL AND users_workspaces.user = :userId AND workspaces.isActive = :isActive',
+      { userId: user.id, isActive: true },
     );
     const [workspaces, count] = await qb.getManyAndCount();
     return { workspaces, count };

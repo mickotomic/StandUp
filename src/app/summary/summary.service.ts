@@ -25,7 +25,14 @@ export class SummaryService {
       sortableColumns: ['id'],
       relations: ['workspace', 'tasks'],
       defaultSortBy: [['id', 'DESC']],
-      select: ['id', 'tasksDue', 'tasksCompleted', 'absentUsers'],
+      select: [
+        'id',
+        'tasksDue',
+        'tasksCompleted',
+        'absentUsers',
+        'createdAt',
+        'finishedAt',
+      ],
     };
     const qb = this.summaryRepository
       .createQueryBuilder('summaries')

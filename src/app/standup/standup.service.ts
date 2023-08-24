@@ -8,10 +8,11 @@ import { Summary } from 'src/entities/summary.entity';
 import { Task } from 'src/entities/task.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
+import { formatDate } from 'src/helpers/date-and-time.helper';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 
 @Injectable()
 export class StandupService {
@@ -51,7 +52,7 @@ export class StandupService {
     const [users, count] = await this.userRepository.findAndCount({
       where: {
         workspaces: { workspace: { id: workspaceId } },
-        tasks: { summary: null },
+        tasks: { summary: IsNull() },
       },
       relations: ['tasks'],
     });
@@ -201,7 +202,20 @@ export class StandupService {
     userId?: number;
     isStandupInProgress: boolean;
     isLastMember: boolean;
+    isStandupFinishedForToday: boolean;
+    serverDate: Date;
   }> {
+    const serverDate = new Date();
+    const finishedStandup = await this.summaryRepository
+      .createQueryBuilder('summary')
+      .where('summary.workspace = :workspaceId', { workspaceId })
+      .andWhere('summary.finishedAt LIKE :date', {
+        date: formatDate(serverDate) + '%',
+      })
+      .getOne();
+
+    const isStandupFinishedForToday = !!finishedStandup;
+
     const standup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -209,13 +223,21 @@ export class StandupService {
       .andWhere('summary.finishedAt IS NULL')
       .getOne();
     if (!standup || !standup.users.includes(user.id)) {
-      return { userId: null, isStandupInProgress: false, isLastMember: false };
+      return {
+        userId: null,
+        isStandupInProgress: false,
+        isLastMember: false,
+        isStandupFinishedForToday,
+        serverDate,
+      };
     }
 
     return {
       userId: standup.currentUser,
       isStandupInProgress: true,
       isLastMember: standup.users.pop() === standup.currentUser,
+      isStandupFinishedForToday,
+      serverDate,
     };
   }
 }
