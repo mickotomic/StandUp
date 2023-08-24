@@ -1,8 +1,5 @@
 import { MailerService } from '@nestjs-modules/mailer';
-<<<<<<< HEAD
-=======
 import { InjectQueue } from '@nestjs/bull';
->>>>>>> dev
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,10 +23,7 @@ export class CronSubscriptionService {
     @InjectRepository(SubscriptionItems)
     private readonly subscriptionItemsRepository: Repository<SubscriptionItems>,
     private mailerService: MailerService,
-<<<<<<< HEAD
-=======
     @InjectQueue('invoice-email') private readonly mailerQueue: Queue,
->>>>>>> dev
   ) {}
 
   @Cron('0 0 4 * * *')
@@ -86,20 +80,12 @@ export class CronSubscriptionService {
       .andWhere('subscription.status <> :status', { status: 'paid' })
       .getMany();
 
-<<<<<<< HEAD
     for (let i = 0; i < subscription.length; i++) {
-=======
-    for (let i = 0; i >= subscription.length; i++) {
->>>>>>> dev
       const ownersEmail = subscription[i].workspace.owner.email;
       const days = Math.floor(
         getDateDifference(new Date(), subscription[i].createdAt),
       );
-<<<<<<< HEAD
       const numberOfDays = days === 12 ? 2 : 1;
-=======
-      const numberOfDays = 12 ? 2 : 1;
->>>>>>> dev
       if (days === 12 || days === 13) {
         sendMail(
           ownersEmail,
@@ -115,11 +101,7 @@ export class CronSubscriptionService {
       if (days >= 14 && days <= 16) {
         sendMail(
           ownersEmail,
-<<<<<<< HEAD
           'Your workspace has been blocked',
-=======
-          'your subscription has been cancelled!',
->>>>>>> dev
           'workspace-deletion-confirmed',
           {
             workspaceName: subscription[i].workspace.projectName,
@@ -134,8 +116,6 @@ export class CronSubscriptionService {
       }
     }
   }
-<<<<<<< HEAD
-=======
 
   async sendInvoiceEmail(
     workspace: Workspace,
@@ -158,5 +138,4 @@ export class CronSubscriptionService {
       },
     );
   }
->>>>>>> dev
 }
