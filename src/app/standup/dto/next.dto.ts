@@ -6,4 +6,5 @@ export class NextDto {
   @IsString()
   @IsIn([ 'next', 'previous' ])
   direction: string;
+  
 }
