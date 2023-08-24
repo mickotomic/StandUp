@@ -4,10 +4,9 @@ import {
   Get,
   Param,
   ParseIntPipe,
-  Patch,
   Post,
+  Query,
   UseGuards,
-
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -16,7 +15,6 @@ import { User } from 'src/entities/user.entity';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
-import { NextDto } from './dto/next.dto';
 
 @ApiTags('app-standup')
 @ApiBearerAuth()
@@ -63,12 +61,12 @@ export class StandupController {
     return await this.standupService.getCurrentUser(+workspaceId, user);
   }
 
-  @Patch('/:workspaceId')
+  @Get('/:workspaceId')
   async next(
     @Param('workspaceId') workspaceId: number,
-    @Body () nextDto: NextDto,
+    @Query('direction') direction: string,
     @GetUser() user: User,
   ) {
-    return await this.standupService.next(+workspaceId, nextDto, user);
+    return await this.standupService.next(+workspaceId, direction, user);
   }
 }
