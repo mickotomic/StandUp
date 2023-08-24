@@ -12,7 +12,11 @@ import { formatDate } from 'src/helpers/date-and-time.helper';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
+
 import { IsNull, Repository } from 'typeorm';
+import { NextDto } from './dto/next.dto';
+
+
 
 @Injectable()
 export class StandupService {
@@ -151,7 +155,7 @@ export class StandupService {
     return { message: returnMessages.StandupFinished };
   }
 
-  async next(workspaceId: number, direction: string, user: User) {
+  async next(workspaceId: number, nextDto: NextDto, user: User) {
     const summary = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -168,7 +172,7 @@ export class StandupService {
         returnMessages.UserDoesNotExistsInWorkspace,
       );
     }
-    if (direction === 'next') {
+    if (nextDto.direction === 'next') {
       const lastMember = summary.users.slice(-1)[0];
       if (lastMember === summary.currentUser) {
         return { userId: summary.currentUser, isLastMember: true };
@@ -181,7 +185,7 @@ export class StandupService {
         userId: summary.currentUser,
         isLastMember: lastMember === currentUser,
       };
-    } else if (direction === 'previous') {
+    } else if (nextDto.direction === 'previous') {
       const firstMember = summary.users[0];
       if (firstMember === summary.currentUser) {
         return { userId: summary.currentUser, isLastMember: false };
