@@ -92,11 +92,10 @@ export class StandupService {
     const users = await this.userRepository.find({
       where: {
         workspaces: { workspace: { id: workspaceId } },
-        tasks: { summary: null },
       },
     });
 
-    const usersIds = users.map((user) => user.id);
+    const usersIds = users.map((element) => element.id);
 
     if (!absentUsers.every((element) => usersIds.includes(element))) {
       throw new BadRequestException(returnMessages.UsersNotInWorkspace);
@@ -107,7 +106,7 @@ export class StandupService {
     });
 
     await this.tasksRepository.query(
-      'UPDATE tasks SET summaryId = ? WHERE workspaceId = ?',
+      `UPDATE tasks SET summaryId = ? WHERE workspaceId = ? AND summaryId IS NULL AND status = 'done'`,
       [existingStartedStandup.id, workspaceId],
     );
 
