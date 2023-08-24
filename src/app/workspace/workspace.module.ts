@@ -9,9 +9,11 @@ import { Workspace } from 'src/entities/workspace.entity';
 import { WorkspaceController } from './workspace.controller';
 import { WorkspaceProcess } from './workspace.process';
 import { WorkspaceService } from './workspace.service';
+import { WorkspaceUserModule } from './workspace-users/workspace-users.module';
 
 @Module({
   imports: [
+    WorkspaceUserModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forFeature([Workspace, User, UserToken, UserWorkspace]),
     BullModule.registerQueue({
