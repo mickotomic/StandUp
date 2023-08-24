@@ -186,6 +186,7 @@ export class StandupService {
       if (firstMember === summary.currentUser) {
         return { userId: summary.currentUser, isLastMember: false };
       }
+
       const currentUser =
         summary.users[summary.users.indexOf(summary.currentUser) - 1];
       summary.currentUser = currentUser;

@@ -80,12 +80,12 @@ export class CronSubscriptionService {
       .andWhere('subscription.status <> :status', { status: 'paid' })
       .getMany();
 
-    for (let i = 0; i >= subscription.length; i++) {
+    for (let i = 0; i < subscription.length; i++) {
       const ownersEmail = subscription[i].workspace.owner.email;
       const days = Math.floor(
         getDateDifference(new Date(), subscription[i].createdAt),
       );
-      const numberOfDays = 12 ? 2 : 1;
+      const numberOfDays = days === 12 ? 2 : 1;
       if (days === 12 || days === 13) {
         sendMail(
           ownersEmail,
@@ -101,7 +101,7 @@ export class CronSubscriptionService {
       if (days >= 14 && days <= 16) {
         sendMail(
           ownersEmail,
-          'your subscription has been cancelled!',
+          'Your workspace has been blocked',
           'workspace-deletion-confirmed',
           {
             workspaceName: subscription[i].workspace.projectName,
