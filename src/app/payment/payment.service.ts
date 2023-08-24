@@ -1,8 +1,10 @@
+import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHmac } from 'crypto';
 import { Subscription } from 'src/entities/subscription.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
+import { sendMail } from 'src/helpers/send-mail.helper';
 import Stripe from 'stripe';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,6 +14,7 @@ export class PaymentService {
   constructor(
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
+    private readonly mailerService: MailerService,
   ) {}
 
   async paymentStripe(subscriptionId: number) {
@@ -86,6 +89,22 @@ export class PaymentService {
       ...subscription,
       status: 'paid',
     });
+    await sendMail(
+      job.data.workspace.owner.email,
+      'StandUp invoice',
+      'invoice-email',
+      { projectName: job.data.workspace.projectName },
+      this.mailerService,
+      [
+        {
+          filename: 'invoice.pdf',
+          path: join(
+            process.cwd(),
+            `temp/invoice-${job.data.workspace.owner.email}.pdf`,
+          ),
+        },
+      ],
+    )
   }
 
   async cancel(subscriptionId: number) {
