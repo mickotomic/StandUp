@@ -13,6 +13,7 @@ import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { Repository } from 'typeorm';
 import { NextDto } from './dto/next.dto';
+import { StandupDto } from './dto/standup.dto';
 
 @Injectable()
 export class StandupService {
@@ -74,7 +75,7 @@ export class StandupService {
     return { shuffledUsers, count };
   }
 
-  async finishStandup(workspaceId: number, absentUsers: number[]) {
+  async finishStandup(workspaceId: number, absentUsers: number[], standupDto: StandupDto) {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -84,6 +85,9 @@ export class StandupService {
 
     if (!existingStartedStandup) {
       throw new BadRequestException(returnMessages.NoStandupForWorkspace);
+    }
+    if (standupDto.isPrevUserPresent){
+      existingStartedStandup.absentUsers.push(existingStartedStandup.currentUser);
     }
 
     const timeSpent =
@@ -175,7 +179,7 @@ export class StandupService {
         return { userId: summary.currentUser, isLastMember: true };
       }
       if (nextDto.isPrevUserPresent){
-        summary.absentUsers.push( summary.currentUser)
+        summary.absentUsers.push(summary.currentUser);
       }
       const currentUser =
         summary.users[summary.users.indexOf(summary.currentUser) + 1];

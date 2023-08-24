@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -36,14 +37,16 @@ export class StandupController {
 
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Post('/:workspaceId/finish-standup')
+  @Put('/:workspaceId/finish-standup')
   async finishStandup(
     @Body() dto: StandupDto,
+    @Body() standupDto: StandupDto,
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ) {
     return await this.standupService.finishStandup(
       +workspaceId,
       dto.absentUsersId,
+      standupDto
     );
   }
 
