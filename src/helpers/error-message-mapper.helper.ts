@@ -21,12 +21,11 @@ export const returnMessages = Object.freeze({
 
   WorkspaceNotFound: 'Workspace not found!',
 
-  WorkspaceNotSoftDeleted:
-    'Workspace is not deleted, no need for restoring it!',
+  WorkspaceNotDeleted: 'No need for restoring workspace!',
 
   WorkspaceOwnerInvite: 'Only workspace owners can invite users!',
 
-  BadProjectNameLength: 'projectName must have between 1 and 255 characters',
+  ProjectNameLength: 'projectName must be between 1 and 255 characters!',
 
   TokenNotValid: 'Token is not valid!',
 

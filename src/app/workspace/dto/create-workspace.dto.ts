@@ -6,7 +6,7 @@ export class CreateWorkspaceDto {
   @ApiProperty()
   @IsString()
   @Length(1, 255, {
-    message: returnMessages.BadProjectNameLength,
+    message: returnMessages.ProjectNameLength,
   })
   projectName: string;
 
