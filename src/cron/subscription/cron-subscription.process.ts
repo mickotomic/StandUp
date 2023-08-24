@@ -37,7 +37,7 @@ export class CronSubscriptionProcess {
     ) {
       cb(null, 'Completed');
     } else {
-      cb(new Error('Faild'), false);
+      cb(new Error('Failed'), false);
     }
   }
 
