@@ -21,8 +21,8 @@ export class WorkspaceUsersService {
       .createQueryBuilder('user_workspaces')
       .leftJoinAndSelect('user_workspaces.user', 'user')
       .leftJoinAndSelect('user_workspaces.workspace', 'workspace')
-      .where('workspace.id =:workspaceId', { workspaceId })
-      .andWhere('user.id =:userId', { userId: user.id })
+      .where('workspace.id = :workspaceId', { workspaceId })
+      .andWhere('user.id = :userId', { userId: user.id })
       .getOne();
 
     if (!userWorkspace || userWorkspace.user.id !== user.id) {
