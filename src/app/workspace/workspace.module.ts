@@ -6,10 +6,10 @@ import { UserToken } from 'src/entities/user-token.entity';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
+import { WorkspaceUserModule } from './workspace-users/workspace-users.module';
 import { WorkspaceController } from './workspace.controller';
 import { WorkspaceProcess } from './workspace.process';
 import { WorkspaceService } from './workspace.service';
-import { WorkspaceUserModule } from './workspace-users/workspace-users.module';
 
 @Module({
   imports: [

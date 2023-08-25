@@ -1,10 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsIn } from 'class-validator';
+import { IsIn, IsString } from 'class-validator';
 
 export class NextDto {
   @ApiProperty({ type: 'string' })
   @IsString()
-  @IsIn([ 'next', 'previous' ])
+  @IsIn(['next', 'previous'])
   direction: string;
-  
 }
