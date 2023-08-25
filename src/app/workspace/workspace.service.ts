@@ -53,7 +53,8 @@ export class WorkspaceService {
     }
     const arrOfEmails = invitedEmails.emails.split(',');
 
-    for (const email of arrOfEmails) {
+    for (let email of arrOfEmails) {
+      email = email.trim();
       const userWorkspace = await this.userWorkspaceRepository.findOneBy({
         workspace: { id: workspace.id },
         user: { email: email },
@@ -159,6 +160,7 @@ export class WorkspaceService {
       ...createWorkspaceDto,
       owner,
     });
+
     await this.userWorkspaceRepository.save({
       workspace: { id: workspace.id },
       user: owner,
@@ -233,19 +235,29 @@ export class WorkspaceService {
   }
 
   async restoreWorkspace(id: number, user: User): Promise<Workspace> {
-    await this.workspaceRepository
+    const workspace = await this.workspaceRepository
       .createQueryBuilder('workspaces')
       .leftJoin('workspaces.owner', 'owner')
       .withDeleted()
-      .restore()
       .where('workspaces.id = :id', { id })
       .andWhere('owner.id = :ownerId', { ownerId: user.id })
-      .execute();
-    const workspace = await this.workspaceRepository.findOneBy({ id });
+      .getOne();
 
     if (!workspace) {
       throw new NotFoundException(returnMessages.WorkspaceNotFound);
     }
-    return workspace;
+
+    if (workspace.deletedAt === null) {
+      throw new BadRequestException(returnMessages.WorkspaceNotDeleted);
+    }
+
+    await this.workspaceRepository
+      .createQueryBuilder('workspaces')
+      .restore()
+      .where('workspaces.id = :id', { id })
+      .execute();
+
+    const restoredWorkspace = await this.workspaceRepository.findOneBy({ id });
+    return restoredWorkspace;
   }
 }
