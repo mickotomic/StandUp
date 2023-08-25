@@ -235,19 +235,29 @@ export class WorkspaceService {
   }
 
   async restoreWorkspace(id: number, user: User): Promise<Workspace> {
-    await this.workspaceRepository
+    const workspace = await this.workspaceRepository
       .createQueryBuilder('workspaces')
-      .leftJoin('workspaces.owner', 'owner')
+      .leftJoinAndSelect('workspaces.owner', 'owner')
       .withDeleted()
-      .restore()
       .where('workspaces.id = :id', { id })
       .andWhere('owner.id = :ownerId', { ownerId: user.id })
-      .execute();
-    const workspace = await this.workspaceRepository.findOneBy({ id });
+      .getOne();
 
     if (!workspace) {
       throw new NotFoundException(returnMessages.WorkspaceNotFound);
     }
-    return workspace;
+
+    if (!workspace.deletedAt) {
+      throw new BadRequestException(returnMessages.WorkspaceNotDeleted);
+    }
+
+    await this.workspaceRepository
+      .createQueryBuilder()
+      .restore()
+      .where('workspaces.id = :id', { id })
+      .execute();
+
+    const restoredWorkspace = await this.workspaceRepository.findOneBy({ id });
+    return restoredWorkspace;
   }
 }

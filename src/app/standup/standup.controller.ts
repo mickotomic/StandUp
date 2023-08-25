@@ -7,16 +7,15 @@ import {
   Patch,
   Post,
   UseGuards,
-
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
+import { NextDto } from './dto/next.dto';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
-import { NextDto } from './dto/next.dto';
 
 @ApiTags('app-standup')
 @ApiBearerAuth()
@@ -67,7 +66,7 @@ export class StandupController {
   @Patch('/:workspaceId')
   async next(
     @Param('workspaceId') workspaceId: number,
-    @Body () nextDto: NextDto,
+    @Body() nextDto: NextDto,
     @GetUser() user: User,
   ) {
     return await this.standupService.next(+workspaceId, nextDto, user);
