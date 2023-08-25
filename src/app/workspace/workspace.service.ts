@@ -237,7 +237,7 @@ export class WorkspaceService {
   async restoreWorkspace(id: number, user: User): Promise<Workspace> {
     const workspace = await this.workspaceRepository
       .createQueryBuilder('workspaces')
-      .leftJoinAndSelect('workspaces.owner', 'owner')
+      .leftJoin('workspaces.owner', 'owner')
       .withDeleted()
       .where('workspaces.id = :id', { id })
       .andWhere('owner.id = :ownerId', { ownerId: user.id })
@@ -252,7 +252,7 @@ export class WorkspaceService {
     }
 
     await this.workspaceRepository
-      .createQueryBuilder()
+      .createQueryBuilder('workspaces')
       .restore()
       .where('workspaces.id = :id', { id })
       .execute();
