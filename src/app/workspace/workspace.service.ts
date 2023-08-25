@@ -247,7 +247,7 @@ export class WorkspaceService {
       throw new NotFoundException(returnMessages.WorkspaceNotFound);
     }
 
-    if (!workspace.deletedAt) {
+    if (workspace.deletedAt === null) {
       throw new BadRequestException(returnMessages.WorkspaceNotDeleted);
     }
 
