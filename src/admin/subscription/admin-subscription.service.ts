@@ -45,6 +45,7 @@ export class AdminSubscriptionService {
     }
 
     subscription.status = updateAdminSubscriptionDto.status;
+    // it would probably be more useful to return subscription
     return await this.subscriptionRepository.save(subscription);
   }
 }

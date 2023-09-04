@@ -8,7 +8,7 @@ import { SummaryService } from './summary.service';
 @Controller('summary')
 export class SummaryController {
   constructor(private readonly summaryService: SummaryService) {}
-
+  // summary history can hit anyone (even if they don't belong to the workspace)
   @ApiQuery({ name: 'page', required: false, type: 'number' })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @Get('/:workspaceId')

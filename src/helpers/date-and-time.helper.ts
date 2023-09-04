@@ -1,3 +1,4 @@
+// let's extend this function
 export function formatDate(date: Date = new Date()): string {
   if (!(date instanceof Date)) {
     throw new Error('Invalid date!');

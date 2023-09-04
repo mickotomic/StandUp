@@ -4,6 +4,7 @@ import { Paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 import { Workspace } from 'src/entities/workspace.entity';
 import { AdminWorkspaceService } from './admin-workspace.service';
 
+// we need to guard these endpoints, admins only
 @ApiTags('admin-workspaces')
 @Controller('admin/workspaces')
 export class AdminWorkspaceController {

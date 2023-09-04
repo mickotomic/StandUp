@@ -72,6 +72,7 @@ export class CronSubscriptionService {
 
   @Cron('0 0 5 * * *')
   async paymentChecking() {
+    // plural
     const subscription = await this.subscriptionRepository
       .createQueryBuilder('subscription')
       .leftJoinAndSelect('subscription.workspace', 'workspace')

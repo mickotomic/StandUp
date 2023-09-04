@@ -5,5 +5,6 @@ import { SubscriptionService } from './subscription.service';
 @ApiTags('app-subscriptions')
 @Controller('subscriptions')
 export class SubscriptionController {
+  // missing implementation
   constructor(private readonly subscriptionService: SubscriptionService) {}
 }

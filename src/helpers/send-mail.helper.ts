@@ -1,6 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { emailLogger } from './winston-logger.helper';
 
+// refactor and use object, this is too many args
 export function sendMail(
   email: string,
   subject: string,
