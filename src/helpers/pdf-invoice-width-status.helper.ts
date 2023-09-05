@@ -12,7 +12,11 @@ export function generatePDFWidthStatus(
   pricePerUser: number,
 ) {
   const doc = new PDFDocument();
-  doc.pipe(fs.createWriteStream(`temp/invoiceWidthStatus-${workspace.owner.email}.pdf`));
+  doc.pipe(
+    fs.createWriteStream(
+      `temp/invoiceWidthStatus-${workspace.owner.email}.pdf`,
+    ),
+  );
 
   //UP LEFT TEXT
   doc.fontSize(24).text('StandUp', 40, 20);
@@ -48,7 +52,6 @@ export function generatePDFWidthStatus(
   doc.text(`Payment Status:`, 420, 560);
   doc.text(`${paymentStatus}`, 460, 580);
   doc.restore();
-
 
   doc.lineCap('butt').moveTo(420, 550).lineTo(550, 550).stroke();
 

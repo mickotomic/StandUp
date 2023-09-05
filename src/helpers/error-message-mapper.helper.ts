@@ -63,5 +63,5 @@ export const returnMessages = Object.freeze({
 
   PaymentCanceled: 'Payment canceled!',
 
-  EmailWidthInvoice: 'Email width invoice is not sent!'
+  EmailWidthInvoice: 'Email width invoice is not sent!',
 });

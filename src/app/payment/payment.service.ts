@@ -87,58 +87,51 @@ export class PaymentService {
     if (subscription.paymentAuthToken !== token) {
       throw new BadRequestException(returnMessages.TokenNotValid);
     }
-        
+
     const subscriptionWorkspace = await this.subscriptionRepository
-    .createQueryBuilder('subscriptions')
-    .leftJoinAndSelect('subscriptions.workspace', 'workspace')
-    .leftJoinAndSelect('workspace.owner', 'owner')
-    .select('owner.email', 'email')
-    .where('subscriptions.id = :subscriptionId', { subscriptionId })
-    .getOne();
+      .createQueryBuilder('subscriptions')
+      .leftJoinAndSelect('subscriptions.workspace', 'workspace')
+      .leftJoinAndSelect('workspace.owner', 'owner')
+      .select('owner.email', 'email')
+      .where('subscriptions.id = :subscriptionId', { subscriptionId })
+      .getOne();
 
-    if (!subscriptionWorkspace){
+    if (!subscriptionWorkspace) {
       throw new BadRequestException(returnMessages.WorkspaceNotFound);
-    }  
+    }
 
-    try{
-    generatePDFWidthStatus(
-      subscriptionWorkspace.workspace,
-      subscriptionWorkspace.workspace.owner,
-      subscription,
-      subscription.price);
+    try {
+      generatePDFWidthStatus(
+        subscriptionWorkspace.workspace,
+        subscriptionWorkspace.workspace.owner,
+        subscription,
+        subscription.price,
+      );
 
-    
+      await sendMail(
+        subscriptionWorkspace.workspace.owner.email,
+        'StandUp invoice',
+        'invoice-email',
+        { projectName: subscriptionWorkspace.workspace.projectName },
+        this.mailerService,
+        [
+          {
+            filename: 'invoice.pdf',
+            path: join(
+              process.cwd(),
+              `temp/invoice-${subscriptionWorkspace.workspace.owner.email}.pdf`,
+            ),
+          },
+        ],
+      );
 
-    await sendMail(
-      subscriptionWorkspace.workspace.owner.email,
-      'StandUp invoice',
-      'invoice-email',
-      { projectName: subscriptionWorkspace.workspace.projectName },
-      this.mailerService,
-      [
-        {
-          filename: 'invoice.pdf',
-          path: join(
-            process.cwd(),
-            `temp/invoice-${subscriptionWorkspace.workspace.owner.email}.pdf`,
-          ),
-        },
-      ],
-    )
-    
-
-
-
-    return await this.subscriptionRepository.save({
-      ...subscription,
-      status: 'paid',
-    });
-  }
-  catch(e){
-    throw new BadRequestException(returnMessages.EmailWidthInvoice, e);
-  }
-
-    
+      return await this.subscriptionRepository.save({
+        ...subscription,
+        status: 'paid',
+      });
+    } catch (e) {
+      throw new BadRequestException(returnMessages.EmailWidthInvoice, e);
+    }
   }
 
   async cancel(subscriptionId: number) {
