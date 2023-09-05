@@ -74,7 +74,9 @@ export class StandupController {
   }
 
   @Get('/active')
-  async getUserActiveStandups(@GetUser() user: User): Promise<Workspace[]> {
+  async getUserActiveStandups(
+    @GetUser() user: User,
+  ): Promise<{ workspaces: Workspace[] }> {
     return await this.standupService.getUserActiveStandups(user);
   }
 }
