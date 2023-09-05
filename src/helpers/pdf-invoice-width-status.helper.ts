@@ -5,14 +5,14 @@ import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { formatDate } from './date-and-time.helper';
 
-export function generatePDF(
+export function generatePDFWidthStatus(
   workspace: Workspace,
   user: User,
   subscription: Subscription,
   pricePerUser: number,
 ) {
   const doc = new PDFDocument();
-  doc.pipe(fs.createWriteStream(`temp/invoice-${workspace.owner.email}.pdf`));
+  doc.pipe(fs.createWriteStream(`temp/invoiceWidthStatus-${workspace.owner.email}.pdf`));
 
   //UP LEFT TEXT
   doc.fontSize(24).text('StandUp', 40, 20);
@@ -34,23 +34,22 @@ export function generatePDF(
     .fontSize(10)
     .text(formatDate(subscription.createdAt), 470, 160, { align: 'right' });
 
-  //BOTTOM LEFT TEXT
-  doc.fontSize(10).text('Teams & instructions', 40, 650);
-  doc.lineCap('butt').moveTo(40, 665).lineTo(250, 665).stroke();
-  doc.fontSize(10).text('Pay within 14 days by MickoStripe,', 40, 670);
-  doc
-    .fontSize(10)
-    .text('otherwise your workspace will be deactivated.', 40, 680);
-
-    const status = subscription.status === 'paid' ? 'Paid' : 'Not Paid';
-  doc.fontSize(15).fillColor(subscription.status === 'paid' ? 'green' : 'red')
-    .text(`Payment Status: ${status}`, 30, 700);
-
   //BOTTOM RIGHT TEXT
   doc.fontSize(12).text('Total:', 420, 535);
   doc
     .fontSize(12)
     .text(subscription.price.toFixed(2) + '$', 460, 535, { align: 'right' });
+
+  const status = subscription.status;
+  const paymentStatus = status === 'paid' ? 'Paid' : 'Failed';
+  const statusColor = status === 'paid' ? 'green' : 'red';
+  doc.save();
+  doc.fontSize(15).fillColor(statusColor);
+  doc.text(`Payment Status:`, 420, 560);
+  doc.text(`${paymentStatus}`, 460, 580);
+  doc.restore();
+
+
   doc.lineCap('butt').moveTo(420, 550).lineTo(550, 550).stroke();
 
   //TABLE GENERATION

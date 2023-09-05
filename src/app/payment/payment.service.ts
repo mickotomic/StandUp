@@ -2,8 +2,10 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHmac } from 'crypto';
+import { join } from 'path';
 import { Subscription } from 'src/entities/subscription.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
+import { generatePDFWidthStatus } from 'src/helpers/pdf-invoice-width-status.helper';
 import { sendMail } from 'src/helpers/send-mail.helper';
 import Stripe from 'stripe';
 import { Repository } from 'typeorm';
@@ -85,26 +87,58 @@ export class PaymentService {
     if (subscription.paymentAuthToken !== token) {
       throw new BadRequestException(returnMessages.TokenNotValid);
     }
-    return await this.subscriptionRepository.save({
-      ...subscription,
-      status: 'paid',
-    });
+        
+    const subscriptionWorkspace = await this.subscriptionRepository
+    .createQueryBuilder('subscriptions')
+    .leftJoinAndSelect('subscriptions.workspace', 'workspace')
+    .leftJoinAndSelect('workspace.owner', 'owner')
+    .select('owner.email', 'email')
+    .where('subscriptions.id = :subscriptionId', { subscriptionId })
+    .getOne();
+
+    if (!subscriptionWorkspace){
+      throw new BadRequestException(returnMessages.WorkspaceNotFound);
+    }  
+
+    try{
+    generatePDFWidthStatus(
+      subscriptionWorkspace.workspace,
+      subscriptionWorkspace.workspace.owner,
+      subscription,
+      subscription.price);
+
+    
+
     await sendMail(
-      job.data.workspace.owner.email,
+      subscriptionWorkspace.workspace.owner.email,
       'StandUp invoice',
       'invoice-email',
-      { projectName: job.data.workspace.projectName },
+      { projectName: subscriptionWorkspace.workspace.projectName },
       this.mailerService,
       [
         {
           filename: 'invoice.pdf',
           path: join(
             process.cwd(),
-            `temp/invoice-${job.data.workspace.owner.email}.pdf`,
+            `temp/invoice-${subscriptionWorkspace.workspace.owner.email}.pdf`,
           ),
         },
       ],
     )
+    
+
+
+
+    return await this.subscriptionRepository.save({
+      ...subscription,
+      status: 'paid',
+    });
+  }
+  catch(e){
+    throw new BadRequestException(returnMessages.EmailWidthInvoice, e);
+  }
+
+    
   }
 
   async cancel(subscriptionId: number) {
