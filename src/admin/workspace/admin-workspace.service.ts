@@ -20,10 +20,10 @@ export class AdminWorkspaceService {
   async getWorkspaceList(query: PaginateQuery): Promise<Paginated<Workspace>> {
     const paginateConfig: PaginateConfig<Workspace> = {
       defaultLimit: 50,
-      sortableColumns: [],
+      sortableColumns: ['id'],
       relations: ['owner'],
       defaultSortBy: [['id', 'DESC']],
-      select: ['id', 'name'],
+      select: ['id', 'projectName'],
       searchableColumns: ['projectName'],
     };
     const qb = this.workspaceRepository

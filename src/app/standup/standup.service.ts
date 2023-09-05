@@ -251,4 +251,20 @@ export class StandupService {
       usersTasks,
     };
   }
+
+  async getUserActiveStandups(
+    user: User,
+  ): Promise<{ workspaces: Workspace[] }> {
+    const workspaces = await this.workspaceRepository
+      .createQueryBuilder('workspaces')
+      .leftJoin('workspaces.summaries', 'summaries')
+      .leftJoin('workspaces.users', 'userworkspaces')
+      .where('userworkspaces.user = :userId', { userId: user.id })
+      .andWhere(
+        'summaries.finishedAt IS NULL AND summaries.startedAt IS NOT NULL',
+      )
+      .getMany();
+
+    return { workspaces };
+  }
 }

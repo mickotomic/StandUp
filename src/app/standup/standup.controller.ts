@@ -12,6 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
+import { Workspace } from 'src/entities/workspace.entity';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { NextDto } from './dto/next.dto';
 import { StandupDto } from './dto/standup.dto';
@@ -70,5 +71,16 @@ export class StandupController {
     @GetUser() user: User,
   ) {
     return await this.standupService.next(+workspaceId, nextDto, user);
+  }
+
+  @ApiOperation({
+    description:
+      'This endpoint return all user worksapces with active standups',
+  })
+  @Get('/active')
+  async getUserActiveStandups(
+    @GetUser() user: User,
+  ): Promise<{ workspaces: Workspace[] }> {
+    return await this.standupService.getUserActiveStandups(user);
   }
 }
