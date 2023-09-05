@@ -1,10 +1,20 @@
-import { Controller, Get, Param, ParseIntPipe, Put } from '@nestjs/common';
-import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
+import { AdminRoleGuard } from 'src/auth/admin-role.guard';
 import { Workspace } from 'src/entities/workspace.entity';
 import { AdminWorkspaceService } from './admin-workspace.service';
 
 @ApiTags('admin-workspaces')
+@ApiBearerAuth()
+@UseGuards(AdminRoleGuard)
 @Controller('admin/workspaces')
 export class AdminWorkspaceController {
   constructor(private readonly workspaceService: AdminWorkspaceService) {}
