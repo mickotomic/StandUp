@@ -73,6 +73,10 @@ export class StandupController {
     return await this.standupService.next(+workspaceId, nextDto, user);
   }
 
+  @ApiOperation({
+    description:
+      'This endpoint return all user worksapces with active standups',
+  })
   @Get('/active')
   async getUserActiveStandups(
     @GetUser() user: User,
