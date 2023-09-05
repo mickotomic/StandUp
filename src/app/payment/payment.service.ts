@@ -70,6 +70,8 @@ export class PaymentService {
           '/payment/cancel/' +
           subscriptionId,
       });
+
+      
       await this.subscriptionRepository.update(
         { id: subscriptionId },
         { transactionId: session.id },
