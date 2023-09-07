@@ -13,8 +13,7 @@ export class TaskService {
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
     @InjectRepository(UserWorkspace)
-    private // fix typo
-    userworkspaceRepository: Repository<UserWorkspace>,
+    private userworkspaceRepository: Repository<UserWorkspace>,
   ) {}
 
   async getDefaultTaskList(
