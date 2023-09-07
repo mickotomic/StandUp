@@ -1,15 +1,17 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { emailLogger } from './winston-logger.helper';
 
-// refactor and use object, this is too many args
-export function sendMail(
-  email: string,
-  subject: string,
-  template: string,
-  context: object,
-  mailerService: MailerService,
-  attachments: { filename: string; path: string }[] = [],
-): Promise<boolean> {
+export interface MailData {
+  email: string;
+  subject: string;
+  template: string;
+  context: object;
+  mailerService: MailerService;
+  attachments?: { filename: string; path: string }[];
+}
+export function sendMail(mailData: MailData): Promise<boolean> {
+  const { email, subject, template, context, mailerService, attachments = [] } = mailData;
+
   return mailerService
     .sendMail({
       to: email,
