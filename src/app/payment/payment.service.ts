@@ -178,6 +178,7 @@ export class PaymentService {
       return await this.subscriptionRepository.update(
         { id: subscriptionId },
         {
+          status: 'canceled',
           errorObject: {
             action: returnMessages.PaymentCanceled,
           },

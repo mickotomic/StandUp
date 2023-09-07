@@ -65,6 +65,7 @@ export function generatePDFWidthStatus(
   row(doc, 340);
   row(doc, 360);
   //TEXT INSIDE COLUMNS
+  doc.fontSize(12);
   textInRowFirst(doc, 'SUBSCRIPTION ID', 345);
   textInRowSecond(doc, 'PRICE PER USER', 345);
   textInRowThird(doc, 'NUMBER OF USERS', 345);
