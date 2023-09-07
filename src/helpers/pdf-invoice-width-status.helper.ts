@@ -14,7 +14,7 @@ export function generatePDFWidthStatus(
   const doc = new PDFDocument();
   doc.pipe(
     fs.createWriteStream(
-      `temp/invoiceWidthStatus-${workspace.owner.email}.pdf`,
+      `temp/invoiceWidthStatus/invoiceWidthStatus-${workspace.owner.email}.pdf`,
     ),
   );
 

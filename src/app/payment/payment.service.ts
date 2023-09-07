@@ -2,6 +2,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHmac } from 'crypto';
+import { rmSync } from 'fs';
 import { join } from 'path';
 import { Subscription } from 'src/entities/subscription.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
@@ -71,87 +72,119 @@ export class PaymentService {
           subscriptionId,
       });
 
-      
       await this.subscriptionRepository.update(
         { id: subscriptionId },
         { transactionId: session.id },
       );
       return session.url;
     } catch (e) {
+      console.error(e);
       throw new BadRequestException(returnMessages.PaymentFailed);
     }
   }
 
   async success(subscriptionId: number, token: string) {
-    const subscription = await this.subscriptionRepository.findOneBy({
-      id: subscriptionId,
+    const subscription = await this.subscriptionRepository.findOne({
+      where: {
+        id: subscriptionId,
+      },
+      relations: { workspace: { owner: true, users: true } },
     });
     if (subscription.paymentAuthToken !== token) {
       throw new BadRequestException(returnMessages.TokenNotValid);
     }
-
-    const subscriptionWorkspace = await this.subscriptionRepository
-      .createQueryBuilder('subscriptions')
-      .leftJoinAndSelect('subscriptions.workspace', 'workspace')
-      .leftJoinAndSelect('workspace.owner', 'owner')
-      .select('owner.email', 'email')
-      .where('subscriptions.id = :subscriptionId', { subscriptionId })
-      .getOne();
-
-    if (!subscriptionWorkspace) {
-      throw new BadRequestException(returnMessages.WorkspaceNotFound);
-    }
-
+    subscription.status = 'paid';
     try {
       generatePDFWidthStatus(
-        subscriptionWorkspace.workspace,
-        subscriptionWorkspace.workspace.owner,
+        subscription.workspace,
+        subscription.workspace.owner,
         subscription,
         subscription.price,
       );
 
-      await sendMail(
-        subscriptionWorkspace.workspace.owner.email,
+      const isMailSent = await sendMail(
+        subscription.workspace.owner.email,
         'StandUp invoice',
         'invoice-email',
-        { projectName: subscriptionWorkspace.workspace.projectName },
+        { projectName: subscription.workspace.projectName },
         this.mailerService,
         [
           {
             filename: 'invoice.pdf',
             path: join(
               process.cwd(),
-              `temp/invoice-${subscriptionWorkspace.workspace.owner.email}.pdf`,
+              `temp/invoiceWidthStatus/invoiceWidthStatus-${subscription.workspace.owner.email}.pdf`,
             ),
           },
         ],
       );
+      if (isMailSent) {
+        rmSync(
+          join(
+            process.cwd(),
+            `temp/invoiceWidthStatus/invoiceWidthStatus-${subscription.workspace.owner.email}.pdf`,
+          ),
+        );
+      }
 
-      return await this.subscriptionRepository.save({
-        ...subscription,
-        status: 'paid',
-      });
+      return await this.subscriptionRepository.save(subscription);
     } catch (e) {
       throw new BadRequestException(returnMessages.EmailWidthInvoice, e);
     }
   }
 
   async cancel(subscriptionId: number) {
-    const subscription = await this.subscriptionRepository.findOneBy({
-      id: subscriptionId,
-    });
-    if (!subscription) {
-      throw new BadRequestException(returnMessages.SubscriptionNotFound);
-    }
-
-    return await this.subscriptionRepository.update(
-      { id: subscriptionId },
-      {
-        status: 'canceled',
-        errorObject: {
-          action: returnMessages.PaymentCanceled,
-        },
+    const subscription = await this.subscriptionRepository.findOne({
+      where: {
+        id: subscriptionId,
       },
-    );
+      relations: { workspace: { owner: true, users: true } },
+    });
+
+    subscription.status = 'canceled';
+    try {
+      generatePDFWidthStatus(
+        subscription.workspace,
+        subscription.workspace.owner,
+        subscription,
+        subscription.price,
+      );
+
+      const isMailSent = await sendMail(
+        subscription.workspace.owner.email,
+        'StandUp invoice',
+        'invoice-email',
+        { projectName: subscription.workspace.projectName },
+        this.mailerService,
+        [
+          {
+            filename: 'invoice.pdf',
+            path: join(
+              process.cwd(),
+              `temp/invoiceWidthStatus/invoiceWidthStatus-${subscription.workspace.owner.email}.pdf`,
+            ),
+          },
+        ],
+      );
+      if (isMailSent) {
+        rmSync(
+          join(
+            process.cwd(),
+            `temp/invoiceWidthStatus/invoiceWidthStatus-${subscription.workspace.owner.email}.pdf`,
+          ),
+        );
+      }
+
+      return await this.subscriptionRepository.update(
+        { id: subscriptionId },
+        {
+          errorObject: {
+            action: returnMessages.PaymentCanceled,
+          },
+        },
+      );
+    } catch (e) {
+      throw new BadRequestException(returnMessages.EmailWidthInvoice, e);
+    }
   }
 }
