@@ -49,7 +49,7 @@ export function generatePDFWidthStatus(
   const statusColor = status === 'paid' ? 'green' : 'red';
   doc.save();
   doc.fontSize(15).fillColor(statusColor);
-  doc.text(`Payment Status:`, 420, 560);
+  doc.text('Payment Status:', 420, 560);
   doc.text(`${paymentStatus}`, 460, 580);
   doc.restore();
 
