@@ -78,7 +78,6 @@ export class PaymentService {
       );
       return session.url;
     } catch (e) {
-      console.error(e);
       throw new BadRequestException(returnMessages.PaymentFailed);
     }
   }
