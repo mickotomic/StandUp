@@ -1,8 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Process, Processor } from '@nestjs/bull';
 import { DoneCallback, Job } from 'bull';
-import { sendMail } from 'src/helpers/send-mail.helper';
-import { MailData } from 'src/helpers/send-mail.helper';
+import { MailData, sendMail } from 'src/helpers/send-mail.helper';
 
 @Processor('workspace')
 export class WorkspaceProcess {
@@ -18,10 +17,21 @@ export class WorkspaceProcess {
     }>,
     cb: DoneCallback,
   ) {
-    if (
-      await sendMail(MailData
-      )
-    ) {
+    const { workspaceName, email, name, link } = job.data;
+
+    const mailData: MailData = {
+      email,
+      subject: 'Invite to workspace',
+      template: 'invitation-email',
+      context: {
+        link,
+        workspaceName,
+        name,
+      },
+      mailerService: this.mailerService,
+    };
+
+    if (await sendMail(mailData)) {
       cb(null, 'Completed');
     } else {
       cb(new Error('Failed'), false);

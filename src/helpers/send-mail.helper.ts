@@ -10,7 +10,14 @@ export interface MailData {
   attachments?: { filename: string; path: string }[];
 }
 export function sendMail(mailData: MailData): Promise<boolean> {
-  const { email, subject, template, context, mailerService, attachments = [] } = mailData;
+  const {
+    email,
+    subject,
+    template,
+    context,
+    mailerService,
+    attachments = [],
+  } = mailData;
 
   return mailerService
     .sendMail({

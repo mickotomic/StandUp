@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/entities/user.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
-import { sendMail } from 'src/helpers/send-mail.helper';
+import { MailData, sendMail } from 'src/helpers/send-mail.helper';
 import { GooglePayload } from 'src/types/google-auth-payload.type';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -96,18 +96,18 @@ export class AuthService {
       throw new BadRequestException(returnMessages.UserAlreadyVerified);
     }
 
-    if (
-      await sendMail(
-        user.email,
-        'User verification code',
-        'verification-email',
-        {
-          name: user.name,
-          token,
-        },
-        this.mailerService,
-      )
-    ) {
+    const mailData: MailData = {
+      email: user.email,
+      subject: 'User verification code',
+      template: 'verification-email',
+      context: {
+        name: user.name,
+        token,
+      },
+      mailerService: this.mailerService,
+    };
+
+    if (await sendMail(mailData)) {
       this.validationCodeRepository.save({ user: user, code: token });
       return { status: 'ok' };
     }
