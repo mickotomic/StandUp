@@ -44,12 +44,9 @@ export class AdminWorkspaceService {
       throw new BadRequestException(returnMessages.WorkspaceNotFound);
     }
 
-    // it would be better to set the properties outside of the method params and to pass that object down/return it
-    // like this, FE gets old state
     await this.workspaceRepository.save({
       ...workspace,
       isActive: !workspace.isActive,
-      // is this expected?
       deletedAt: workspace.isActive ? new Date() : null,
     });
 

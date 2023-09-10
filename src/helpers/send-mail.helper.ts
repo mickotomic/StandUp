@@ -1,5 +1,5 @@
-import { emailLogger } from './winston-logger.helper';
 import { MailDataT } from 'src/types/mail-data.type';
+import { emailLogger } from './winston-logger.helper';
 
 export function sendMail(mailData: MailDataT): Promise<boolean> {
   const {

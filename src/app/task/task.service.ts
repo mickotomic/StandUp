@@ -19,7 +19,6 @@ export class TaskService {
   async getDefaultTaskList(
     workspaceId: number,
     user: User,
-    // it should be "boolean string"
     isForCurrentUserOnly = '',
   ): Promise<{ tasks: Task[]; count: number }> {
     const workspace = await this.userWorkspaceRepository.findOne({
@@ -44,7 +43,6 @@ export class TaskService {
   }
 
   async createTask(user: User, dto: TaskDto): Promise<Task> {
-    // we should introduce some kind of guard for this purpose
     const workspace = await this.userWorkspaceRepository.findOne({
       where: { user: { id: user.id }, workspace: { id: dto.workspaceId } },
     });
@@ -76,7 +74,6 @@ export class TaskService {
     task.priority = dto.priority;
     task.status = dto.status;
     task.deadline = dto.deadline;
-    // it would probably make more sense to return task
     return await this.taskRepository.save(task);
   }
 
