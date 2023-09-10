@@ -11,16 +11,9 @@ export class AdminRoleGuard extends AuthGuard('jwt') implements CanActivate {
   async canActivate(context: ExecutionContext) {
     await (super.canActivate(context) as Promise<boolean>);
     const request = context.switchToHttp().getRequest();
-    const requiredRoles = this.reflector.getAllAndOverride<string>('admin', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
+   
     if (request?.user) {
-      // are these check necessary?
-      return requiredRoles
-        ? requiredRoles === request.user.role
-        : request.user.role === 'admin';
+      return request.user.role === 'admin';
     }
     return false;
   }

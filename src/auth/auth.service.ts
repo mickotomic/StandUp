@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/entities/user.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
-import { MailData, sendMail } from 'src/helpers/send-mail.helper';
+import { sendMail } from 'src/helpers/send-mail.helper';
 import { GooglePayload } from 'src/types/google-auth-payload.type';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,6 +15,7 @@ import { VerificationCodeDto } from './dto/code-verification.dto';
 import { LoginDto } from './dto/loginUser.dto';
 import { RegenerateCodeDto } from './dto/regenerate-code.dto';
 import { UserDto } from './dto/register.dto';
+import { MailDataT } from 'src/types/mail-data.type';
 
 @Injectable()
 export class AuthService {
@@ -96,7 +97,7 @@ export class AuthService {
       throw new BadRequestException(returnMessages.UserAlreadyVerified);
     }
 
-    const mailData: MailData = {
+    const mailData: MailDataT = {
       email: user.email,
       subject: 'User verification code',
       template: 'verification-email',

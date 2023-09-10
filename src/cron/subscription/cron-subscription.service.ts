@@ -10,7 +10,8 @@ import { Workspace } from 'src/entities/workspace.entity';
 import calculateSubscriptionPrice from 'src/helpers/calculate-subscription-price.helper';
 import { generatePDF } from 'src/helpers/generate-pdf-invoice.helper';
 import getDateDifference from 'src/helpers/get-date-difference.helper';
-import { MailData, sendMail } from 'src/helpers/send-mail.helper';
+import { sendMail } from 'src/helpers/send-mail.helper';
+import { MailDataT } from 'src/types/mail-data.type';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -72,7 +73,6 @@ export class CronSubscriptionService {
 
   @Cron('0 0 5 * * *')
   async paymentChecking() {
-    // plural
     const subscription = await this.subscriptionRepository
       .createQueryBuilder('subscription')
       .leftJoinAndSelect('subscription.workspace', 'workspace')
@@ -87,7 +87,7 @@ export class CronSubscriptionService {
         getDateDifference(new Date(), subscription[i].createdAt),
       );
       const numberOfDays = days === 12 ? 2 : 1;
-      const mailDataNotice: MailData = {
+      const mailDataNotice: MailDataT = {
         email: ownersEmail,
         subject: `your subscription will be cancelled in ${numberOfDays} days!`,
         template: 'workspace-deletion-notice',
@@ -98,7 +98,7 @@ export class CronSubscriptionService {
         mailerService: this.mailerService,
       };
 
-      const mailDataBlocked: MailData = {
+      const mailDataBlocked: MailDataT = {
         email: ownersEmail,
         subject: 'Your workspace has been blocked',
         template: 'workspace-deletion-confirmed',

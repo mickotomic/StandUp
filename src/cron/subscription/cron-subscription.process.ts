@@ -4,7 +4,8 @@ import { DoneCallback, Job } from 'bull';
 import { rmSync } from 'fs';
 import { join } from 'path';
 import { Workspace } from 'src/entities/workspace.entity';
-import { MailData, sendMail } from 'src/helpers/send-mail.helper';
+import { sendMail } from 'src/helpers/send-mail.helper';
+import { MailDataT } from 'src/types/mail-data.type';
 
 @Processor('invoice-email')
 export class CronSubscriptionProcess {
@@ -17,7 +18,7 @@ export class CronSubscriptionProcess {
     }>,
     cb: DoneCallback,
   ) {
-    const mailData: MailData = {
+    const mailData: MailDataT = {
       email: job.data.workspace.owner.email,
       subject: 'StandUp invoice',
       template: 'invoice-email',

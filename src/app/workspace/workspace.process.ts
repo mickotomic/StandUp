@@ -1,7 +1,8 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Process, Processor } from '@nestjs/bull';
 import { DoneCallback, Job } from 'bull';
-import { MailData, sendMail } from 'src/helpers/send-mail.helper';
+import { sendMail } from 'src/helpers/send-mail.helper';
+import { MailDataT } from 'src/types/mail-data.type';
 
 @Processor('workspace')
 export class WorkspaceProcess {
@@ -19,7 +20,7 @@ export class WorkspaceProcess {
   ) {
     const { workspaceName, email, name, link } = job.data;
 
-    const mailData: MailData = {
+    const mailData: MailDataT = {
       email,
       subject: 'Invite to workspace',
       template: 'invitation-email',

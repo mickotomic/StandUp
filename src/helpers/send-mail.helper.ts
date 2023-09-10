@@ -1,15 +1,7 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { emailLogger } from './winston-logger.helper';
+import { MailDataT } from 'src/types/mail-data.type';
 
-export interface MailData {
-  email: string;
-  subject: string;
-  template: string;
-  context: object;
-  mailerService: MailerService;
-  attachments?: { filename: string; path: string }[];
-}
-export function sendMail(mailData: MailData): Promise<boolean> {
+export function sendMail(mailData: MailDataT): Promise<boolean> {
   const {
     email,
     subject,
