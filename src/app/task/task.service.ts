@@ -19,7 +19,6 @@ export class TaskService {
   async getDefaultTaskList(
     workspaceId: number,
     user: User,
-    // it should be "boolean string"
     isForCurrentUserOnly = '',
   ): Promise<{ tasks: Task[]; count: number }> {
     const workspace = await this.userWorkspaceRepository.findOne({
