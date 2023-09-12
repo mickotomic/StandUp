@@ -21,14 +21,6 @@ export class TaskService {
     user: User,
     isForCurrentUserOnly = '',
   ): Promise<{ tasks: Task[]; count: number }> {
-    const workspace = await this.userWorkspaceRepository.findOne({
-      where: { user: { id: user.id }, workspace: { id: workspaceId } },
-    });
-
-    if (!workspace) {
-      throw new BadRequestException(returnMessages.UserDoesNotBelong);
-    }
-
     const qb = this.taskRepository
       .createQueryBuilder('tasks')
       .leftJoinAndSelect('tasks.user', 'user')
