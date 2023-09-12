@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserWorkspace } from 'src/entities/user-workspace.entity';
 import { User } from 'src/entities/user.entity';
+import { appLogger } from 'src/helpers/winston-logger.helper';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -38,6 +39,11 @@ export class UserWorkspaceGuard
       }
       return true;
     } catch (e) {
+      appLogger.log({
+        level: 'error',
+        message: JSON.stringify(e.message),
+        type: 'Unauthorized access error',
+      });
       return false;
     }
   }
