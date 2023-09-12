@@ -13,6 +13,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
+import { UserWorkspaceGuard } from 'src/guards/user-workspace.guard';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { NextDto } from './dto/next.dto';
 import { StandupDto } from './dto/standup.dto';
@@ -25,8 +26,7 @@ import { StandupService } from './standup.service';
 export class StandupController {
   constructor(private readonly standupService: StandupService) {}
 
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UserWorkspaceGuard)
   @Post('/:workspaceId/start-standup')
   async startStandup(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
@@ -34,8 +34,7 @@ export class StandupController {
     return await this.standupService.startStandup(+workspaceId);
   }
 
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UserWorkspaceGuard)
   @Post('/:workspaceId/finish-standup')
   async finishStandup(
     @Body() dto: StandupDto,
@@ -51,6 +50,7 @@ export class StandupController {
     description: `This endpoint should be used for fetching current 
     standup status in intervals`,
   })
+  @UseGuards(UserWorkspaceGuard)
   @Get('/:workspaceId/polling')
   async getCurrentUser(
     @GetUser() user: User,
@@ -64,6 +64,7 @@ export class StandupController {
     return await this.standupService.getCurrentUser(+workspaceId, user);
   }
 
+  @UseGuards(UserWorkspaceGuard)
   @Patch('/:workspaceId')
   async next(
     @Param('workspaceId') workspaceId: number,
