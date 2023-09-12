@@ -31,7 +31,7 @@ export function sendMail(mailData: MailDataT): Promise<boolean> {
     .catch((error) => {
       emailLogger.log({
         level: 'error',
-        message: JSON.stringify(error),
+        message: JSON.stringify(error.message),
         type: subject,
       });
       return false;
