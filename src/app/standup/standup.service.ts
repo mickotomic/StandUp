@@ -11,7 +11,7 @@ import { Workspace } from 'src/entities/workspace.entity';
 import { formatDate } from 'src/helpers/date-and-time.helper';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
-import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
+import { UsersWithTasksT } from 'src/types/user-with-tasks.type';
 import { IsNull, Repository } from 'typeorm';
 import { NextDto } from './dto/next.dto';
 
@@ -30,7 +30,7 @@ export class StandupService {
 
   async startStandup(
     workspaceId: number,
-  ): Promise<{ shuffledUsers: UsersWidthTasksT[]; count: number }> {
+  ): Promise<{ shuffledUsers: UsersWithTasksT[]; count: number }> {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })

@@ -13,7 +13,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
-import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
+import { UsersWithTasksT } from 'src/types/user-with-tasks.type';
 import { NextDto } from './dto/next.dto';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
@@ -30,7 +30,7 @@ export class StandupController {
   @Post('/:workspaceId/start-standup')
   async startStandup(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
-  ): Promise<{ shuffledUsers: UsersWidthTasksT[]; count: number }> {
+  ): Promise<{ shuffledUsers: UsersWithTasksT[]; count: number }> {
     return await this.standupService.startStandup(+workspaceId);
   }
 
