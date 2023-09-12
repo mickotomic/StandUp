@@ -17,8 +17,7 @@ export function generatePDF(
   //UP LEFT TEXT
   doc.fontSize(24).text('StandUp', 40, 20);
   doc.fontSize(10).text('www.stand-up.ba', 40, 50, {
-    // this will be an in prod, should not be hard-coded
-    link: 'http://localhost:3000/',
+    link: process.env.FE_URL,
     underline: true,
   });
   doc.fontSize(14).text(workspace.projectName, 40, 70);

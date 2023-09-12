@@ -5,7 +5,6 @@ export default function calculateSubscriptionPrice(
     return 5;
   } else if (numberOfUsers > 9 && numberOfUsers < 15) {
     return 4;
-    // looks like not needed
   } else if (numberOfUsers > 14) {
     return 3;
   }

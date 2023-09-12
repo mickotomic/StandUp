@@ -17,7 +17,6 @@ export class AdminRoleGuard extends AuthGuard('jwt') implements CanActivate {
     ]);
 
     if (request?.user) {
-      // are these check necessary?
       return requiredRoles
         ? requiredRoles === request.user.role
         : request.user.role === 'admin';

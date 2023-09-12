@@ -14,7 +14,6 @@ import { CronSubscriptionService } from './cron-subscription.service';
     TypeOrmModule.forFeature([Workspace, Subscription, SubscriptionItems]),
     BullModule.registerQueue({
       limiter: {
-        // let's have some defaults like || 5
         max: +process.env.QUEUES_LIMITER_MAX,
         duration: +process.env.QUEUES_LIMITER_DURATION,
       },
