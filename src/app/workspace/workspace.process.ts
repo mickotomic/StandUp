@@ -18,7 +18,7 @@ export class WorkspaceProcess {
     }>,
     cb: DoneCallback,
   ) {
-    const { workspaceName, email, name, link } = job.data;
+    const { workspaceName, email, link } = job.data;
 
     const mailData: MailDataT = {
       email,
@@ -27,7 +27,7 @@ export class WorkspaceProcess {
       context: {
         link,
         workspaceName,
-        name,
+        userName: job.data.name,
       },
       mailerService: this.mailerService,
     };

@@ -23,7 +23,7 @@ export class CronSubscriptionProcess {
       subject: 'StandUp invoice',
       template: 'invoice-email',
       context: {
-        projectName: job.data.workspace.projectName,
+        workspaceName: job.data.workspace.projectName,
       },
       mailerService: this.mailerService,
       attachments: [

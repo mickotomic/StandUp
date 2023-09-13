@@ -102,7 +102,7 @@ export class AuthService {
       subject: 'User verification code',
       template: 'verification-email',
       context: {
-        name: user.name,
+        userName: user.name,
         token,
       },
       mailerService: this.mailerService,

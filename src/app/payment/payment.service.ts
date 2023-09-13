@@ -107,7 +107,7 @@ export class PaymentService {
         subject: 'StandUp invoice',
         template: 'invoice-email',
         context: {
-          projectName: subscription.workspace.projectName,
+          workspaceName: subscription.workspace.projectName,
         },
         mailerService: this.mailerService,
         attachments: [
@@ -159,7 +159,7 @@ export class PaymentService {
         subject: 'StandUp invoice',
         template: 'invoice-email',
         context: {
-          projectName: subscription.workspace.projectName,
+          workspaceName: subscription.workspace.projectName,
         },
         mailerService: this.mailerService,
         attachments: [
