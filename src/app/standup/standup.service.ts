@@ -13,6 +13,7 @@ import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { Repository } from 'typeorm';
 import { StandupDto } from './dto/standup.dto';
+import { FinishStandupDto } from './dto/finishStandup.dto';
 
 @Injectable()
 export class StandupService {
@@ -74,7 +75,7 @@ export class StandupService {
     return { shuffledUsers, count };
   }
 
-  async finishStandup(workspaceId: number, standupDto: StandupDto) {
+  async finishStandup(workspaceId: number, finishStandupDto: FinishStandupDto) {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -85,7 +86,7 @@ export class StandupService {
     if (!existingStartedStandup) {
       throw new BadRequestException(returnMessages.NoStandupForWorkspace);
     }
-    if (standupDto.isPrevUserPresent) {
+    if (finishStandupDto.isPrevUserPresent) {
       existingStartedStandup.attendees.push(existingStartedStandup.currentUser);
     } else {
       existingStartedStandup.absentUsers.push(
