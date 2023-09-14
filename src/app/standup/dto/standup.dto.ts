@@ -1,9 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsIn,
-  IsOptional,
-} from 'class-validator';
+import { IsBoolean, IsIn, IsOptional } from 'class-validator';
 
 export class StandupDto {
   @ApiProperty()

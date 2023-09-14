@@ -40,7 +40,7 @@ export class StandupController {
     @Body() dto: StandupDto,
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ) {
-    return await this.standupService.finishStandup( +workspaceId, dto );
+    return await this.standupService.finishStandup(+workspaceId, dto);
   }
 
   @ApiOperation({

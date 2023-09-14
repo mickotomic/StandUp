@@ -74,12 +74,7 @@ export class StandupService {
     return { shuffledUsers, count };
   }
 
-  async finishStandup(
-    workspaceId: number,
-    // attendees: number,
-    // absentUsers: number,
-    standupDto: StandupDto
-  ) {
+  async finishStandup(workspaceId: number, standupDto: StandupDto) {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -91,49 +86,15 @@ export class StandupService {
       throw new BadRequestException(returnMessages.NoStandupForWorkspace);
     }
     if (standupDto.isPrevUserPresent) {
-      //if (existingStartedStandup.attendees.indexOf(existingStartedStandup.currentUser) === -1){
-        existingStartedStandup.attendees.push(existingStartedStandup.currentUser);
-      // }
-      // if(existingStartedStandup.absentUsers.indexOf(existingStartedStandup.currentUser) !== -1){
-      //   existingStartedStandup.absentUsers = existingStartedStandup.absentUsers.filter( x => x !== existingStartedStandup.currentUser)
-      // }
+      existingStartedStandup.attendees.push(existingStartedStandup.currentUser);
     } else {
-      // if (existingStartedStandup.absentUsers.indexOf(existingStartedStandup.currentUser) === -1){
-        existingStartedStandup.absentUsers.push(existingStartedStandup.currentUser);
-      // }
-      // if(existingStartedStandup.attendees.indexOf(existingStartedStandup.currentUser) !== -1){
-      //   existingStartedStandup.attendees= existingStartedStandup.attendees.filter( x => x !== existingStartedStandup.currentUser)
-      // }
+      existingStartedStandup.absentUsers.push(
+        existingStartedStandup.currentUser,
+      );
     }
-
-    // if (attendees.every((element) => usersIds.includes(element))) {
-    //   attendees.slice(-1);
-    // } else {
-    //   existingStartedStandup.absentUsers.push(
-    //     existingStartedStandup.currentUser,
-    //   );
-    // }
-
 
     const timeSpent =
       new Date().getTime() - existingStartedStandup.startedAt.getTime();
-
-  //   const users = await this.userRepository.find({
-  //     where: {
-  //       workspaces: { workspace: { id: workspaceId } },
-  //       tasks: { summary: null },
-  //     },
-  //   });
-
-  //  const usersIds = users.map((user) => user.id);
-
-  //   if (!absentUsers.every((element) => usersIds.includes(element))) {
-  //     throw new BadRequestException(returnMessages.UsersNotInWorkspace);
-  //   }
-
-  //   const attendeesIds = usersIds.filter((id) => {
-  //     return absentUsers.indexOf(id) === -1;
-  //   });
 
     await this.tasksRepository.query(
       'UPDATE tasks SET summaryId = ? WHERE workspaceId = ?',
@@ -170,8 +131,8 @@ export class StandupService {
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),
       timespent: timeSpent,
-       absentUsers: existingStartedStandup.absentUsers,
-       attendees: existingStartedStandup.attendees,
+      absentUsers: existingStartedStandup.absentUsers,
+      attendees: existingStartedStandup.attendees,
       tasksCompleted,
       tasksDue,
       tasksPastDue,
@@ -204,24 +165,29 @@ export class StandupService {
       }
 
       if (standupDto.isPrevUserPresent) {
-        if (summary.attendees.indexOf(summary.currentUser) === -1){
+        if (summary.attendees.indexOf(summary.currentUser) === -1) {
           summary.attendees.push(summary.currentUser);
         }
-        if(summary.absentUsers.indexOf(summary.currentUser) !== -1){
-          summary.absentUsers = summary.absentUsers.filter( x => x !== summary.currentUser)
+        if (summary.absentUsers.indexOf(summary.currentUser) !== -1) {
+          summary.absentUsers = summary.absentUsers.filter(
+            (x) => x !== summary.currentUser,
+          );
         }
       } else {
-        if (summary.absentUsers.indexOf(summary.currentUser) === -1){
+        if (summary.absentUsers.indexOf(summary.currentUser) === -1) {
           summary.absentUsers.push(summary.currentUser);
         }
-        if(summary.attendees.indexOf(summary.currentUser) !== -1){
-          summary.attendees= summary.attendees.filter( x => x !== summary.currentUser)
+        if (summary.attendees.indexOf(summary.currentUser) !== -1) {
+          summary.attendees = summary.attendees.filter(
+            (x) => x !== summary.currentUser,
+          );
         }
       }
 
-      const nextUser = summary.users[summary.users.indexOf(summary.currentUser) + 1];
+      const nextUser =
+        summary.users[summary.users.indexOf(summary.currentUser) + 1];
       summary.currentUser = nextUser;
-     
+
       this.summaryRepository.update(summary.id, summary);
       return {
         userId: summary.currentUser,
@@ -235,9 +201,9 @@ export class StandupService {
       }
       const currentUser =
         summary.users[summary.users.indexOf(summary.currentUser) - 1];
-       summary.currentUser = currentUser;
-       this.summaryRepository.update(summary.id, summary);
-       return { userId: summary.currentUser, isLastMember: false };
+      summary.currentUser = currentUser;
+      this.summaryRepository.update(summary.id, summary);
+      return { userId: summary.currentUser, isLastMember: false };
     }
   }
 
