@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -14,9 +15,10 @@ import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
 import { Workspace } from 'src/entities/workspace.entity';
 import { UsersWithTasksT } from 'src/types/user-with-tasks.type';
-import { NextDto } from './dto/next.dto';
+import { UserWorkspaceGuard } from 'src/guards/user-workspace.guard';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
+import { FinishStandupDto } from './dto/finishStandup.dto';
 
 @ApiTags('app-standup')
 @ApiBearerAuth()
@@ -25,8 +27,7 @@ import { StandupService } from './standup.service';
 export class StandupController {
   constructor(private readonly standupService: StandupService) {}
 
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UserWorkspaceGuard)
   @Post('/:workspaceId/start-standup')
   async startStandup(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
@@ -34,23 +35,24 @@ export class StandupController {
     return await this.standupService.startStandup(+workspaceId);
   }
 
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  @Post('/:workspaceId/finish-standup')
+  @Put('/:workspaceId/finish-standup')
+  @UseGuards(UserWorkspaceGuard)
+  
   async finishStandup(
-    @Body() dto: StandupDto,
+    @Body() dto: FinishStandupDto,
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ) {
-    return await this.standupService.finishStandup(
-      +workspaceId,
-      dto.absentUsersId,
-    );
+    return await this.standupService.finishStandup(+workspaceId, dto);
   }
 
   @ApiOperation({
     description: `This endpoint should be used for fetching current 
     standup status in intervals`,
   })
+  @UseGuards(UserWorkspaceGuard)
   @Get('/:workspaceId/polling')
   async getCurrentUser(
     @GetUser() user: User,
@@ -67,11 +69,11 @@ export class StandupController {
   @Patch('/:workspaceId')
   async next(
     @Param('workspaceId') workspaceId: number,
-    @Body() nextDto: NextDto,
+    @Body() standupDto: StandupDto,
     @GetUser() user: User,
   ) {
-    return await this.standupService.next(+workspaceId, nextDto, user);
-  }
+    return await this.standupService.next(+workspaceId, standupDto, user);
+ }
 
   @ApiOperation({
     description:
@@ -82,5 +84,6 @@ export class StandupController {
     @GetUser() user: User,
   ): Promise<{ workspaces: Workspace[] }> {
     return await this.standupService.getUserActiveStandups(user);
+
   }
 }

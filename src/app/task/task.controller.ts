@@ -16,6 +16,7 @@ import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { Task } from 'src/entities/task.entity';
 import { User } from 'src/entities/user.entity';
+import { UserWorkspaceGuard } from 'src/guards/user-workspace.guard';
 import { TaskDto } from './dto/task.dto';
 import { TaskService } from './task.service';
 
@@ -26,9 +27,10 @@ import { TaskService } from './task.service';
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
-  @Get('/')
   @ApiQuery({ name: 'workspaceId' })
   @ApiQuery({ name: 'isForCurrentUserOnly' })
+  @UseGuards(UserWorkspaceGuard)
+  @Get('/')
   async getDefaultTaskList(
     @Query('workspaceId') workspaceId: number,
     @Query('isForCurrentUserOnly') isForCurrentUserOnly: string,

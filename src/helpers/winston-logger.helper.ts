@@ -12,3 +12,11 @@ export const emailLogger = createLogger({
     new transports.File({ filename: 'logs/mail/info.log', level: 'info' }),
   ],
 });
+
+export const appLogger = createLogger({
+  format: combine(timestamp(), myFormat),
+  transports: [
+    new transports.File({ filename: 'logs/app/error.log', level: 'error' }),
+    new transports.File({ filename: 'logs/app/info.log', level: 'info' }),
+  ],
+});

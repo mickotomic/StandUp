@@ -12,8 +12,12 @@ import { formatDate } from 'src/helpers/date-and-time.helper';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWithTasksT } from 'src/types/user-with-tasks.type';
+import { StandupDto } from './dto/standup.dto';
+import { FinishStandupDto } from './dto/finishStandup.dto';
+
 import { IsNull, Repository } from 'typeorm';
-import { NextDto } from './dto/next.dto';
+
+
 
 @Injectable()
 export class StandupService {
@@ -70,12 +74,14 @@ export class StandupService {
       startedAt: new Date(),
       users: usersIds,
       currentUser: shuffledUsers[0].id,
+      absentUsers: [],
+      attendees: []
     });
 
     return { shuffledUsers, count };
   }
 
-  async finishStandup(workspaceId: number, absentUsers: number[]) {
+  async finishStandup(workspaceId: number, finishStandupDto: FinishStandupDto) {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -86,28 +92,19 @@ export class StandupService {
     if (!existingStartedStandup) {
       throw new BadRequestException(returnMessages.NoStandupForWorkspace);
     }
+    if (finishStandupDto.isPrevUserPresent) {
+      existingStartedStandup.attendees.push(existingStartedStandup.currentUser);
+    } else {
+      existingStartedStandup.absentUsers.push(
+        existingStartedStandup.currentUser,
+      );
+    }
 
     const timeSpent =
       new Date().getTime() - existingStartedStandup.startedAt.getTime();
-
-    const users = await this.userRepository.find({
-      where: {
-        workspaces: { workspace: { id: workspaceId } },
-      },
-    });
-
-    const usersIds = users.map((user) => user.id);
-
-    if (!absentUsers.every((element) => usersIds.includes(element))) {
-      throw new BadRequestException(returnMessages.UsersNotInWorkspace);
-    }
-
-    const attendeesIds = usersIds.filter((id) => {
-      return absentUsers.indexOf(id) === -1;
-    });
-
+   
     await this.tasksRepository.query(
-      `UPDATE tasks SET summaryId = ? WHERE workspaceId = ? AND summaryId IS NULL AND status = 'done'`,
+      'UPDATE tasks SET summaryId = ? WHERE workspaceId = ? AND summaryId IS NULL AND status = "done"',
       [existingStartedStandup.id, workspaceId],
     );
 
@@ -141,8 +138,8 @@ export class StandupService {
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),
       timespent: timeSpent,
-      absentUsers: absentUsers,
-      attendees: attendeesIds,
+      absentUsers: existingStartedStandup.absentUsers,
+      attendees: existingStartedStandup.attendees,
       tasksCompleted,
       tasksDue,
       tasksPastDue,
@@ -151,7 +148,9 @@ export class StandupService {
     return { message: returnMessages.StandupFinished };
   }
 
-  async next(workspaceId: number, nextDto: NextDto, user: User) {
+
+  async next(workspaceId: number, standupDto: StandupDto, user: User) {
+
     const summary = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -168,29 +167,55 @@ export class StandupService {
         returnMessages.UserDoesNotExistsInWorkspace,
       );
     }
-    if (nextDto.direction === 'next') {
+
+    if (standupDto.direction === 'next') {
+
       const lastMember = summary.users.slice(-1)[0];
       if (lastMember === summary.currentUser) {
         return { userId: summary.currentUser, isLastMember: true };
       }
-      const currentUser =
+
+      if (standupDto.isPrevUserPresent) {
+        if (summary.attendees.indexOf(summary.currentUser) === -1) {
+          summary.attendees.push(summary.currentUser);
+        }
+        if (summary.absentUsers.indexOf(summary.currentUser) !== -1) {
+          summary.absentUsers = summary.absentUsers.filter(
+            (x) => x !== summary.currentUser,
+          );
+        }
+      } else {
+        if (summary.absentUsers.indexOf(summary.currentUser) === -1) {
+          summary.absentUsers.push(summary.currentUser);
+        }
+        if (summary.attendees.indexOf(summary.currentUser) !== -1) {
+          summary.attendees = summary.attendees.filter(
+            (x) => x !== summary.currentUser,
+          );
+        }
+      }
+
+      const nextUser =
         summary.users[summary.users.indexOf(summary.currentUser) + 1];
-      summary.currentUser = currentUser;
+      summary.currentUser = nextUser;
+
       this.summaryRepository.update(summary.id, summary);
       return {
         userId: summary.currentUser,
-        isLastMember: lastMember === currentUser,
+        isLastMember: lastMember === nextUser,
       };
-    } else if (nextDto.direction === 'previous') {
+
+    } else if (standupDto.direction === 'previous') {
+
       const firstMember = summary.users[0];
+
       if (firstMember === summary.currentUser) {
         return { userId: summary.currentUser, isLastMember: false };
       }
 
-      const currentUser =
+      summary.currentUser =
         summary.users[summary.users.indexOf(summary.currentUser) - 1];
-      summary.currentUser = currentUser;
-      this.summaryRepository.update(summary.id, summary);
+      await this.summaryRepository.update(summary.id, summary);
       return { userId: summary.currentUser, isLastMember: false };
     }
   }
