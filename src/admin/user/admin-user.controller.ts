@@ -17,11 +17,7 @@ import { UpdateAdminUserDto } from './dto/update-user.dto';
 @ApiTags('admin-users')
 @ApiBearerAuth()
 @UseGuards(AdminRoleGuard)
-<<<<<<< HEAD
-@Controller('admin-user')
-=======
 @Controller('/admin/users')
->>>>>>> dev
 export class AdminUserController {
   constructor(private readonly userService: AdminUserService) {}
 
