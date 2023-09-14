@@ -257,7 +257,6 @@ export class WorkspaceService {
       .where('workspaces.id = :id', { id })
       .execute();
 
-    const restoredWorkspace = await this.workspaceRepository.findOneBy({ id });
-    return restoredWorkspace;
+    return await this.workspaceRepository.findOneBy({ id });
   }
 }

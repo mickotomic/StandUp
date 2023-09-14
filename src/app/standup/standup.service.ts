@@ -107,7 +107,7 @@ export class StandupService {
     });
 
     await this.tasksRepository.query(
-      `UPDATE tasks SET summaryId = ? WHERE workspaceId = ? AND summaryId IS NULL AND status = 'done'`,
+      'UPDATE tasks SET summaryId = ? WHERE workspaceId = ? AND summaryId IS NULL AND status = "done"',
       [existingStartedStandup.id, workspaceId],
     );
 
@@ -187,10 +187,9 @@ export class StandupService {
         return { userId: summary.currentUser, isLastMember: false };
       }
 
-      const currentUser =
+      summary.currentUser =
         summary.users[summary.users.indexOf(summary.currentUser) - 1];
-      summary.currentUser = currentUser;
-      this.summaryRepository.update(summary.id, summary);
+      await this.summaryRepository.update(summary.id, summary);
       return { userId: summary.currentUser, isLastMember: false };
     }
   }
