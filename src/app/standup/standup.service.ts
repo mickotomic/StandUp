@@ -70,6 +70,8 @@ export class StandupService {
       startedAt: new Date(),
       users: usersIds,
       currentUser: shuffledUsers[0].id,
+      absentUsers: [],
+      attendees: []
     });
 
     return { shuffledUsers, count };
