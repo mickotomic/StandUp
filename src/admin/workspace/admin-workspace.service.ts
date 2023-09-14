@@ -44,7 +44,11 @@ export class AdminWorkspaceService {
       throw new BadRequestException(returnMessages.WorkspaceNotFound);
     }
 
+<<<<<<< HEAD
+    await this.workspaceRepository.save({
+=======
     return await this.workspaceRepository.save({
+>>>>>>> dev
       ...workspace,
       isActive: !workspace.isActive,
       deletedAt: workspace.isActive ? new Date() : null,

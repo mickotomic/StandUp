@@ -11,6 +11,7 @@ import calculateSubscriptionPrice from 'src/helpers/calculate-subscription-price
 import { generatePDF } from 'src/helpers/generate-pdf-invoice.helper';
 import getDateDifference from 'src/helpers/get-date-difference.helper';
 import { sendMail } from 'src/helpers/send-mail.helper';
+import { MailDataT } from 'src/types/mail-data.type';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -86,28 +87,32 @@ export class CronSubscriptionService {
         getDateDifference(new Date(), subscription[i].createdAt),
       );
       const numberOfDays = days === 12 ? 2 : 1;
+      const mailDataNotice: MailDataT = {
+        email: ownersEmail,
+        subject: `your subscription will be cancelled in ${numberOfDays} days!`,
+        template: 'workspace-deletion-notice',
+        context: {
+          workspaceName: subscription[i].workspace.projectName,
+          numOfDays: numberOfDays,
+        },
+        mailerService: this.mailerService,
+      };
+
+      const mailDataBlocked: MailDataT = {
+        email: ownersEmail,
+        subject: 'Your workspace has been blocked',
+        template: 'workspace-deletion-confirmed',
+        context: {
+          workspaceName: subscription[i].workspace.projectName,
+        },
+        mailerService: this.mailerService,
+      };
+
       if (days === 12 || days === 13) {
-        sendMail(
-          ownersEmail,
-          `your subscription will be cancelled in ${numberOfDays} days!`,
-          'workspace-deletion-notice',
-          {
-            workspaceName: subscription[i].workspace.projectName,
-            numOfDays: numberOfDays,
-          },
-          this.mailerService,
-        );
+        sendMail(mailDataNotice);
       }
       if (days >= 14 && days <= 16) {
-        sendMail(
-          ownersEmail,
-          'Your workspace has been blocked',
-          'workspace-deletion-confirmed',
-          {
-            workspaceName: subscription[i].workspace.projectName,
-          },
-          this.mailerService,
-        );
+        sendMail(mailDataBlocked);
 
         this.workspaceRepository.update(
           { id: subscription[i].workspace.id },

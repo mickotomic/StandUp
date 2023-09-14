@@ -9,7 +9,6 @@ import { SummaryService } from './summary.service';
 @Controller('/app/summary')
 export class SummaryController {
   constructor(private readonly summaryService: SummaryService) {}
-
   @ApiQuery({ name: 'page', required: false, type: 'number' })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
   @ApiBearerAuth()

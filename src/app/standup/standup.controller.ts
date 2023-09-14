@@ -13,12 +13,12 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
+import { Workspace } from 'src/entities/workspace.entity';
+import { UsersWithTasksT } from 'src/types/user-with-tasks.type';
 import { UserWorkspaceGuard } from 'src/guards/user-workspace.guard';
-import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
 import { FinishStandupDto } from './dto/finishStandup.dto';
-import { Workspace } from 'src/entities/workspace.entity';
 
 @ApiTags('app-standup')
 @ApiBearerAuth()
@@ -31,7 +31,7 @@ export class StandupController {
   @Post('/:workspaceId/start-standup')
   async startStandup(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
-  ): Promise<{ shuffledUsers: UsersWidthTasksT[]; count: number }> {
+  ): Promise<{ shuffledUsers: UsersWithTasksT[]; count: number }> {
     return await this.standupService.startStandup(+workspaceId);
   }
 
