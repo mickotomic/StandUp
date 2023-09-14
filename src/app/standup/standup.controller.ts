@@ -13,10 +13,12 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
+import { UserWorkspaceGuard } from 'src/guards/user-workspace.guard';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
 import { FinishStandupDto } from './dto/finishStandup.dto';
+import { Workspace } from 'src/entities/workspace.entity';
 
 @ApiTags('app-standup')
 @ApiBearerAuth()
@@ -25,8 +27,7 @@ import { FinishStandupDto } from './dto/finishStandup.dto';
 export class StandupController {
   constructor(private readonly standupService: StandupService) {}
 
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UserWorkspaceGuard)
   @Post('/:workspaceId/start-standup')
   async startStandup(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
@@ -34,9 +35,12 @@ export class StandupController {
     return await this.standupService.startStandup(+workspaceId);
   }
 
+
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Put('/:workspaceId/finish-standup')
+  @UseGuards(UserWorkspaceGuard)
+  
   async finishStandup(
     @Body() dto: FinishStandupDto,
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
@@ -48,6 +52,7 @@ export class StandupController {
     description: `This endpoint should be used for fetching current 
     standup status in intervals`,
   })
+  @UseGuards(UserWorkspaceGuard)
   @Get('/:workspaceId/polling')
   async getCurrentUser(
     @GetUser() user: User,
@@ -56,6 +61,7 @@ export class StandupController {
     userId?: number;
     isStandupInProgress: boolean;
     isLastMember: boolean;
+    usersTasks: User[];
   }> {
     return await this.standupService.getCurrentUser(+workspaceId, user);
   }
@@ -67,5 +73,17 @@ export class StandupController {
     @GetUser() user: User,
   ) {
     return await this.standupService.next(+workspaceId, standupDto, user);
+ }
+
+  @ApiOperation({
+    description:
+      'This endpoint return all user worksapces with active standups',
+  })
+  @Get('/active')
+  async getUserActiveStandups(
+    @GetUser() user: User,
+  ): Promise<{ workspaces: Workspace[] }> {
+    return await this.standupService.getUserActiveStandups(user);
+
   }
 }

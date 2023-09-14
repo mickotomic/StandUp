@@ -9,20 +9,27 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
-import { AdminRoleGuard } from 'src/auth/admin-role.guard';
 import { User } from 'src/entities/user.entity';
+import { AdminRoleGuard } from 'src/guards/admin-role.guard';
 import { AdminUserService } from './admin-user.service';
 import { UpdateAdminUserDto } from './dto/update-user.dto';
 
 @ApiTags('admin-users')
 @ApiBearerAuth()
 @UseGuards(AdminRoleGuard)
-@Controller('admin-user')
+@Controller('/admin/users')
 export class AdminUserController {
   constructor(private readonly userService: AdminUserService) {}
 
   @ApiQuery({ name: 'page', required: false, type: 'number' })
   @ApiQuery({ name: 'limit', required: false, type: 'number' })
+  @ApiQuery({ name: 'search', required: false, type: 'string' })
+  @ApiQuery({
+    name: 'filter.isActive',
+    required: false,
+    type: 'string',
+    description: 'Accepts 1 or 0 (as true or false)',
+  })
   @Get()
   async getUsersList(
     @Paginate() query: PaginateQuery,

@@ -21,7 +21,11 @@ export const returnMessages = Object.freeze({
 
   WorkspaceNotFound: 'Workspace not found!',
 
+  WorkspaceNotDeleted: 'No need for restoring workspace!',
+
   WorkspaceOwnerInvite: 'Only workspace owners can invite users!',
+
+  ProjectNameLength: 'projectName must be between 1 and 255 characters!',
 
   TokenNotValid: 'Token is not valid!',
 
@@ -45,11 +49,19 @@ export const returnMessages = Object.freeze({
 
   UserDoesNotExistsInWorkspace: 'User does not exist in workspace',
 
-  UserAlradyVerified: 'User is already verified',
+  UserAlreadyVerified: 'User is already verified',
 
   BooleanValueExpected: 'Can be "true" or "false"!',
 
   UserDoesNotBelong: 'User does not belong to this workspace!',
 
   TaskNotFound: 'Task not found!',
+
+  SubscriptionNotFound: 'Subscription not found!',
+
+  PaymentFailed: 'Payment failed!',
+
+  PaymentCanceled: 'Payment canceled!',
+
+  EmailWidthInvoice: 'Email width invoice is not sent!',
 });
