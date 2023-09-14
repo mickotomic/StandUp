@@ -4,8 +4,8 @@ import { IsBoolean, IsOptional } from "class-validator";
 
 
 export class FinishStandupDto {
-    @ApiProperty()
-    @IsBoolean()
-    @IsOptional()
-    isPrevUserPresent: boolean;
+  @ApiProperty()
+  @IsBoolean()
+  @IsOptional()
+  isPrevUserPresent: boolean;
 }
