@@ -6,18 +6,19 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/decorator/get-user.decorator';
 import { User } from 'src/entities/user.entity';
-import { Workspace } from 'src/entities/workspace.entity';
 import { UserWorkspaceGuard } from 'src/guards/user-workspace.guard';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
-import { NextDto } from './dto/next.dto';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
+import { FinishStandupDto } from './dto/finishStandup.dto';
+import { Workspace } from 'src/entities/workspace.entity';
 
 @ApiTags('app-standup')
 @ApiBearerAuth()
@@ -34,16 +35,17 @@ export class StandupController {
     return await this.standupService.startStandup(+workspaceId);
   }
 
+
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Put('/:workspaceId/finish-standup')
   @UseGuards(UserWorkspaceGuard)
-  @Post('/:workspaceId/finish-standup')
+  
   async finishStandup(
-    @Body() dto: StandupDto,
+    @Body() dto: FinishStandupDto,
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ) {
-    return await this.standupService.finishStandup(
-      +workspaceId,
-      dto.absentUsersId,
-    );
+    return await this.standupService.finishStandup(+workspaceId, dto);
   }
 
   @ApiOperation({
@@ -64,15 +66,14 @@ export class StandupController {
     return await this.standupService.getCurrentUser(+workspaceId, user);
   }
 
-  @UseGuards(UserWorkspaceGuard)
   @Patch('/:workspaceId')
   async next(
     @Param('workspaceId') workspaceId: number,
-    @Body() nextDto: NextDto,
+    @Body() standupDto: StandupDto,
     @GetUser() user: User,
   ) {
-    return await this.standupService.next(+workspaceId, nextDto, user);
-  }
+    return await this.standupService.next(+workspaceId, standupDto, user);
+ }
 
   @ApiOperation({
     description:
@@ -83,5 +84,6 @@ export class StandupController {
     @GetUser() user: User,
   ): Promise<{ workspaces: Workspace[] }> {
     return await this.standupService.getUserActiveStandups(user);
+
   }
 }
