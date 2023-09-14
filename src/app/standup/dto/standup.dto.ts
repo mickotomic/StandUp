@@ -1,16 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsBoolean,
+  IsIn,
+  IsOptional,
+} from 'class-validator';
 
 export class StandupDto {
-  @ApiProperty({ type: [Number] })
-  @IsArray()
-  @IsNumber({}, { each: true })
-  absentUsersId: number[];
+  @ApiProperty()
+  @IsIn(['next', 'previous'])
+  direction: string;
 
-  
   @ApiProperty()
   @IsBoolean()
   @IsOptional()
   isPrevUserPresent: boolean;
-
 }

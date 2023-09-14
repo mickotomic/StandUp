@@ -12,7 +12,6 @@ import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { Repository } from 'typeorm';
-import { NextDto } from './dto/next.dto';
 import { StandupDto } from './dto/standup.dto';
 
 @Injectable()
@@ -75,7 +74,12 @@ export class StandupService {
     return { shuffledUsers, count };
   }
 
-  async finishStandup(workspaceId: number, absentUsers: number[], standupDto: StandupDto) {
+  async finishStandup(
+    workspaceId: number,
+    // attendees: number,
+    // absentUsers: number,
+    standupDto: StandupDto
+  ) {
     const existingStartedStandup = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -86,29 +90,50 @@ export class StandupService {
     if (!existingStartedStandup) {
       throw new BadRequestException(returnMessages.NoStandupForWorkspace);
     }
-    if (standupDto.isPrevUserPresent){
-      existingStartedStandup.absentUsers.push(existingStartedStandup.currentUser);
+    if (standupDto.isPrevUserPresent) {
+      //if (existingStartedStandup.attendees.indexOf(existingStartedStandup.currentUser) === -1){
+        existingStartedStandup.attendees.push(existingStartedStandup.currentUser);
+      // }
+      // if(existingStartedStandup.absentUsers.indexOf(existingStartedStandup.currentUser) !== -1){
+      //   existingStartedStandup.absentUsers = existingStartedStandup.absentUsers.filter( x => x !== existingStartedStandup.currentUser)
+      // }
+    } else {
+      // if (existingStartedStandup.absentUsers.indexOf(existingStartedStandup.currentUser) === -1){
+        existingStartedStandup.absentUsers.push(existingStartedStandup.currentUser);
+      // }
+      // if(existingStartedStandup.attendees.indexOf(existingStartedStandup.currentUser) !== -1){
+      //   existingStartedStandup.attendees= existingStartedStandup.attendees.filter( x => x !== existingStartedStandup.currentUser)
+      // }
     }
+
+    // if (attendees.every((element) => usersIds.includes(element))) {
+    //   attendees.slice(-1);
+    // } else {
+    //   existingStartedStandup.absentUsers.push(
+    //     existingStartedStandup.currentUser,
+    //   );
+    // }
+
 
     const timeSpent =
       new Date().getTime() - existingStartedStandup.startedAt.getTime();
 
-    const users = await this.userRepository.find({
-      where: {
-        workspaces: { workspace: { id: workspaceId } },
-        tasks: { summary: null },
-      },
-    });
+  //   const users = await this.userRepository.find({
+  //     where: {
+  //       workspaces: { workspace: { id: workspaceId } },
+  //       tasks: { summary: null },
+  //     },
+  //   });
 
-    const usersIds = users.map((user) => user.id);
+  //  const usersIds = users.map((user) => user.id);
 
-    if (!absentUsers.every((element) => usersIds.includes(element))) {
-      throw new BadRequestException(returnMessages.UsersNotInWorkspace);
-    }
+  //   if (!absentUsers.every((element) => usersIds.includes(element))) {
+  //     throw new BadRequestException(returnMessages.UsersNotInWorkspace);
+  //   }
 
-    const attendeesIds = usersIds.filter((id) => {
-      return absentUsers.indexOf(id) === -1;
-    });
+  //   const attendeesIds = usersIds.filter((id) => {
+  //     return absentUsers.indexOf(id) === -1;
+  //   });
 
     await this.tasksRepository.query(
       'UPDATE tasks SET summaryId = ? WHERE workspaceId = ?',
@@ -139,15 +164,14 @@ export class StandupService {
         tasksDue.push(task.id);
       }
 
-      if (deadline < date && task.status !== 'done')
-       tasksPastDue.push(task.id);
+      if (deadline < date && task.status !== 'done') tasksPastDue.push(task.id);
     });
 
     await this.summaryRepository.update(existingStartedStandup.id, {
       finishedAt: new Date(),
       timespent: timeSpent,
-      absentUsers: absentUsers,
-      attendees: attendeesIds,
+       absentUsers: existingStartedStandup.absentUsers,
+       attendees: existingStartedStandup.attendees,
       tasksCompleted,
       tasksDue,
       tasksPastDue,
@@ -156,7 +180,7 @@ export class StandupService {
     return { message: returnMessages.StandupFinished };
   }
 
-  async next(workspaceId: number, nextDto: NextDto, user: User) {
+  async next(workspaceId: number, standupDto: StandupDto, user: User) {
     const summary = await this.summaryRepository
       .createQueryBuilder('summary')
       .where('summary.workspace = :workspaceId', { workspaceId })
@@ -173,32 +197,47 @@ export class StandupService {
         returnMessages.UserDoesNotExistsInWorkspace,
       );
     }
-    if (nextDto.direction === 'next') {
+    if (standupDto.direction === 'next') {
       const lastMember = summary.users.slice(-1)[0];
       if (lastMember === summary.currentUser) {
         return { userId: summary.currentUser, isLastMember: true };
       }
-      if (nextDto.isPrevUserPresent){
-        summary.absentUsers.push(summary.currentUser);
+
+      if (standupDto.isPrevUserPresent) {
+        if (summary.attendees.indexOf(summary.currentUser) === -1){
+          summary.attendees.push(summary.currentUser);
+        }
+        if(summary.absentUsers.indexOf(summary.currentUser) !== -1){
+          summary.absentUsers = summary.absentUsers.filter( x => x !== summary.currentUser)
+        }
+      } else {
+        if (summary.absentUsers.indexOf(summary.currentUser) === -1){
+          summary.absentUsers.push(summary.currentUser);
+        }
+        if(summary.attendees.indexOf(summary.currentUser) !== -1){
+          summary.attendees= summary.attendees.filter( x => x !== summary.currentUser)
+        }
       }
-      const currentUser =
-        summary.users[summary.users.indexOf(summary.currentUser) + 1];
-      summary.currentUser = currentUser;
+
+      const nextUser = summary.users[summary.users.indexOf(summary.currentUser) + 1];
+      summary.currentUser = nextUser;
+     
       this.summaryRepository.update(summary.id, summary);
       return {
         userId: summary.currentUser,
-        isLastMember: lastMember === currentUser,
+        isLastMember: lastMember === nextUser,
       };
-    } else if (nextDto.direction === 'previous') {
+    } else if (standupDto.direction === 'previous') {
       const firstMember = summary.users[0];
+
       if (firstMember === summary.currentUser) {
         return { userId: summary.currentUser, isLastMember: false };
       }
       const currentUser =
         summary.users[summary.users.indexOf(summary.currentUser) - 1];
-      summary.currentUser = currentUser;
-      this.summaryRepository.update(summary.id, summary);
-      return { userId: summary.currentUser, isLastMember: false };
+       summary.currentUser = currentUser;
+       this.summaryRepository.update(summary.id, summary);
+       return { userId: summary.currentUser, isLastMember: false };
     }
   }
 

@@ -16,8 +16,6 @@ import { User } from 'src/entities/user.entity';
 import { UsersWidthTasksT } from 'src/types/user-width-tasks.type';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
-import { NextDto } from './dto/next.dto';
-
 
 @ApiTags('app-standup')
 @ApiBearerAuth()
@@ -40,14 +38,9 @@ export class StandupController {
   @Put('/:workspaceId/finish-standup')
   async finishStandup(
     @Body() dto: StandupDto,
-    @Body() standupDto: StandupDto,
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ) {
-    return await this.standupService.finishStandup(
-      +workspaceId,
-      dto.absentUsersId,
-      standupDto
-    );
+    return await this.standupService.finishStandup( +workspaceId, dto );
   }
 
   @ApiOperation({
@@ -69,9 +62,9 @@ export class StandupController {
   @Patch('/:workspaceId')
   async next(
     @Param('workspaceId') workspaceId: number,
-    @Body() nextDto: NextDto,
+    @Body() standupDto: StandupDto,
     @GetUser() user: User,
   ) {
-    return await this.standupService.next(+workspaceId, nextDto, user);
+    return await this.standupService.next(+workspaceId, standupDto, user);
   }
 }
