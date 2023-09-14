@@ -10,9 +10,9 @@ export type MailDataT = {
 };
 
 export type ContextT = {
-  workspaceName?: string,
-  numOfDays?: number,
-  userName?: string,
-  token?: string,
-  link?: string,
-}
+  workspaceName?: string;
+  numOfDays?: number;
+  userName?: string;
+  token?: string;
+  link?: string;
+};
