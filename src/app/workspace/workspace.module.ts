@@ -18,8 +18,8 @@ import { WorkspaceService } from './workspace.service';
     TypeOrmModule.forFeature([Workspace, User, UserToken, UserWorkspace]),
     BullModule.registerQueue({
       limiter: {
-        max: +process.env.QUEUES_LIMITER_MAX,
-        duration: +process.env.QUEUES_LIMITER_DURATION,
+        max: +process.env.QUEUES_LIMITER_MAX || 5,
+        duration: +process.env.QUEUES_LIMITER_DURATION || 5000,
       },
       name: 'workspace',
     }),
