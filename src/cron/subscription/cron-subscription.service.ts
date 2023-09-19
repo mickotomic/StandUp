@@ -72,7 +72,7 @@ export class CronSubscriptionService {
 
   @Cron('0 0 5 * * *')
   async paymentChecking() {
-    const subscription = await this.subscriptionRepository
+    const subscriptions = await this.subscriptionRepository
       .createQueryBuilder('subscription')
       .leftJoinAndSelect('subscription.workspace', 'workspace')
       .leftJoinAndSelect('workspace.owner', 'owner')
@@ -80,10 +80,10 @@ export class CronSubscriptionService {
       .andWhere('subscription.status <> :status', { status: 'paid' })
       .getMany();
 
-    for (let i = 0; i < subscription.length; i++) {
-      const ownersEmail = subscription[i].workspace.owner.email;
+    for (let i = 0; i < subscriptions.length; i++) {
+      const ownersEmail = subscriptions[i].workspace.owner.email;
       const days = Math.floor(
-        getDateDifference(new Date(), subscription[i].createdAt),
+        getDateDifference(new Date(), subscriptions[i].createdAt),
       );
       const numberOfDays = days === 12 ? 2 : 1;
       if (days === 12 || days === 13) {
@@ -92,7 +92,7 @@ export class CronSubscriptionService {
           `your subscription will be cancelled in ${numberOfDays} days!`,
           'workspace-deletion-notice',
           {
-            workspaceName: subscription[i].workspace.projectName,
+            workspaceName: subscriptions[i].workspace.projectName,
             numOfDays: numberOfDays,
           },
           this.mailerService,
@@ -104,13 +104,13 @@ export class CronSubscriptionService {
           'Your workspace has been blocked',
           'workspace-deletion-confirmed',
           {
-            workspaceName: subscription[i].workspace.projectName,
+            workspaceName: subscriptions[i].workspace.projectName,
           },
           this.mailerService,
         );
 
         this.workspaceRepository.update(
-          { id: subscription[i].workspace.id },
+          { id: subscriptions[i].workspace.id },
           { isActive: false, deletedAt: new Date() },
         );
       }
