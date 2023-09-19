@@ -18,7 +18,7 @@ import { UsersWithTasksT } from 'src/types/user-with-tasks.type';
 import { UserWorkspaceGuard } from 'src/guards/user-workspace.guard';
 import { StandupDto } from './dto/standup.dto';
 import { StandupService } from './standup.service';
-import { FinishStandupDto } from './dto/finishStandup.dto';
+import { FinishStandupDto } from './dto/finish-standup.dto';
 
 @ApiTags('app-standup')
 @ApiBearerAuth()

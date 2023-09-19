@@ -13,7 +13,7 @@ import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { shuffle } from 'src/helpers/shuffle.helper';
 import { UsersWithTasksT } from 'src/types/user-with-tasks.type';
 import { StandupDto } from './dto/standup.dto';
-import { FinishStandupDto } from './dto/finishStandup.dto';
+import { FinishStandupDto } from './dto/finish-standup.dto';
 
 import { IsNull, Repository } from 'typeorm';
 
