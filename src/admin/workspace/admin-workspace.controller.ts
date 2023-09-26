@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
-import { AdminRoleGuard } from 'src/auth/admin-role.guard';
 import { Workspace } from 'src/entities/workspace.entity';
+import { AdminRoleGuard } from 'src/guards/admin-role.guard';
 import { AdminWorkspaceService } from './admin-workspace.service';
 
 @ApiTags('admin-workspaces')

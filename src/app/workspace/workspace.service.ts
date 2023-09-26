@@ -149,7 +149,7 @@ export class WorkspaceService {
     email: string,
   ): Promise<{ userExists: boolean }> {
     const user = await this.userRepository.findOneBy({ email });
-    return { userExists: user ? true : false };
+    return { userExists: !!user };
   }
 
   public async createWorkspace(
@@ -257,7 +257,6 @@ export class WorkspaceService {
       .where('workspaces.id = :id', { id })
       .execute();
 
-    const restoredWorkspace = await this.workspaceRepository.findOneBy({ id });
-    return restoredWorkspace;
+    return await this.workspaceRepository.findOneBy({ id });
   }
 }

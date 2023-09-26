@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
-import { AdminRoleGuard } from 'src/auth/admin-role.guard';
 import { Subscription } from 'src/entities/subscription.entity';
+import { AdminRoleGuard } from 'src/guards/admin-role.guard';
 import { AdminSubscriptionService } from './admin-subscription.service';
 import { UpdateAdminSubscriptionDto } from './dto/update-subscription.dto';
 

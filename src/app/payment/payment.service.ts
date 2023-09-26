@@ -8,6 +8,7 @@ import { Subscription } from 'src/entities/subscription.entity';
 import { returnMessages } from 'src/helpers/error-message-mapper.helper';
 import { generatePDFWidthStatus } from 'src/helpers/pdf-invoice-width-status.helper';
 import { sendMail } from 'src/helpers/send-mail.helper';
+import { MailDataT } from 'src/types/mail-data.type';
 import Stripe from 'stripe';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -101,13 +102,15 @@ export class PaymentService {
         subscription.price,
       );
 
-      const isMailSent = await sendMail(
-        subscription.workspace.owner.email,
-        'StandUp invoice',
-        'invoice-email',
-        { projectName: subscription.workspace.projectName },
-        this.mailerService,
-        [
+      const mailData: MailDataT = {
+        email: subscription.workspace.owner.email,
+        subject: 'StandUp invoice',
+        template: 'invoice-email',
+        context: {
+          workspaceName: subscription.workspace.projectName,
+        },
+        mailerService: this.mailerService,
+        attachments: [
           {
             filename: 'invoice.pdf',
             path: join(
@@ -116,7 +119,9 @@ export class PaymentService {
             ),
           },
         ],
-      );
+      };
+
+      const isMailSent = await sendMail(mailData);
       if (isMailSent) {
         rmSync(
           join(
@@ -149,13 +154,15 @@ export class PaymentService {
         subscription.price,
       );
 
-      const isMailSent = await sendMail(
-        subscription.workspace.owner.email,
-        'StandUp invoice',
-        'invoice-email',
-        { projectName: subscription.workspace.projectName },
-        this.mailerService,
-        [
+      const mailData: MailDataT = {
+        email: subscription.workspace.owner.email,
+        subject: 'StandUp invoice',
+        template: 'invoice-email',
+        context: {
+          workspaceName: subscription.workspace.projectName,
+        },
+        mailerService: this.mailerService,
+        attachments: [
           {
             filename: 'invoice.pdf',
             path: join(
@@ -164,7 +171,9 @@ export class PaymentService {
             ),
           },
         ],
-      );
+      };
+
+      const isMailSent = await sendMail(mailData);
       if (isMailSent) {
         rmSync(
           join(

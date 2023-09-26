@@ -11,6 +11,7 @@ import calculateSubscriptionPrice from 'src/helpers/calculate-subscription-price
 import { generatePDF } from 'src/helpers/generate-pdf-invoice.helper';
 import getDateDifference from 'src/helpers/get-date-difference.helper';
 import { sendMail } from 'src/helpers/send-mail.helper';
+import { MailDataT } from 'src/types/mail-data.type';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -72,7 +73,7 @@ export class CronSubscriptionService {
 
   @Cron('0 0 5 * * *')
   async paymentChecking() {
-    const subscription = await this.subscriptionRepository
+    const subscriptions = await this.subscriptionRepository
       .createQueryBuilder('subscription')
       .leftJoinAndSelect('subscription.workspace', 'workspace')
       .leftJoinAndSelect('workspace.owner', 'owner')
@@ -80,37 +81,41 @@ export class CronSubscriptionService {
       .andWhere('subscription.status <> :status', { status: 'paid' })
       .getMany();
 
-    for (let i = 0; i < subscription.length; i++) {
-      const ownersEmail = subscription[i].workspace.owner.email;
+    for (let i = 0; i < subscriptions.length; i++) {
+      const ownersEmail = subscriptions[i].workspace.owner.email;
       const days = Math.floor(
-        getDateDifference(new Date(), subscription[i].createdAt),
+        getDateDifference(new Date(), subscriptions[i].createdAt),
       );
       const numberOfDays = days === 12 ? 2 : 1;
+      const mailDataNotice: MailDataT = {
+        email: ownersEmail,
+        subject: `your subscription will be cancelled in ${numberOfDays} days!`,
+        template: 'workspace-deletion-notice',
+        context: {
+          workspaceName: subscriptions[i].workspace.projectName,
+          numOfDays: numberOfDays,
+        },
+        mailerService: this.mailerService,
+      };
+
+      const mailDataBlocked: MailDataT = {
+        email: ownersEmail,
+        subject: 'Your workspace has been blocked',
+        template: 'workspace-deletion-confirmed',
+        context: {
+          workspaceName: subscriptions[i].workspace.projectName,
+        },
+        mailerService: this.mailerService,
+      };
+
       if (days === 12 || days === 13) {
-        sendMail(
-          ownersEmail,
-          `your subscription will be cancelled in ${numberOfDays} days!`,
-          'workspace-deletion-notice',
-          {
-            workspaceName: subscription[i].workspace.projectName,
-            numOfDays: numberOfDays,
-          },
-          this.mailerService,
-        );
+        sendMail(mailDataNotice);
       }
       if (days >= 14 && days <= 16) {
-        sendMail(
-          ownersEmail,
-          'Your workspace has been blocked',
-          'workspace-deletion-confirmed',
-          {
-            workspaceName: subscription[i].workspace.projectName,
-          },
-          this.mailerService,
-        );
+        sendMail(mailDataBlocked);
 
         this.workspaceRepository.update(
-          { id: subscription[i].workspace.id },
+          { id: subscriptions[i].workspace.id },
           { isActive: false, deletedAt: new Date() },
         );
       }

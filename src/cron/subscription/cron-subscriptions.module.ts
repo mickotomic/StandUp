@@ -14,8 +14,8 @@ import { CronSubscriptionService } from './cron-subscription.service';
     TypeOrmModule.forFeature([Workspace, Subscription, SubscriptionItems]),
     BullModule.registerQueue({
       limiter: {
-        max: +process.env.QUEUES_LIMITER_MAX,
-        duration: +process.env.QUEUES_LIMITER_DURATION,
+        max: +process.env.QUEUES_LIMITER_MAX || 5,
+        duration: +process.env.QUEUES_LIMITER_DURATION || 5000,
       },
       name: 'invoice-email',
     }),

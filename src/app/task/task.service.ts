@@ -13,7 +13,7 @@ export class TaskService {
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
     @InjectRepository(UserWorkspace)
-    private userworkspaceRepository: Repository<UserWorkspace>,
+    private userWorkspaceRepository: Repository<UserWorkspace>,
   ) {}
 
   async getDefaultTaskList(
@@ -21,14 +21,6 @@ export class TaskService {
     user: User,
     isForCurrentUserOnly = '',
   ): Promise<{ tasks: Task[]; count: number }> {
-    const workspace = await this.userworkspaceRepository.findOne({
-      where: { user: { id: user.id }, workspace: { id: workspaceId } },
-    });
-
-    if (!workspace) {
-      throw new BadRequestException(returnMessages.UserDoesNotBelong);
-    }
-
     const qb = this.taskRepository
       .createQueryBuilder('tasks')
       .leftJoinAndSelect('tasks.user', 'user')
@@ -43,7 +35,7 @@ export class TaskService {
   }
 
   async createTask(user: User, dto: TaskDto): Promise<Task> {
-    const workspace = await this.userworkspaceRepository.findOne({
+    const workspace = await this.userWorkspaceRepository.findOne({
       where: { user: { id: user.id }, workspace: { id: dto.workspaceId } },
     });
 
@@ -74,7 +66,6 @@ export class TaskService {
     task.priority = dto.priority;
     task.status = dto.status;
     task.deadline = dto.deadline;
-
     return await this.taskRepository.save(task);
   }
 
