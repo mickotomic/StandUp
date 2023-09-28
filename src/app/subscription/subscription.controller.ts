@@ -7,14 +7,14 @@ import { User } from 'src/entities/user.entity';
 import { SubscriptionService } from './subscription.service';
 
 @ApiTags('app-subscriptions')
-@Controller('subscriptions')
+@Controller('/app/subscriptions')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get('/:workspaceId')
   async getWorkspaceSubscriptions(
-    @Param('workspaceId') workspaceId: string,
+    @Param('workspaceId') workspaceId: number,
     @Paginate() query: PaginateQuery,
     @GetUser() user: User,
   ) {
