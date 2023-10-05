@@ -1,9 +1,27 @@
-import { Controller } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Paginate, PaginateQuery } from 'nestjs-paginate';
+import { GetUser } from 'src/decorator/get-user.decorator';
+import { User } from 'src/entities/user.entity';
 import { SubscriptionService } from './subscription.service';
 
 @ApiTags('app-subscriptions')
-@Controller('subscriptions')
+@Controller('/app/subscriptions')
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/:workspaceId')
+  async getWorkspaceSubscriptions(
+    @Param('workspaceId') workspaceId: number,
+    @Paginate() query: PaginateQuery,
+    @GetUser() user: User,
+  ) {
+    return await this.subscriptionService.getWorkspaceSubscriptions(
+      +workspaceId,
+      query,
+      user,
+    );
+  }
 }
